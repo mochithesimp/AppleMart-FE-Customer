@@ -8,7 +8,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, onPageChange }) => {
     return (
-        <div className="px-6 py-4 flex items-center justify-between border-t">
+        <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5, 10].map((page) => (
                     <button
