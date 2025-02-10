@@ -1,5 +1,4 @@
 import Header from './../components/Header';
-import SearchBar from './../components/SearchBar';
 import CustomerTable from './../components/CustomerTable';
 import Pagination from './../components/Pagination';
 import Sidebar from './../components/Sidebar';
@@ -16,15 +15,18 @@ const AdminPage = () => {
       email: "vule@gmail.com",
       dateOfBirth: "11/29/2003"
     },
+    {
+      id: 2,
+      fullName: "Vu Le",
+      status: "Approved",
+      email: "vule@gmail.com",
+      dateOfBirth: "11/29/2003"
+    },
 
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const handleSearch = (value: string) => {
-    // Implement search functionality
-    console.log('Searching for:', value);
-  };
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
@@ -32,7 +34,6 @@ const AdminPage = () => {
         <TopBar />
         <div className="pt-16">
           <Header />
-          <SearchBar onSearch={handleSearch} />
           <div className="px-6">
             <CustomerTable customers={customers} />
             <Pagination currentPage={currentPage} onPageChange={setCurrentPage} />
