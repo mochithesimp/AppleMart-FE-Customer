@@ -9,7 +9,11 @@ const Navbar: React.FC = () => {
         <ul className="top-navbar-list">
           <li>Location: Thu Duc - HCM - VN</li>
 
-          <li>Tel: (+84) 3939393939</li>
+          <li className="product">
+          <Link to="/product">
+              <button>Product</button>
+            </Link>
+          </li>
 
           <li className="login">
             {/* <BsFillPeopleFill fontSize="1em" /> */}
