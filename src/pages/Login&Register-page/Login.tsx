@@ -8,12 +8,16 @@ import store from "../../assets/store.png";
 import safari from "../../assets/safari.png";
 import call from "../../assets/call.png";
 import "./Login.css";
+import { useState } from "react";
 const LoginPage = () => {
+  const [activeForm, setActiveForm] = useState<'login' | 'register'>('login');
+
   return (
-    <div className="all">
       <div className="loginContainers">
         <div className="form-container">
-          <div className="col col-1">
+          <div className="col col-1" style={{
+              borderRadius: activeForm === 'login' ? '0 30% 20% 0' : '0 20% 30% 0'
+            }}>
             <div className="image-layer">
               <img src={coin} className="form-image coin" alt="coin" />
               <img src={Project} className="form-image-main" alt="main" />
@@ -28,16 +32,31 @@ const LoginPage = () => {
           </div>
           <div className="col col-2">
             <div className="btn-box">
-              <button className="btn btn-1" id="login">
+              {/* <button className="btn btn-1" id="login">
+                Sign In
+              </button> */}
+              <button
+                className={`btn ${activeForm === 'login' ? 'active-btn' : ''}`}
+                onClick={() => setActiveForm('login')}
+              >
                 Sign In
               </button>
-              <button className="btn btn-2" id="register">
+              {/* <button className="btn btn-2" id="register">
+                Sign Up
+              </button> */}
+              <button
+                className={`btn ${activeForm === 'register' ? 'active-btn' : ''}`}
+                onClick={() => setActiveForm('register')}
+              >
                 Sign Up
               </button>
             </div>
 
             {/* Login Form Container */}
-            <div className="login-form">
+            <div className="login-form" style={{
+                left: activeForm === 'login' ? '50%' : '150%',
+                opacity: activeForm === 'login' ? 1 : 0
+              }}>
               <div className="form-title">
                 <span>Sign In</span>
               </div>
@@ -78,7 +97,10 @@ const LoginPage = () => {
             </div>
 
             {/* Register Form Container */}
-            <div className="register-form">
+            <div className="register-form" style={{
+                left: activeForm === 'register' ? '50%' : '-50%',
+                opacity: activeForm === 'register' ? 1 : 0
+              }}>
               <div className="form-title">
                 <span>Create Account</span>
               </div>
@@ -129,7 +151,6 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
