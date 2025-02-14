@@ -1,10 +1,10 @@
 // src/App.tsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/Home-page/Home";
-import LoginPage from "./pages/Login&Register-page/Login";
-import AdminPage from "./pages/Admin";
+import LoginPage from "./pages/Authentication-page/UserAuth";
 import ProductPage from "./pages/Product-page/Product";
-import ForPassPage from "./pages/ForgetPassword-page/ForgetPassword";
+import ForPassPage from "./pages/Authentication-page/ForgetPassword";
+import ChangePassPage from "./pages/Authentication-page/ChangePassword";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,8 +23,8 @@ const router = createBrowserRouter([
     element: <ForPassPage />,
   },
   {
-    path: '/Admin',
-    element: <AdminPage />,
+    path: '/ChangePass',
+    element: <ChangePassPage />,
   },
 ]);
 function App() {
