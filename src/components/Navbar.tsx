@@ -21,12 +21,6 @@ const Navbar: React.FC = () => {
               <button>Login</button>
             </Link>
           </li>
-          <li className="Admin">
-            {/* <BsFillPeopleFill fontSize="1em" /> */}
-            <Link to="/Admin">
-              <button>Admin</button>
-            </Link>
-          </li>
         </ul>
       </div>
     </nav>
