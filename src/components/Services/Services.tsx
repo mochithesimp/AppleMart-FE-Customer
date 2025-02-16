@@ -1,5 +1,4 @@
-import { Divide } from 'lucide-react';
-import React from 'react'
+
 import {
     FaCarSide,
     FaHeadphonesAlt,

@@ -1,5 +1,3 @@
-
-import React from 'react'
 import Heading from '../Shared/Heading';
 import ProductCard from './ProductCard';
 import Img1 from "../../assets/Product/p-1.jpg"

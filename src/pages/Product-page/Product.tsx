@@ -16,6 +16,7 @@ import Footer from "../../components/Footer/Footer";
 import Popup from "../../components/Popup/Popup";
 import { useState } from "react";
 
+
 const BannerData2 = {
     discount: "30% OFF",
     title: "Happy Hours",
@@ -59,6 +60,6 @@ const ProductPage = () => {
             <Popup orderPopup = {orderPopup}
             handleOrderPopup = {handleOrderPopup}></Popup>
         </div>
-    );
+    ); 
 };
 export default ProductPage;

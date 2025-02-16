@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { FaLocationArrow, FaMobileAlt } from "react-icons/fa";
 import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa6';
 
