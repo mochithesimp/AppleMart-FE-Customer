@@ -1,0 +1,124 @@
+.cart-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: initial;
+  flex-grow: 0;
+  align-self: initial;
+  flex-wrap: wrap;
+  padding: 80px 0;
+  transition: background-color 0.3s ease-in-out;
+}
+.cart-container > .e-con-inner {
+  flex-wrap: initial;
+  justify-content: initial;
+  align-items: initial;
+  align-content: initial;
+  flex-basis: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  align-self: auto;
+  flex-direction: column;
+}
+.e-con > .e-con-inner {
+  gap: 20px 20px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline-start: 0;
+  padding-inline-end: 0;
+  height: 100%;
+}
+.e-con,
+.e-con > .e-con-inner {
+  display: flex;
+}
+.heading-title {
+  color: #000000ff;
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 120%;
+}
+.elementor-widget {
+  height: 100%;
+}
+.e-cart__container {
+  display: grid;
+  flex-wrap: wrap;
+  grid-template-columns: 59% auto;
+  align-items: stretch;
+  grid-column-gap: 30px;
+  grid-row-gap: 30px;
+}
+
+.e-cart__colum-left,
+.e-cart__colum-right {
+  padding: 16px 30px;
+  margin: 0 0 30px 0;
+  border-width: 1px;
+  border-color: #d5d8dc;
+}
+table {
+  margin: 0 0 1.5em;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0;
+  font-family: inherit;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+}
+td,
+th {
+  font-weight: 400;
+  text-align: left;
+}
+.screen-reader-text {
+  clip: rect(1px, 1px, 1px, 1px);
+  word-wrap: normal !important;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  overflow-wrap: normal !important;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+}
+.minus-quantity,
+.plus-quantity {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  border: 1px solid #ccc;
+  /* border-radius: 3px; */
+  align-items: center;
+  cursor: pointer;
+}
+.input-text-qty,
+.minus-quantity,
+.plus-quantity {
+  background-color: transparent;
+  border-style: solid;
+  border-color: #d5d8dc;
+  /* border-radius: 3px; */
+  padding: 1px 2px;
+  text-align: center;
+  font-size: 14px;
+  min-height: 28px;
+  max-height: 28px;
+}
+.quantity input {
+  text-align: center;
+  width: 60px;
+  border: 1px solid #ccc;
+  border-radius: 0%;
+}
+.input-text-qty:focus {
+  outline: none;
+  border-color: #d5d8dc;
+  border: 1px solid #ccc;
+}

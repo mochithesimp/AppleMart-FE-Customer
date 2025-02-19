@@ -5,6 +5,8 @@ import LoginPage from "./pages/Authentication-page/UserAuth";
 import ProductPage from "./pages/Product-page/Product";
 import ForPassPage from "./pages/Authentication-page/ForgetPassword";
 import ChangePassPage from "./pages/Authentication-page/ChangePassword";
+import CartPage from "./pages/Cart-page/Cart";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: '/ChangePass',
     element: <ChangePassPage />,
+  },
+  {
+    path: '/Cart',
+    element: <CartPage />,
   },
 ]);
 function App() {
