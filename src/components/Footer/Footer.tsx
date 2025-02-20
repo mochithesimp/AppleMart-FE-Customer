@@ -37,7 +37,7 @@ const Footer = () => {
                         </p>
                         <p className='text-gray-500 mt-4'>Software Design</p>
                         <a
-                            href="https://www.facebook.com/vu.lethanh.5496?locale=vi_VN"
+                            href="https://www.facebook.com/leverrin.leh"
                             target="_blank"
                             className="inline-block bg-primary/90 text-white
                             py-2 px-4 mt-4 text-sm rounded-full"
