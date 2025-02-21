@@ -7,34 +7,39 @@ import ForPassPage from "./pages/Authentication-page/ForgetPassword";
 import ChangePassPage from "./pages/Authentication-page/ChangePassword";
 import CartPage from "./pages/Cart-page/Cart";
 import ProductMenu from "./pages/ProductMenu-page/ProductMenu";
+import ChatPage from "./pages/Chat-page/Chat";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
   },
   {
-    path: '/login',
+    path: "/login",
     element: <LoginPage />,
   },
   {
-    path: '/Product',
+    path: "/Product",
     element: <ProductPage />,
   },
   {
-    path: '/ForgetPass',
+    path: "/ForgetPass",
     element: <ForPassPage />,
   },
   {
-    path: '/ChangePass',
+    path: "/ChangePass",
     element: <ChangePassPage />,
   },
   {
-    path: '/Cart',
+    path: "/Cart",
     element: <CartPage />,
   },
   {
     path: '/ProductMenu',
     element: <ProductMenu/>,
+  },
+  {
+    path: "/Chat",
+    element: <ChatPage />,
   },
 ]);
 function App() {
