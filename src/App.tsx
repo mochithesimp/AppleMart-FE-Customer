@@ -6,6 +6,7 @@ import ProductPage from "./pages/Product-page/Product";
 import ForPassPage from "./pages/Authentication-page/ForgetPassword";
 import ChangePassPage from "./pages/Authentication-page/ChangePassword";
 import CartPage from "./pages/Cart-page/Cart";
+import ProductMenu from "./pages/ProductMenu-page/ProductMenu";
 import ChatPage from "./pages/Chat-page/Chat";
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/Cart",
     element: <CartPage />,
+  },
+  {
+    path: '/ProductMenu',
+    element: <ProductMenu/>,
   },
   {
     path: "/Chat",
