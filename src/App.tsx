@@ -6,7 +6,7 @@ import ProductPage from "./pages/Product-page/Product";
 import ForPassPage from "./pages/Authentication-page/ForgetPassword";
 import ChangePassPage from "./pages/Authentication-page/ChangePassword";
 import CartPage from "./pages/Cart-page/Cart";
-
+import ProductMenu from "./pages/ProductMenu-page/ProductMenu";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -31,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: '/Cart',
     element: <CartPage />,
+  },
+  {
+    path: '/ProductMenu',
+    element: <ProductMenu/>,
   },
 ]);
 function App() {

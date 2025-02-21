@@ -30,7 +30,7 @@ const Popup: React.FC<{
       <div className="menu-cart__container">
         <div
           ref={popupRef}
-          className="menu-cart__main dark:bg-zinc-800 dark:border-none "
+          className="menu-cart__main dark:bg-zinc-700 dark:border-none "
           style={{
             left: orderPopup === true ? "76%" : "100%",
             opacity: orderPopup === true ? 1 : 0,

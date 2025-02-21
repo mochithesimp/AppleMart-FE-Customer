@@ -15,7 +15,7 @@ const MenuLinks = [
   {
     id: 2,
     name: "Shop",
-    link: "/#shop",
+    link: "/ProductMenu",
   },
   {
     id: 3,
