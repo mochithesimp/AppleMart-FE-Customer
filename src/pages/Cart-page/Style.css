@@ -6,7 +6,7 @@
   flex-grow: 0;
   align-self: initial;
   flex-wrap: wrap;
-  padding: 80px 0;
+  padding-top: 80px;
   transition: background-color 0.3s ease-in-out;
 }
 .cart-container > .e-con-inner {
@@ -56,8 +56,14 @@
   padding: 16px 30px;
   margin: 0 0 30px 0;
   border-width: 1px;
+  border-radius: 3px;
   border-color: #d5d8dc;
 }
+.e-cart__colum-left {
+  height: 745px;
+  overflow-y: auto;
+}
+
 table {
   margin: 0 0 1.5em;
   width: 100%;
@@ -65,7 +71,7 @@ table {
   border-spacing: 0;
   border: 0;
   font-family: inherit;
-  font-size: 100%;
+  font-size: 18px;
   font-style: inherit;
   font-weight: inherit;
   margin: 0;
@@ -74,7 +80,7 @@ table {
 }
 td,
 th {
-  font-weight: 400;
+  /* font-weight: 400; */
   text-align: left;
 }
 .screen-reader-text {
@@ -121,4 +127,192 @@ th {
   outline: none;
   border-color: #d5d8dc;
   border: 1px solid #ccc;
+}
+
+.cart-form__contents tbody tr:first-child td {
+  border-top: 0;
+}
+
+.cart-form__contents tbody tr td {
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #d5d8dc;
+  padding: 20px 20px 20px 0;
+}
+.product-thumbnail > img {
+  width: 100px;
+  height: 100px;
+  display: block;
+  border-radius: 4px 4px 4px 4px;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.5);
+}
+
+.cart_totals {
+  float: none;
+  width: 100%;
+}
+
+.cart_totals h2 {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: none;
+  font-style: normal;
+  text-decoration: none;
+  line-height: 150%;
+  margin: 0 0 20px 0;
+  padding: 0 20px 8px 0;
+}
+.cart-subtotal > td {
+  text-align: right !important;
+  padding-top: 12px;
+  padding-bottom: 9px;
+}
+.cart-subtotal > div {
+  padding-top: 12px;
+  padding-bottom: 9px;
+}
+.shipping-totals > td {
+  text-align: left !important;
+  padding: 12px 0 9px 0;
+}
+.shipping-methods {
+  list-style: disc;
+  margin: 0 0 1.5em 3em;
+}
+.shipping-totals > td > div::before {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.order-total > td {
+  border-top-color: #69727d;
+  border-top-width: 2px;
+  text-align: right !important;
+  padding: 12px 0 9px 0;
+}
+.order-total > div {
+  border-top-color: #69727d;
+  border-top-width: 2px;
+  padding: 12px 0 9px 0;
+}
+.proceed-to-checkout {
+  display: flex;
+  padding: 0.7em 1em;
+
+  padding-bottom: 0;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.button-checkout {
+  padding: 17px 94px 17px 94px;
+  width: fit-content;
+  font-size: 18px;
+  text-align: center;
+  color: var(--checkout-button-normal-text-color, #fff);
+  background-color: black;
+  border-radius: 3px;
+  min-height: auto;
+  margin-bottom: 0;
+}
+
+.cart-subtotal__contents {
+  margin-bottom: 27px;
+}
+/* 
+.input-text {
+  color: #69727d;
+  background-color: #f9fafa;
+  border-radius: 3px;
+  border: 0;
+  padding: 16px;
+  font-size: 14px;
+}
+.select2-container {
+  margin-bottom: 4px;
+}
+.select2-selection--single {
+  color: #69727d;
+  background-color: #f9fafa;
+  border-radius: 0;
+  border: 0;
+  height: 45px;
+}
+ .select2-selection__rendered {
+  color: #69727D;
+  line-height: 45px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+} */
+
+.shipping-calulator-form {
+  margin-top: 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  transition: 
+    max-height 0.6s ease-in-out,
+    opacity 0.4s ease-in-out,
+    transform 0.4s ease-in-out;
+}
+.shipping-calulator-form.visible {
+  max-height: 500px; /* Điều chỉnh theo nội dung thực tế */
+  opacity: 1;
+  transform: translateY(0);
+}
+.dropdown-arrow {
+  margin-left: 8px;
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.shipping-calculator-button.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.select-country,
+.select-town-city {
+  transition: 
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.select-country:focus,
+.select-town-city:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+.form-row {
+  margin-bottom: 6px;
+  padding: 3px 0;
+}
+.form-row > select {
+  width: 100%;
+}
+.select-country {
+  background-color: #f9fafa;
+  line-height: 45px;
+
+  padding: 10px 16px;
+}
+.select-province, .select-district, .select-ward {
+  line-height: 45px;
+  color: #69727D;
+  padding: 12px 24px;
+  border-radius: 4px 4px 4px 4px;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+}
+.update-adress {
+  margin-bottom: 18px;
+}
+
+.bt-update-address {
+  padding: 17px 30px 17px 30px;
+  width: fit-content;
+  font-size: 18px;
+  text-align: center;
+  color: var(--checkout-button-normal-text-color, #fff);
+  background-color: black;
+  border-radius: 3px;
+  min-height: auto;
+  margin-bottom: 0;
 }

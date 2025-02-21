@@ -78,7 +78,7 @@ const NavbarforP = () => {
   }, [orderPopup]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 sticky z-40 w-[100%]">
+    <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 fixed z-40 w-[100%]">
       <div className="py-4">
         <div className="container flex justify-between items-center">
           <div className=" flex items-center gap-4">
