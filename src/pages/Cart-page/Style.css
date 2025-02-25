@@ -250,9 +250,7 @@ th {
   opacity: 0;
   overflow: hidden;
   transform: translateY(-10px);
-  transition: 
-    max-height 0.6s ease-in-out,
-    opacity 0.4s ease-in-out,
+  transition: max-height 0.6s ease-in-out, opacity 0.4s ease-in-out,
     transform 0.4s ease-in-out;
 }
 .shipping-calulator-form.visible {
@@ -271,9 +269,7 @@ th {
 
 .select-country,
 .select-town-city {
-  transition: 
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .select-country:focus,
@@ -294,9 +290,11 @@ th {
 
   padding: 10px 16px;
 }
-.select-province, .select-district, .select-ward {
+.select-province,
+.select-district,
+.select-ward {
   line-height: 45px;
-  color: #69727D;
+  color: #69727d;
   padding: 12px 24px;
   border-radius: 4px 4px 4px 4px;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
