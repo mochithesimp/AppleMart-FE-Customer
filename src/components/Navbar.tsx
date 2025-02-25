@@ -7,12 +7,14 @@ const Navbar: React.FC = () => {
     <nav className="header">
       <div className="top-navbar">
         <ul className="top-navbar-list">
-          <li><Link to="/chat">
+          <li>
+            <Link to="/chat">
               <button>Chat</button>
-            </Link></li>
+            </Link>
+          </li>
 
           <li className="product">
-          <Link to="/product">
+            <Link to="/product">
               <button>Product</button>
             </Link>
           </li>

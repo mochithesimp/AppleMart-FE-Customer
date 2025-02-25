@@ -1,4 +1,3 @@
-
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import Footer from "../../components/Footer/Footer";
 import SideBarforProduct from "../../components/SideBarforProduct/SideBarforProduct";
@@ -11,9 +10,9 @@ const ProductMenu = () => {
       <NavbarforP />
 
       {/* Main content */}
-      <div className="flex flex-grow bg-gray-100">
+      <div className="flex flex-grow bg-gray-100 mt-16 ">
         {/* Sidebar (chiếm 1/4 màn hình) */}
-        <div className="dark:bg-gray-900 w-1/5 bg-white shadow-lg p-4">
+        <div className="dark:bg-gray-900 w-1/5 bg-white shadow-lg p-4 relative ">
           <SideBarforProduct />
         </div>
 

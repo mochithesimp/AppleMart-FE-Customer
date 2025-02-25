@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
-
+import noface from "../../assets/NoFace.jpg"
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
+import { Link } from "react-router-dom";
 
 const MenuLinks = [
   {
@@ -19,8 +20,8 @@ const MenuLinks = [
   },
   {
     id: 3,
-    name: "About",
-    link: "/#about",
+    name: "Chat",
+    link: "/chat",
   },
   {
     id: 4,
@@ -155,6 +156,12 @@ const NavbarforP = () => {
             {/* Dark Mode section */}
             <div>
               <DarkMode />
+            </div>
+
+            <div className="login">
+              <Link to="/login">
+              <img src={noface} alt="" className='w-10 h-10 rounded-full' />
+              </Link>
             </div>
           </div>
         </div>

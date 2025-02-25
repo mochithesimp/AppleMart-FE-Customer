@@ -30,7 +30,7 @@ const Popup: React.FC<{
       <div className="menu-cart__container">
         <div
           ref={popupRef}
-          className="menu-cart__main dark:bg-zinc-700 dark:border-none "
+          className="menu-cart__main dark:bg-zinc-700 dark:border-none z-30"
           style={{
             left: orderPopup === true ? "76%" : "100%",
             opacity: orderPopup === true ? 1 : 0,
@@ -56,7 +56,7 @@ const Popup: React.FC<{
                       <div className="menu-cart__product-price">
                         1 × ${item.price.toFixed(2)}
                       </div>
-                      <button className="menu-cart__product-remove">✖</button>
+                      <button className="menu-cart__product-remove">X</button>
                     </div>
                   ))}
                 </div>

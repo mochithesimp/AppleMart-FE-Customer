@@ -9,6 +9,7 @@ import ChangePassPage from "./pages/Authentication-page/ChangePassword";
 import CartPage from "./pages/Cart-page/Cart";
 import ProductMenu from "./pages/ProductMenu-page/ProductMenu";
 import ChatPage from "./pages/Chat-page/Chat";
+import CheckoutPage from "./pages/Checkout-page/Checkout";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -39,8 +40,12 @@ const router = createBrowserRouter([
     element: <CartPage />,
   },
   {
-    path: '/ProductMenu',
-    element: <ProductMenu/>,
+    path: "/Checkout",
+    element: <CheckoutPage />,
+  },
+  {
+    path: "/ProductMenu",
+    element: <ProductMenu />,
   },
   {
     path: "/Chat",

@@ -100,12 +100,6 @@ const CartPage = () => {
     );
   };
 
-  // useEffect(() => {
-  //   if (selectedCountry) {
-  //     setCities(citiesByCountry[selectedCountry] || []);
-  //     setSelectedCity(""); // Reset thành phố khi đổi quốc gia
-  //   }
-  // }, [selectedCountry]);
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 ">
       <NavbarforP />
@@ -321,7 +315,9 @@ const CartPage = () => {
                       </tbody>
                     </table>
                     <div className="proceed-to-checkout">
-                      <a className="button-checkout">Proceed to Checkout</a>
+                      <Link to="/Checkout" className="button-checkout">
+                        Proceed to Checkout
+                      </Link>
                     </div>
                   </div>
                 </div>
