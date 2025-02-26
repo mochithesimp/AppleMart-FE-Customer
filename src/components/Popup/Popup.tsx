@@ -70,7 +70,7 @@ const Popup: React.FC<{
 
                 <div className="menu-cart__footer-buttons">
                   <Link to="/cart" className="button--view-cart">View cart</Link>                
-                  <button className="button--view-checkout">Checkout</button>
+                  <Link to="/checkout" className="button--view-checkout">Checkout</Link>
                 </div>
               </>
             ) : (

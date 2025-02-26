@@ -37,7 +37,7 @@ const Footer = () => {
                         </p>
                         <p className='text-gray-500 mt-4'>Software Design</p>
                         <a
-                            href="https://www.facebook.com/leverrin.leh"
+                            href="https://www.facebook.com/tantai.chiem.1"
                             target="_blank"
                             className="inline-block bg-primary/90 text-white
                             py-2 px-4 mt-4 text-sm rounded-full"
@@ -88,11 +88,11 @@ const Footer = () => {
                                 <div>
                                     <div className="flex items-center gap-3">
                                         <FaLocationArrow />
-                                        <p>Thủ Đức, TpHCM</p>
+                                        <p>32 Nguyen Thi Thap Street, 7th District, HCM city</p>
                                     </div>
                                     <div className="flex items-center gap-3 mt-6">
                                         <FaMobileAlt />
-                                        <p>+84 123456789</p>
+                                        <p>+84 833280889</p>
                                     </div>
                                     {/* social */}
                                     <div className='flex items-center gap-3 mt-6'>

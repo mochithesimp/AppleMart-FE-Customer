@@ -17,6 +17,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      toast.error("Missing Email or Password");
+      return;
+    }
+    
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in Successfully");
