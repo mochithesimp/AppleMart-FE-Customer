@@ -6,8 +6,8 @@ import SearchFilter from "./SearchFilter";
 
 const FilterSection: React.FC = () => {
     return (
-        <div className="bg-gray-100 dark:bg-zinc-700 mt-2 shadow-md p-3 border rounded-lg h-full max-h-[600px] overflow-y-auto">
-            <h2 className="text-lg font-semibold">Bộ lọc sản phẩm</h2>
+        <div className="dark:text-white bg-gray-100 dark:bg-zinc-700 mt-2 shadow-md p-3 border rounded-lg h-full max-h-[600px] overflow-y-auto">
+            <h2 className="text-lg font-semibold">Product Filter</h2>
             <SearchFilter />
             <PriceFilter />
             <ColorFilter />

@@ -11,7 +11,7 @@ const ProductSection: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <h2 className="dark:text-white text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
+      <h2 className="dark:text-white text-2xl font-bold mb-4">Product List</h2>
 
       {loading ? (
         <Spinner />

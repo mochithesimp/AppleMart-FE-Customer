@@ -1,86 +1,37 @@
-import Heading from '../Shared/Heading';
-import ProductCard from './ProductCard';
-import Img1 from "../../assets/Product/p-1.jpg"
-import Img2 from "../../assets/Product/p-2.jpg"
-import Img3 from "../../assets/Product/p-3.jpg"
-import Img4 from "../../assets/Product/p-4.jpg"
-import Img5 from "../../assets/Product/p-5.jpg"
-import Img6 from "../../assets/Product/p-7.jpg"
-import Img7 from "../../assets/Product/p-9.jpg"
-const ProductsData = [
-    {
-        id: 1,
-        img: Img1,
-        title: "Boat Headphone",
-        price: "120",
-        aosDelay: "0",
-    },
-    {
-        id: 2,
-        img: Img2,
-        title: "Rocky Mountain",
-        price: "420",
-        aosDelay: "200",
-    },
-    {
-        id: 3,
-        img: Img3,
-        title: "Goggles",
-        price: "320",
-        aosDelay: "400",
-    },
-    {
-        id:4,
-        img:Img4,
-        title:"Printed",
-        price: "220",
-        aosDelay: "600",
-    },
-];
-const ProductsData2 = [
-    {
-        id: 1,
-        img: Img5,
-        title: "Boat Headphone",
-        price: "120",
-        aosDelay: "0",
-    },
-    {
-        id: 2,
-        img: Img6,
-        title: "Rocky Mountain",
-        price: "420",
-        aosDelay: "200",
-    },
-    {
-        id: 3,
-        img: Img7,
-        title: "Goggles",
-        price: "320",
-        aosDelay: "400",
-    },
-    {
-        id:4,
-        img:Img2,
-        title:"Printed",
-        price: "220",
-        aosDelay: "600",
-    },
-]
+import Heading from "../Shared/Heading";
+import ProductCard from "./ProductCard";
+
+import { useEffect, useState } from "react";
+import { ProductItem } from "../../interfaces";
+import { getProductItems } from "../../apiServices/ProductServices/productItemServices";
 
 const Products = () => {
-    return (
-        <div>
-            <div className="container">
-                {/* Header */}
-                <Heading title="Our Products"
-                    subtitle={"Explore Our Products"} />
-                {/* Body */}
-                <ProductCard data={ProductsData} />
-                <ProductCard data={ProductsData2} />
-            </div>
-        </div>
-    )
-}
+  //   const { allProduct } = useAllProduct();
+  const [productItems, setProductItems] = useState<ProductItem[]>([]);
 
-export default Products
+  useEffect(() => {
+    const fetchData = async () => {
+      const productItems = await getProductItems();
+         //console.log("check data search: ", res);
+      if (productItems && productItems.$values) {
+        setProductItems(productItems.$values);
+      } else {
+        console.error("Data not found or invalid response structure");
+      }
+    };
+    fetchData();
+  }, [productItems]);
+
+  return (
+    <div>
+      <div className="container">
+        {/* Header */}
+        <Heading title="Our Products" subtitle={"Explore Our Products"} />
+        {/* Body */}
+        <ProductCard data={productItems} />
+      </div>
+    </div>
+  );
+};
+
+export default Products;

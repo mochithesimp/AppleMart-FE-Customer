@@ -1,8 +1,20 @@
 import React from "react";
 import ProductItemCard from "../ProductsItems/ProductItemCard";
 
+interface P {
+  id: number;
+  image: string,
+  name: string,
+  price: number,
+  oldPrice: number,
+  discount: number,
+  rating: string,
+  sold: number,
+  storageOptions: string[];
+}
+
 interface ProductListProps {
-  products: any[];
+  products: P[];
   visibleProducts: number;
 }
 

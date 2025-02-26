@@ -8,7 +8,24 @@ const GoogleLogin = () => {
       const result = await signInWithPopup(auth, provider);
       console.log("User info:", result.user);
       const user = result.user;
-      console.log("User info111:", user);
+
+      // const response = await fetch('https://localhost:7140/api/Account/Register', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     email: user.email,
+      //     name: user.displayName,
+      //     password: "",
+      //     confirmPassword: "",
+      //   }),
+      // });
+  
+      // if (!response.ok) {
+      //   throw new Error('Failed to save user to database');
+      // }
+
       if (result.user) {
         await setDoc(
           doc(db, "Users", user.uid),

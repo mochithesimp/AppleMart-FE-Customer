@@ -14,7 +14,7 @@ const SidebarP: React.FC = () => {
             {/* Sidebar */}
             <div
                 className={classNames(
-                    "sticky top-20 mt-5 left-7 h-72 bg-gray-100 dark:bg-zinc-700 shadow-lg z-30 w-64 p-4 transition-transform duration-300 lg:w-56 rounded-[15px]",
+                    " dark:text-white sticky top-20 mt-5 left-7 h-80 bg-gray-100 dark:bg-zinc-700 shadow-lg z-30 w-64 p-4 transition-transform duration-300 lg:w-56 rounded-[15px]",
                     {
                         "translate-x-0": openSidebar, 
                         "-translate-x-full lg:translate-x-0": !openSidebar 
@@ -37,7 +37,7 @@ const SidebarP: React.FC = () => {
                         onMouseLeave={() => setShowFilter(false)}
                     >
                         <Filter size={20} />
-                        <span className="font-semibold">Bộ lọc sản phẩm</span>
+                        <span className="font-semibold">Product Filter</span>
                     </button>
 
                     {/* Dropdown Filter Section */}

@@ -6,6 +6,8 @@ import imomo from "../../assets/Checkout/Primary logo@2x.png";
 import "./Style.css";
 import { useRef, useState } from "react";
 import { useCheckoutAnimation } from "./useCheckoutAnimation";
+import Partners from "../../components/Partners/Partners";
+import Footer from "../../components/Footer/Footer";
 
 const CheckoutPage = () => {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -300,6 +302,8 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      <Partners />
+      <Footer />
     </div>
   );
 };
