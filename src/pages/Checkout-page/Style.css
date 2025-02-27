@@ -111,6 +111,7 @@
 }
 
 .checkout-review-order-table {
+  width: 100%;
   margin-bottom: 0;
   border: 0;
   font-size: 14px;
@@ -132,6 +133,7 @@
 }
 
 .checkout-review-order-table th {
+  text-align: left;
   padding-bottom: 6.5px;
 }
 
@@ -140,6 +142,7 @@
   padding-bottom: calc(13px / 2);
   border: 0;
   padding-left: 0;
+  text-align: right;
 }
 
 .checkout-review-order-table .cart_item td {
@@ -175,6 +178,10 @@
   display: flex;
   flex-direction: column;
   margin-left: 5px;
+}
+
+.checkout-review-order-table .product-content > span {
+  text-align: left;
 }
 
 .product-total,
