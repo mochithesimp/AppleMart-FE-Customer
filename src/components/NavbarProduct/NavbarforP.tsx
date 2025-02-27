@@ -21,7 +21,7 @@ const MenuLinks = [
   {
     id: 3,
     name: "Chat",
-    link: "/chat",
+    link: "/Chat",
   },
   {
     id: 4,
@@ -84,23 +84,23 @@ const NavbarforP = () => {
         <div className="container flex justify-between items-center">
           <div className=" flex items-center gap-4">
             {/* Logo */}
-            <a
-              href="#"
+            <Link
+              to={"/"}
               className=" text-primary font-semibold tracking-widest text-2xl uppercase sm:text 3xl "
             >
               AppleMart
-            </a>
+            </Link>
             {/* Menu */}
             <div className=" lg:block">
               <ul className="flex items-center gap-4">
                 {MenuLinks.map((data, index) => (
                   <li key={index}>
-                    <a
-                      href={data.link}
-                      className="inline-block px-4 font-semibold text-gray-500 hover:text-black dark:hover:text-white duration-200 p-2 hover:bg-red-400 w-full p-2"
+                    <Link
+                      to={data.link}
+                      className="inline-block px-4 font-semibold text-gray-500 hover:text-black dark:hover:text-white duration-200 p-2 hover:bg-red-400 w-full"
                     >
-                      {data.name}{" "}
-                    </a>
+                      {data.name}
+                    </Link>
                   </li>
                 ))}
                 {/* dropdown */}
