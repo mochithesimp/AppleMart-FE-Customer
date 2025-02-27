@@ -1,9 +1,12 @@
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import Footer from "../../components/Footer/Footer";
 import SideBarforProduct from "../../components/SideBarforProduct/SideBarforProduct";
-import ProductSection from "../../components/ProductsSection/ProductsSection";
+// import ProductSection from "../../components/ProductsSection/ProductsSection";
+import React from "react";
+const ProductSection = React.lazy(() => import('../../components/ProductsSection/ProductsSection'));
 
 const ProductMenu = () => {
+  
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}

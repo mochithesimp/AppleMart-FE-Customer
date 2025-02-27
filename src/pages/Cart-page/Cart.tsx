@@ -179,7 +179,7 @@ const CartPage = () => {
                     <table className="cart-subtotal__contents">
                       <tbody>
                         <tr className="cart-subtotal">
-                          <div>Subtotal</div>
+                          <th>Subtotal</th>
                           <td data-title="Subtotal">
                             <span className="price-amount">$2000</span>
                           </td>
@@ -307,7 +307,7 @@ const CartPage = () => {
                           </td>
                         </tr>
                         <tr className="order-total">
-                          <div>Total</div>
+                          <th>Total</th>
                           <td data-title="Total">
                             <span className="Price-amount">$2000</span>
                           </td>

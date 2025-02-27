@@ -167,9 +167,10 @@ th {
   padding-top: 12px;
   padding-bottom: 9px;
 }
-.cart-subtotal > div {
+.cart-subtotal > th {
   padding-top: 12px;
   padding-bottom: 9px;
+  font-weight: normal;
 }
 .shipping-totals > td {
   text-align: left !important;
@@ -189,10 +190,11 @@ th {
   text-align: right !important;
   padding: 12px 0 9px 0;
 }
-.order-total > div {
+.order-total > th {
   border-top-color: #69727d;
   border-top-width: 2px;
   padding: 12px 0 9px 0;
+  font-weight: normal;
 }
 .proceed-to-checkout {
   display: flex;
