@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
-import noface from "../../assets/NoFace.jpg"
+import noface from "../../assets/NoFace.jpg";
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
 import { Link } from "react-router-dom";
@@ -116,9 +116,21 @@ const NavbarforP = () => {
                   </a>
                   {/* Dropdown Link */}
                   <div className="absolute z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md dark:bg-gray-900 p-2 dark:text-white ">
-                    <ul className=" space-y-2">
+                    {/* <ul className=" space-y-2">
                       {DropDownLinks.map((data) => (
                         <li>
+                          <a
+                            className="text-gray-500 dark:hover:text-white duration-200 inline-block w-full p-2 hover:bg-primary/20 rounded-md font-semibold"
+                            href={data.link}
+                          >
+                            {data.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul> */}
+                    <ul className="space-y-2">
+                      {DropDownLinks.map((data, index) => (
+                        <li key={index}>
                           <a
                             className="text-gray-500 dark:hover:text-white duration-200 inline-block w-full p-2 hover:bg-primary/20 rounded-md font-semibold"
                             href={data.link}
@@ -160,7 +172,7 @@ const NavbarforP = () => {
 
             <div className="login">
               <Link to="/login">
-              <img src={noface} alt="" className='w-10 h-10 rounded-full' />
+                <img src={noface} alt="" className="w-10 h-10 rounded-full" />
               </Link>
             </div>
           </div>

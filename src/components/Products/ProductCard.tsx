@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from '../Shared/Button';
 import { ProductItem } from '../../interfaces';
-
+import img1 from "../../assets/Product/earphone.png";
   interface ProductCardProps {
     data: ProductItem[];
   }
@@ -14,7 +14,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                     data.map((product, index) => (
                         <div className='group ' key={index}>
                             <div className='relative'>
-                                <img src={""} alt="" className='h-[180px] w-[260px] object-cover rounded-md' />
+                                <img src={img1} alt="" className='h-[180px] w-[260px] object-cover rounded-md' />
                                 {/* hover btn */}
                                 <div className=' hidden  group-hover:flex absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 h-full w-full text-center group-hover:backdrop-blur-sm justify-center items-center duration-200'>
                                     <Button
@@ -25,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                             </div>
                             <div className='leading-7'>
                                 <h2 className='font-semibold'>{product.name}</h2>
-                                <h2 className='font-bold'>${product.productId}</h2>
+                                <h2 className='font-bold'>${product.price}</h2>
                             </div>
                         </div>
                     ))

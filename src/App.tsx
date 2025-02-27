@@ -1,15 +1,25 @@
-// src/App.tsx
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import HomePage from "./pages/Home-page/Home";
-import LoginPage from "./pages/Authentication-page/UserAuth";
-import UserProfile from "./pages/Authentication-page/UserProfile";
-import ProductPage from "./pages/Product-page/Product";
-import ForPassPage from "./pages/Authentication-page/ForgetPassword";
-import ChangePassPage from "./pages/Authentication-page/ChangePassword";
-import CartPage from "./pages/Cart-page/Cart";
-import ProductMenu from "./pages/ProductMenu-page/ProductMenu";
-import ChatPage from "./pages/Chat-page/Chat";
-import CheckoutPage from "./pages/Checkout-page/Checkout";
+
+// Lazy load các trang
+const HomePage = lazy(() => import("./pages/Home-page/Home"));
+const LoginPage = lazy(() => import("./pages/Authentication-page/UserAuth"));
+const UserProfile = lazy(
+  () => import("./pages/Authentication-page/UserProfile")
+);
+const ProductPage = lazy(() => import("./pages/Product-page/Product"));
+const ForPassPage = lazy(
+  () => import("./pages/Authentication-page/ForgetPassword")
+);
+const ChangePassPage = lazy(
+  () => import("./pages/Authentication-page/ChangePassword")
+);
+const CartPage = lazy(() => import("./pages/Cart-page/Cart"));
+const CheckoutPage = lazy(() => import("./pages/Checkout-page/Checkout"));
+const ProductMenu = lazy(() => import("./pages/ProductMenu-page/ProductMenu"));
+const ChatPage = lazy(() => import("./pages/Chat-page/Chat"));
+
+// Khai báo router
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,7 +35,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/Product",
-    element: <ProductPage />,
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductPage />
+      </Suspense>
+    ),
   },
   {
     path: "/ForgetPass",
@@ -45,13 +59,18 @@ const router = createBrowserRouter([
   },
   {
     path: "/ProductMenu",
-    element: <ProductMenu />,
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductMenu />
+      </Suspense>
+    ),
   },
   {
     path: "/Chat",
     element: <ChatPage />,
   },
 ]);
+
 function App() {
   return <RouterProvider router={router} />;
 }
