@@ -1,11 +1,12 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+// import { signInWithEmailAndPassword } from "firebase/auth";
 import ResgiterForm from "./Register-form";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { auth } from "../components/Firebase";
+// import { auth } from "../components/Firebase";
 import { toast } from "react-toastify";
 import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
+import { login } from "../../../apiServices/AccountServices/loginServices";
 interface LoginFormProps {
   activeForm: "login" | "register" | "forget";
   setActiveForm: (form: "login" | "register" | "forget") => void;
@@ -24,12 +25,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
     }
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User logged in Successfully");
-      window.location.href = "/profile";
-      toast.success("User logged in Successfully", {
-        position: "top-center",
-      });
+      // await signInWithEmailAndPassword(auth, email, password);
+      // console.log("User logged in Successfully");
+      // window.location.href = "/profile";
+      // toast.success("User logged in Successfully", {
+      //   position: "top-center",
+      // });
+
+      const response = await login(email, password);
+
+      if (response?.status === 200) {
+        // Login successful
+        // Lay-Luu token vao local storage
+        const { token, refreshToken } = response.data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("refreshToken", refreshToken);
+        window.location.href = "/chat";
+       }
     } catch (error) {
       console.log(error);
 

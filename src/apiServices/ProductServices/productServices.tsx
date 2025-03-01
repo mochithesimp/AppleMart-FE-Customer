@@ -2,9 +2,9 @@
 // import axios from "axios";
 import * as request from "../../utils/request";
 
-export const getProductId = async (queryParams: URLSearchParams) => {
+export const getProductId = async (productId: number) => {
   try {
-    const res = await request.get("Products", { params: queryParams });
+    const res = await request.get(`Product/${productId}`);
     //console.log("check data search: ", res);
     return res;
   } catch (error) {

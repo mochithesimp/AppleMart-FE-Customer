@@ -7,7 +7,7 @@ import LoadMoreButton from "./LoadMoreButton";
 const itemsPerPage = 8; // Số lượng sản phẩm hiển thị ban đầu
 
 const ProductSection: React.FC = () => {
-  const { products, visibleProducts, loading, handleLoadMore } = useProducts(itemsPerPage);
+  const { productsWithItems, visibleProducts, loading, handleLoadMore } = useProducts(itemsPerPage);
 
   return (
     <div className="container mx-auto px-4">
@@ -17,8 +17,8 @@ const ProductSection: React.FC = () => {
         <Spinner />
       ) : (
         <>
-          <ProductList products={products} visibleProducts={visibleProducts} />
-          <LoadMoreButton onClick={handleLoadMore} isDisabled={visibleProducts >= products.length} />
+          <ProductList products={productsWithItems} visibleProducts={visibleProducts} />
+          <LoadMoreButton onClick={handleLoadMore} isDisabled={visibleProducts >= productsWithItems.length} />
         </>
       )}
     </div>

@@ -1,24 +1,19 @@
 import { createContext, useState, useContext, useEffect } from "react";
 // import { aProduct, ShopContextType } from "../interfaces";
-import { getProduct } from "../apiServices/ProductServices/productServices";
+// import { getProduct } from "../apiServices/ProductServices/productServices";
 import { aProduct, ShopContextType } from "../interfaces";
+import { getProduct } from "../apiServices/ProductServices/productServices";
 
-export const ShopContext = createContext<ShopContextType>({
-  allProduct: [],
-});
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAllProduct = () => {
-  const context = useContext(ShopContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
-};
+const ShopContext = createContext<ShopContextType| undefined>(undefined);
 
-const ShopContextProvider = ({ children }: { children: React.ReactNode }) => {
+
+export const ShopContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [allProduct, setAllProduct] = useState<aProduct[]>([]);
-
+  const [product, setProduct] = useState<aProduct[]>([]);
+  const [filterProduct, setFilterProduct] = useState<aProduct[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<boolean | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<boolean | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       const result = await getProduct();
@@ -32,10 +27,17 @@ const ShopContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <ShopContext.Provider value={{ allProduct }}>
+    <ShopContext.Provider value={{ allProduct, product, filterProduct, selectedProduct, selectedFilter, setProduct, setAllProduct, setFilterProduct, setSelectedProduct, setSelectedFilter}}>
       {children}
     </ShopContext.Provider>
   );
 };
 
-export default ShopContextProvider;
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAllProduct = () => {
+  const context = useContext(ShopContext);
+  if (!context) {
+    throw new Error("useAllProduct must be used within a ShopContextProvider");
+  }
+  return context;
+};

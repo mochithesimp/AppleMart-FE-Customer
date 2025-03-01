@@ -10,11 +10,12 @@ export interface aProduct {
   description: string;
   isDeleted: boolean;
   displayIndex: boolean;
+  productItems?: ProductItem[]
 }
 
 export interface ProductItem {
-  productItemId: number;
-  productId: number;
+  productItemID: number;
+  productID: number;
   name: string;
   description: string;
   quantity: number;
@@ -24,7 +25,7 @@ export interface ProductItem {
 }
 
 export interface iCategory {
-  CategoryID: number;
+  categoryID: number;
   name: string;
   description: string;
   isDeleted: boolean;
@@ -40,4 +41,13 @@ export interface ImageProduct {
 
 export interface ShopContextType {
   allProduct: aProduct[];
+  product: aProduct[];
+  filterProduct: aProduct[];
+  selectedProduct: boolean | null;
+  selectedFilter: boolean | null;
+  setProduct: React.Dispatch<React.SetStateAction<aProduct[]>>;
+  setAllProduct: React.Dispatch<React.SetStateAction<aProduct[]>>;
+  setFilterProduct: React.Dispatch<React.SetStateAction<aProduct[]>>;
+  setSelectedFilter: React.Dispatch<React.SetStateAction<boolean | null>>;
+  setSelectedProduct: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
