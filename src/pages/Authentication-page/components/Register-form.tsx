@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../components/Firebase";
-import { setDoc, doc } from "firebase/firestore";
+// import { createUserWithEmailAndPassword } from "firebase/auth";
+// import { auth, db } from "../components/Firebase";
+// import { setDoc, doc } from "firebase/firestore";
 import GoogleLogin from "../GoogleLogin";
 import { toast } from "react-toastify";
 import "../Style.css";
+import { register } from "../../../apiServices/AccountServices/accountServices";
 interface ResgiterFormProps {
   activeForm: "login" | "register" | "forget";
 }
@@ -17,7 +18,7 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  console.log(phoneNumber);
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -25,21 +26,35 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      const user = auth.currentUser;
-      console.log("User: ", user);
-      if (user) {
-        await setDoc(doc(db, "Users", user.uid), {
-          email: user.email,
-          name: name,
-          phoneNumber: phoneNumber,
-        });
+
+      const registerValues = {
+        name,
+        email,
+        password,
+        confirmPassword,       
+      };
+
+      const response = await register(registerValues);
+      if (response) {
+          toast.success('Registration successful');
+          window.location.href = "/chat";
       }
-      console.log("User Registered Successfully!!");
-      toast.success("User Registered Successfully!!", {
-        position: "top-center",
-      });
-      window.location.href = "/profile";
+
+      // await createUserWithEmailAndPassword(auth, email, password);
+      // const user = auth.currentUser;
+      // console.log("User: ", user);
+      // if (user) {
+      //   await setDoc(doc(db, "Users", user.uid), {
+      //     email: user.email,
+      //     name: name,
+      //     phoneNumber: phoneNumber,
+      //   });
+      // }
+      // console.log("User Registered Successfully!!");
+      // toast.success("User Registered Successfully!!", {
+      //   position: "top-center",
+      // });
+      // window.location.href = "/profile";
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message, {
