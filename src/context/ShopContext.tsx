@@ -1,8 +1,9 @@
 import { createContext, useState, useContext, useEffect } from "react";
 // import { aProduct, ShopContextType } from "../interfaces";
 // import { getProduct } from "../apiServices/ProductServices/productServices";
-import { aProduct, ShopContextType } from "../interfaces";
+import { aProduct, ProductItem, ShopContextType } from "../interfaces";
 import { getProduct } from "../apiServices/ProductServices/productServices";
+import { getProductItems } from "../apiServices/ProductServices/productItemServices";
 
 
 const ShopContext = createContext<ShopContextType| undefined>(undefined);
@@ -10,6 +11,7 @@ const ShopContext = createContext<ShopContextType| undefined>(undefined);
 
 export const ShopContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [allProduct, setAllProduct] = useState<aProduct[]>([]);
+  const [productItems, setProductItems] = useState<ProductItem[]>([]);
   const [product, setProduct] = useState<aProduct[]>([]);
   const [filterProduct, setFilterProduct] = useState<aProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<boolean | null>(null);
@@ -26,8 +28,21 @@ export const ShopContextProvider = ({ children }: { children: React.ReactNode })
     fetchData();
   }, []);
 
+useEffect(() => {
+    const fetchData = async () => {
+      const productItems = await getProductItems();
+
+      if (productItems && productItems.$values) {
+        setProductItems(productItems.$values);
+      } else {
+        console.error("Data not found or invalid response structure");
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
-    <ShopContext.Provider value={{ allProduct, product, filterProduct, selectedProduct, selectedFilter, setProduct, setAllProduct, setFilterProduct, setSelectedProduct, setSelectedFilter}}>
+    <ShopContext.Provider value={{ allProduct, productItems, product, filterProduct, selectedProduct, selectedFilter, setProduct, setAllProduct, setFilterProduct, setSelectedProduct, setSelectedFilter}}>
       {children}
     </ShopContext.Provider>
   );

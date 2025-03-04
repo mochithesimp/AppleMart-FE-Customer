@@ -6,6 +6,7 @@ import noface from "../../assets/NoFace.jpg";
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
 import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 const MenuLinks = [
   {
@@ -48,7 +49,30 @@ const DropDownLinks = [
 ];
 
 const NavbarforP = () => {
+  const [cartCount, setCartCount] = useState(0);
+  const { cart } = useCart();
   const [orderPopup, setOrderPopup] = useState<boolean>(false);
+  const token = localStorage.getItem("token");
+
+  //Get token login
+  const isLoggedIn = token;
+
+  //Renove token logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    // localStorage.removeItem("cart");
+  };
+
+  // Calculate the total quantity in stock
+  useEffect(() => {
+    const totalQuantityInStock = cart.reduce(
+      (total, product) => total + product.quantity,
+      0
+    );
+    setCartCount(totalQuantityInStock);
+  }, [cart]);
+
   const handleOrderPopup = () => {
     setOrderPopup(!orderPopup);
   };
@@ -162,7 +186,7 @@ const NavbarforP = () => {
               <FaCartShopping className="text-xl text-gray-600 dark:text-gray-400" />
 
               <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
-                4
+                {cartCount}
               </div>
             </button>
             {/* Dark Mode section */}
@@ -170,10 +194,35 @@ const NavbarforP = () => {
               <DarkMode />
             </div>
 
-            <div className="login">
-              <Link to="/login">
-                <img src={noface} alt="" className="w-10 h-10 rounded-full" />
-              </Link>
+            <div className="relative">
+              {isLoggedIn ? (
+                <div className="relative inline-block">
+                  <div className="flex items-center space-x-2 cursor-pointer group">
+                    <img
+                      src={noface}
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="hidden group-hover:block absolute right-0 mt-2 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
+                      <Link
+                        to="/login"
+                        onClick={handleLogout}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                      >
+                        Logout
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <li className="list-none">
+                  <Link to="/login">
+                    <button className="">
+                      Login
+                    </button>
+                  </Link>
+                </li>
+              )}
             </div>
           </div>
         </div>

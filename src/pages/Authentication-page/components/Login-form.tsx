@@ -1,12 +1,13 @@
 // import { signInWithEmailAndPassword } from "firebase/auth";
 import ResgiterForm from "./Register-form";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 // import { auth } from "../components/Firebase";
 import { toast } from "react-toastify";
 import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
 import { login } from "../../../apiServices/AccountServices/loginServices";
+import { AxiosError } from "axios";
 interface LoginFormProps {
   activeForm: "login" | "register" | "forget";
   setActiveForm: (form: "login" | "register" | "forget") => void;
@@ -15,7 +16,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -23,7 +24,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
       toast.error("Missing Email or Password");
       return;
     }
-    
+
     try {
       // await signInWithEmailAndPassword(auth, email, password);
       // console.log("User logged in Successfully");
@@ -35,20 +36,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
       const response = await login(email, password);
 
       if (response?.status === 200) {
-        // Login successful
-        // Lay-Luu token vao local storage
-        const { token, refreshToken } = response.data;
+        const { accessToken, refreshToken } = response.data;
 
-        localStorage.setItem("token", token);
+        localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        window.location.href = "/chat";
-       }
+        navigate("/");
+      }
     } catch (error) {
-      console.log(error);
-
-      toast.error((error as Error).message, {
-        position: "bottom-center",
-      });
+      if (error instanceof AxiosError) {
+        console.error("Response error:", error.response?.data);
+      } else {
+        console.error("Unexpected error:", error);
+      }
     }
   };
 
@@ -112,7 +111,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
             <i className="bx bxl-facebook"></i>
             <i className="bx bxl-github"></i>
           </div>
-        </div>       
+        </div>
       </form>
       <ResgiterForm activeForm={activeForm} />
     </div>

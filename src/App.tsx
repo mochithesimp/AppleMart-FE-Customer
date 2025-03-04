@@ -1,5 +1,8 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { CartProvider } from "./context/CartContext";
+import { ToastContainer } from "react-toastify";
+import ProductDetails from "./pages/ProductDetails-page/ProductDetail";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -58,6 +61,10 @@ const router = createBrowserRouter([
     element: <CheckoutPage />,
   },
   {
+    path: "/productDetails/:productItemId",
+    element: <ProductDetails />
+  },
+  {
     path: "/ProductMenu",
     element: (
       <Suspense fallback={<div>Loading...</div>}>
@@ -72,7 +79,12 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <CartProvider>
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </CartProvider>
+  );
 }
 
 export default App;

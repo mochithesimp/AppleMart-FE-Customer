@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-// import { createUserWithEmailAndPassword } from "firebase/auth";
-// import { auth, db } from "../components/Firebase";
-// import { setDoc, doc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../components/Firebase";
+import { setDoc, doc } from "firebase/firestore";
 import GoogleLogin from "../GoogleLogin";
 import { toast } from "react-toastify";
 import "../Style.css";
 import { register } from "../../../apiServices/AccountServices/accountServices";
+// import { register } from "../../../apiServices/AccountServices/accountServices";
 interface ResgiterFormProps {
   activeForm: "login" | "register" | "forget";
 }
 const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [email, setEmail] = useState("");
-  const [name, setname] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  console.log(phoneNumber);
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -26,35 +26,33 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
       return;
     }
     try {
-
       const registerValues = {
         name,
         email,
         password,
-        confirmPassword,       
+        confirmPassword,
       };
 
       const response = await register(registerValues);
-      if (response) {
-          toast.success('Registration successful');
-          window.location.href = "/chat";
+      if (!response) {
+        return;
       }
+      console.log("User Registered Successfully!!");
+      toast.success("Registration successful! The system is processing, please wait...", {
+        position: "top-center",
+      });
+      await createUserWithEmailAndPassword(auth, email, password);
+      const user = auth.currentUser;
 
-      // await createUserWithEmailAndPassword(auth, email, password);
-      // const user = auth.currentUser;
-      // console.log("User: ", user);
-      // if (user) {
-      //   await setDoc(doc(db, "Users", user.uid), {
-      //     email: user.email,
-      //     name: name,
-      //     phoneNumber: phoneNumber,
-      //   });
-      // }
-      // console.log("User Registered Successfully!!");
-      // toast.success("User Registered Successfully!!", {
-      //   position: "top-center",
-      // });
-      // window.location.href = "/profile";
+      if (user) {
+        await setDoc(doc(db, "Users", user.uid), {
+          email: user.email,
+          name: user.displayName,
+          userName: name,
+          phoneNumber: phoneNumber,
+        });
+      }   
+      window.location.reload()
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message, {
@@ -92,7 +90,7 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
                   type="text"
                   className="input-field"
                   placeholder="Username"
-                  onChange={(e) => setname(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
                 <i className="bx bx-user icon"></i>
