@@ -1,6 +1,8 @@
 import React from "react";
 import img1 from "../../assets/Product/earphone.png";
 import {  ProductItem } from "../../interfaces";
+import { HandleAddToCart } from "../../pages/Cart-page/components/HandleAddToCart";
+import { Link } from "react-router-dom";
 // interface ProductProps {
 //   image: string;
 //   name: string;
@@ -18,6 +20,11 @@ import {  ProductItem } from "../../interfaces";
 // }
 
 const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }) => {
+  const { handleAddToCart } = HandleAddToCart();
+
+  const HandleAddToCartClick = (productItem: ProductItem) => {
+    handleAddToCart(productItem);
+  };
   return (
     <div className="border rounded-xl shadow-md p-4 bg-white dark:bg-zinc-800 relative group transition-all duration-300 hover:scale-105 hover:shadow-xl">
       {/* Hình ảnh sản phẩm */}
@@ -29,14 +36,15 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
         />
         {/* Nút "Add to Cart" */}
         <div className="absolute inset-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary transition-all duration-200">
+          <button className="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-primary transition-all duration-200"
+          onClick={() => HandleAddToCartClick(productItem)} >
             Add to Cart
           </button>
         </div>
       </div>
 
       {/* Thông tin sản phẩm */}
-      <h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-white">{productItem.name}</h3>
+      <Link to={`/productDetails/${productItem.productItemID}`}><h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-white">{productItem.name}</h3></Link>
 
       {productItem.price && (
         <p className="text-sm text-gray-500 dark:text-gray-400 line-through">

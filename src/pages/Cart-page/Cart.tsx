@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import "./Style.css";
 import p1 from "../../assets/Product/p-1.jpg";
-import p2 from "../../assets/Product/p-2.jpg";
-import p3 from "../../assets/Product/p-3.jpg";
+// import p2 from "../../assets/Product/p-2.jpg";
+// import p3 from "../../assets/Product/p-3.jpg";
 import axios from "axios";
 import Footer from "../../components/Footer/Footer";
 import Partners from "../../components/Partners/Partners";
+import { useCart } from "../../context/CartContext";
 interface Ward {
   Id: string;
   Name: string;
@@ -25,15 +26,15 @@ interface Province {
   Districts: District[];
 }
 const CartPage = () => {
-  const cartItems = [
-    { id: 1, name: "Tai nghe Sony", price: 120.99, image: p1 },
-    { id: 2, name: "Đồng hồ thông minh", price: 199.99, image: p2 },
-    { id: 3, name: "Chuột không dây", price: 35.5, image: p3 },
-    { id: 4, name: "Chuột không dây", price: 35.5, image: p3 },
-    { id: 5, name: "Chuột không dây", price: 35.5, image: p3 },
-    { id: 6, name: "Chuột không dây", price: 35.5, image: p3 },
-  ];
-
+  // const cartItems = [
+  //   { id: 1, name: "Tai nghe Sony", price: 120.99, image: p1 },
+  //   { id: 2, name: "Đồng hồ thông minh", price: 199.99, image: p2 },
+  //   { id: 3, name: "Chuột không dây", price: 35.5, image: p3 },
+  //   { id: 4, name: "Chuột không dây", price: 35.5, image: p3 },
+  //   { id: 5, name: "Chuột không dây", price: 35.5, image: p3 },
+  //   { id: 6, name: "Chuột không dây", price: 35.5, image: p3 },
+  // ];
+  const { cart, decrementQuantity, incrementQuantity, removeItems } = useCart();
   const [showForm, setShowForm] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("VN");
 
@@ -100,6 +101,32 @@ const CartPage = () => {
     );
   };
 
+  const totalAmount = cart.reduce(
+    (total, product) => total + product.price * product.quantity,
+    0
+  );
+
+  // const handleIncrement = (
+  //   productItemId: number,
+  //   quantity: number,
+  //   stock: number
+  // ) => {
+  //   if (quantity < stock) {
+  //     incrementQuantity(productItemId);
+  //   } else if (quantity >= stock && stock !== 0) {
+  //     swal({
+  //       title: "Out of stock",
+  //       text: "This product is currently out of stock.",
+  //       icon: "info",
+  //       dangerMode: true,
+  //     }).then(() => {
+  //       return;
+  //     });
+  //   } else if (quantity >= stock && stock == 0) {
+  //     incrementQuantity(productItemId);
+  //   }
+  // };
+
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 ">
       <NavbarforP />
@@ -132,20 +159,23 @@ const CartPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {cartItems.map((item) => (
+                      {cart.map((item, index) => (
                         <tr
-                          key={item.id}
+                          key={index}
                           className="cart-form__cart-item cart_item"
                         >
                           <td className="product-remove">
-                            <button className="text-red-500">X</button>
+                            <button
+                              className="text-red-500"
+                              onClick={() => {
+                                removeItems(item.productItemID);
+                              }}
+                            >
+                              X
+                            </button>
                           </td>
                           <td className="product-thumbnail">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className=""
-                            />
+                            <img src={p1} alt={item.name} className="" />
                           </td>
                           <td className="product-name">{item.name}</td>
                           <td className="product-price">
@@ -153,18 +183,32 @@ const CartPage = () => {
                           </td>
                           <td className="product-quantity">
                             <div className="quantity flex items-center">
-                              <button className="minus-quantity px-2">-</button>
+                              <button
+                                className="minus-quantity px-2"
+                                onClick={() =>
+                                  decrementQuantity(item.productItemID)
+                                }
+                              >
+                                -
+                              </button>
                               <input
                                 className="input-text-qty w-12 text-center"
                                 type="text"
-                                value="1"
+                                value={item.quantity}
                                 readOnly
                               />
-                              <button className="plus-quantity px-2">+</button>
+                              <button
+                                className="plus-quantity px-2"
+                                onClick={() =>
+                                  incrementQuantity(item.productItemID)
+                                }
+                              >
+                                +
+                              </button>
                             </div>
                           </td>
                           <td className="product-subtotal">
-                            ${item.price.toFixed(2)}
+                            ${(item.price * item.quantity).toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -181,7 +225,9 @@ const CartPage = () => {
                         <tr className="cart-subtotal">
                           <th>Subtotal</th>
                           <td data-title="Subtotal">
-                            <span className="price-amount">$2000</span>
+                            <span className="price-amount">
+                              ${totalAmount.toFixed(2)}
+                            </span>
                           </td>
                         </tr>
                         <tr className="shipping-totals">
@@ -309,7 +355,9 @@ const CartPage = () => {
                         <tr className="order-total">
                           <th>Total</th>
                           <td data-title="Total">
-                            <span className="Price-amount">$2000</span>
+                            <span className="Price-amount">
+                              ${totalAmount.toFixed(2)}
+                            </span>
                           </td>
                         </tr>
                       </tbody>

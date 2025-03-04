@@ -2,6 +2,27 @@ import { useEffect, useState } from "react";
 import { auth, db } from "./components/Firebase";
 import { doc, getDoc, DocumentData } from "firebase/firestore";
 
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+
+
+
+const auth1 = getAuth();
+
+onAuthStateChanged(auth1, (user) => {
+  if (user) {
+    user.getIdToken(true)  // `true` để làm mới token nếu cần
+      .then((idToken) => {
+        console.log("Firebase ID Token:", idToken);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy ID Token:", error);
+      });
+  } else {
+    console.error("Người dùng chưa đăng nhập!");
+  }
+});
+
 const UserProfile = () => {
   const [userDetails, setUserDetails] = useState<DocumentData | null>(null);
   const fetchUserData = async () => {

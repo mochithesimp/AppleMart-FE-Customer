@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 // import img1 from "../../assets/Product/earphone.png";
 import { useAllProduct } from "../../context/ShopContext";
-import { getProductItems } from "../../apiServices/ProductServices/productItemServices";
-import { aProduct, ProductItem } from "../../interfaces";
+import { aProduct } from "../../interfaces";
 
 // 🔹 Danh sách sản phẩm giả lập
 // const products = new Array(20).fill(null).map((_, index) => ({
@@ -20,8 +19,7 @@ import { aProduct, ProductItem } from "../../interfaces";
 export const useProducts = (itemsPerPage: number) => {
   const [visibleProducts, setVisibleProducts] = useState(itemsPerPage);
   const [loading, setLoading] = useState(false);
-  const { product, allProduct, filterProduct, setProduct, selectedProduct, selectedFilter, setSelectedFilter} = useAllProduct();
-  const [productItems, setProductItems] = useState<ProductItem[]>([]);
+  const { product, allProduct, productItems, filterProduct, setProduct, selectedProduct, selectedFilter, setSelectedFilter} = useAllProduct();
   const [productsWithItems, setProductsWithItems] =
     useState<aProduct[]>(allProduct);
   useEffect(() => {
@@ -33,19 +31,6 @@ export const useProducts = (itemsPerPage: number) => {
   const handleLoadMore = () => {
     setVisibleProducts((prev) => prev + itemsPerPage);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const productItems = await getProductItems();
-
-      if (productItems && productItems.$values) {
-        setProductItems(productItems.$values);
-      } else {
-        console.error("Data not found or invalid response structure");
-      }
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     let newProductsWithItems = [];
