@@ -38,7 +38,7 @@ export interface ProductItemAttribute {
 export interface Attribute {
   attributeID: number;
   attributeName: string;
-  dataType:string;
+  dataType: string;
   categoryID: number;
   isDeleted: boolean;
 }
@@ -49,7 +49,7 @@ export interface iCategory {
   description: string;
   isDeleted: boolean;
   displayIndex: boolean;
-  
+
 }
 
 export interface ImageProduct {
@@ -89,3 +89,46 @@ export interface CartProductItem {
   stock: number;
   isDeleted: boolean;
 }
+
+export interface User {
+  id: string;
+  userName: string;
+  isOnline: boolean;
+}
+
+export interface Message {
+  chatID: number;
+  chatRoomID: number;
+  senderID: string;
+  senderName: string;
+  content: string;
+  isRead: boolean;
+  createdDate: string;
+}
+
+export interface ChatRoom {
+  chatRoomID: number;
+  roomName: string;
+  isGroup: boolean;
+  createdDate: string;
+  messages: Message[] | { $values: Message[] };
+  participants: User[] | { $values: User[] };
+  lastMessage?: Message;
+}
+
+export interface StyledProps {
+  isOnline?: boolean;
+  active?: boolean;
+  isMine?: boolean;
+}
+
+export interface ApiResponse<T> {
+  $values?: T[];
+  [key: string]: any;
+}
+
+export const unwrapValues = <T>(data: T[] | { $values: T[] } | undefined): T[] => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  return data.$values || [];
+};
