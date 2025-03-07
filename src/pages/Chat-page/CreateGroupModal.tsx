@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { User } from '../../interfaces';
-
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -75,9 +74,9 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
             <ModalContent onClick={e => e.stopPropagation()}>
                 <h2>Create Group Chat</h2>
                 <form onSubmit={handleSubmit}>
-                    <Input
+                    <input
                         value={groupName}
-                        onChange={e => setGroupName(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGroupName(e.target.value)}
                         placeholder="Group Name"
                         required
                     />
@@ -92,9 +91,9 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                             </UserItem>
                         ))}
                     </UserList>
-                    <Button type="submit" disabled={!groupName || selectedUsers.length === 0}>
+                    <button type="submit" disabled={!groupName || selectedUsers.length === 0}>
                         Create Group
-                    </Button>
+                    </button>
                 </form>
             </ModalContent>
         </ModalOverlay>
