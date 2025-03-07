@@ -112,7 +112,7 @@ export interface ChatRoom {
   isGroup: boolean;
   createdDate: string;
   messages: Message[] | { $values: Message[] };
-  participants: User[] | { $values: User[] };
+  participants?: User[] | { $values: User[] };
   lastMessage?: Message;
 }
 
@@ -120,11 +120,13 @@ export interface StyledProps {
   isOnline?: boolean;
   active?: boolean;
   isMine?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export interface ApiResponse<T> {
   $values?: T[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const unwrapValues = <T>(data: T[] | { $values: T[] } | undefined): T[] => {

@@ -163,37 +163,37 @@ const MessageBubble = styled.div<StyledProps>`
   }};
 `;
 
-const MessageItem = styled.div<StyledProps>`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 4px 0;
+// const MessageItem = styled.div<StyledProps>`
+//   display: flex;
+//   flex-direction: column;
+//   width: 100%;
+//   margin: 4px 0;
 
-  .message-wrapper {
-    display: flex;
-    justify-content: ${props => props.isMine ? 'flex-end' : 'flex-start'};
-    width: 100%;
-  }
+//   .message-wrapper {
+//     display: flex;
+//     justify-content: ${props => props.isMine ? 'flex-end' : 'flex-start'};
+//     width: 100%;
+//   }
 
-  .message-content {
-    max-width: 60%;
-    background: ${props => props.isMine ? '#0084ff' : '#e4e6eb'};
-    color: ${props => props.isMine ? '#ffffff' : '#050505'};
-    padding: 8px 12px;
-    border-radius: 18px;
-    font-size: 14px;
-    line-height: 1.4;
-    word-wrap: break-word;
-  }
+//   .message-content {
+//     max-width: 60%;
+//     background: ${props => props.isMine ? '#0084ff' : '#e4e6eb'};
+//     color: ${props => props.isMine ? '#ffffff' : '#050505'};
+//     padding: 8px 12px;
+//     border-radius: 18px;
+//     font-size: 14px;
+//     line-height: 1.4;
+//     word-wrap: break-word;
+//   }
 
-  .message-meta {
-    font-size: 11px;
-    color: #65676b;
-    margin-top: 4px;
-    text-align: ${props => props.isMine ? 'right' : 'left'};
-    padding: 0 12px;
-  }
-`;
+//   .message-meta {
+//     font-size: 11px;
+//     color: #65676b;
+//     margin-top: 4px;
+//     text-align: ${props => props.isMine ? 'right' : 'left'};
+//     padding: 0 12px;
+//   }
+// `;
 
 const InputArea = styled.div`
   padding: 16px;
@@ -314,21 +314,29 @@ const ChatPage: React.FC = () => {
         connection.on('ReceiveMessage', (message: Message) => {
           console.log('Received message:', message);
 
-          setRooms(prev => prev.map(room => {
-            if (room.chatRoomID === message.chatRoomID) {
-              const updatedMessages = room.messages ? [...room.messages, message] : [message];
-              return {
-                ...room,
-                messages: updatedMessages,
-                lastMessage: message
-              };
-            }
-            return room;
-          }));
+          setRooms(prev =>
+            prev.map(room => {
+              if (room.chatRoomID === message.chatRoomID) {
+                const updatedMessages = Array.isArray(room.messages)
+                  ? [...room.messages, message]
+                  : [...(room.messages?.$values || []), message];
+          
+                return {
+                  ...room,
+                  messages: updatedMessages,
+                  lastMessage: message
+                };
+              }
+              return room;
+            })
+          );
 
           setActiveRoom(prev => {
             if (prev && prev.chatRoomID === message.chatRoomID) {
-              const updatedMessages = prev.messages ? [...prev.messages, message] : [message];
+              const updatedMessages = Array.isArray(prev.messages)
+                ? [...prev.messages, message]
+                : [...(prev.messages?.$values || []), message]; // Chắc chắn messages luôn là một mảng
+          
               return {
                 ...prev,
                 messages: updatedMessages,
@@ -349,9 +357,13 @@ const ChatPage: React.FC = () => {
 
           setRooms(prev => prev.map(room => ({
             ...room,
-            participants: room.participants?.map(p =>
-              p.userID === userId ? { ...p, isOnline: true } : p
-            )
+            participants: Array.isArray(room.participants)
+              ? room.participants.map(p => 
+                  p.id === userId ? { ...p, isOnline: true } : p
+                )
+              : room.participants?.$values.map(p => 
+                  p.id === userId ? { ...p, isOnline: true } : p
+                )
           })));
         });
 
@@ -365,9 +377,13 @@ const ChatPage: React.FC = () => {
 
           setRooms(prev => prev.map(room => ({
             ...room,
-            participants: room.participants?.map(p =>
-              p.userID === userId ? { ...p, isOnline: false } : p
-            )
+            participants: Array.isArray(room.participants)
+              ? room.participants.map(p => 
+                  p.id === userId ? { ...p, isOnline: true } : p
+                )
+              : room.participants?.$values.map(p => 
+                  p.id === userId ? { ...p, isOnline: true } : p
+                )
           })));
         });
 
@@ -393,8 +409,8 @@ const ChatPage: React.FC = () => {
       const response = await axios.get<ApiResponse<ChatRoom>>('/api/chat/rooms');
       console.log('Chat rooms response:', response.data);
 
-      const roomsData = response.data.$values || response.data || [];
-      const rooms = roomsData.map(room => ({
+      const roomsData: ChatRoom[] = (response.data.$values || response.data || []) as ChatRoom[];
+      const rooms: ChatRoom[] = roomsData.map((room: ChatRoom) => ({
         ...room,
         participants: unwrapValues(room.participants || []),
         messages: unwrapValues(room.messages || [])
@@ -417,7 +433,7 @@ const ChatPage: React.FC = () => {
     try {
       const response = await axios.get<ApiResponse<User>>('/api/chat/users/online');
       console.log('Online users:', response.data);
-      const users = response.data.$values || response.data || [];
+      const users: User[] = (response.data.$values || response.data || []) as User[];
       setOnlineUsers(users);
     } catch (error) {
       console.error('Failed to load online users:', error);
@@ -553,15 +569,20 @@ const ChatPage: React.FC = () => {
                 <h3>{activeRoom.roomName}</h3>
                 <small>
                   {activeRoom.isGroup
-                    ? `${activeRoom.participants?.length || 0} members`
-                    : activeRoom.participants?.some(p => p.isOnline)
+                    ? `${(Array.isArray(activeRoom.participants) 
+                        ? activeRoom.participants.length 
+                        : activeRoom.participants?.$values?.length) || 0} members`
+                    : (Array.isArray(activeRoom.participants) 
+                        ? activeRoom.participants.some(p => p.isOnline)
+                        : activeRoom.participants?.$values?.some(p => p.isOnline))
                       ? 'Active now'
                       : 'Offline'}
                 </small>
               </div>
             </ChatHeader>
+
             <MessageList ref={messageListRef}>
-              {(activeRoom?.messages || [])
+            {(Array.isArray(activeRoom?.messages) ? activeRoom.messages : activeRoom?.messages?.$values || [])
                 .sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime())
                 .reduce((groups, msg) => {
                   const lastGroup = groups[groups.length - 1];
