@@ -91,8 +91,12 @@ export interface CartProductItem {
 }
 
 export interface User {
-  id: string;
+  id: number;
+  chatRoomID: number;
+  userID: string;
   userName: string;
+  isAdmin: boolean;
+  createdDate: string;
   isOnline: boolean;
 }
 
@@ -129,8 +133,8 @@ export interface ApiResponse<T> {
   [key: string]: unknown;
 }
 
-export const unwrapValues = <T>(data: T[] | { $values: T[] } | undefined): T[] => {
+export function unwrapValues<T>(data: T[] | { $values: T[] } | undefined): T[] {
   if (!data) return [];
   if (Array.isArray(data)) return data;
   return data.$values || [];
-};
+}

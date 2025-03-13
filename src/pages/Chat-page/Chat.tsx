@@ -2,9 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HubConnectionBuilder, HubConnection } from '@microsoft/signalr';
 import axios from 'axios';
 import styled from 'styled-components';
-import { ChatRoom, Message, User, StyledProps, ApiResponse, unwrapValues } from '../../interfaces';
-import { FaPlus, FaUsers, FaPaperPlane } from 'react-icons/fa';
+import { ChatRoom, Message, User, StyledProps, ApiResponse } from '../../interfaces/index';
+import { FaPlus, FaUsers, FaPaperPlane, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import * as signalR from '@microsoft/signalr';
+
+const unwrapValues = <T,>(data: T[] | { $values: T[] } | undefined): T[] => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  return data.$values || [];
+};
+
+const USERS_PER_PAGE = 2;
 
 const Container = styled.div`
   display: flex;
@@ -47,10 +55,46 @@ const ChatHeader = styled.div`
 const OnlineUsers = styled.div`
   padding: 16px;
   border-bottom: 1px solid #e4e6eb;
-  overflow-x: auto;
-  white-space: nowrap;
+  overflow: hidden;
   display: flex;
   align-items: center;
+  gap: 8px;
+  position: relative;
+`;
+
+const NavigationButton = styled.button`
+  background: #ffffff;
+  border: 1px solid #e4e6eb;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    background: #f5f6f7;
+    transform: scale(1.05);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
+const UsersContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  transition: transform 0.3s ease;
+  min-width: ${USERS_PER_PAGE * 48}px;
+  justify-content: flex-start;
 `;
 
 const UserAvatar = styled.div<StyledProps>`
@@ -134,66 +178,41 @@ const MessageList = styled.div`
 const MessageGroup = styled.div<StyledProps>`
   display: flex;
   flex-direction: column;
+  align-items: ${props => props.isMine ? 'flex-end' : 'flex-start'};
+  margin: 4px 0;
   width: 100%;
-  margin: 8px 0;
 
   .messages {
     display: flex;
     flex-direction: column;
+    gap: 2px;
     align-items: ${props => props.isMine ? 'flex-end' : 'flex-start'};
+  }
+
+  .message-meta {
+    font-size: 12px;
+    color: #65676b;
+    margin-top: 4px;
+    padding: 0 12px;
   }
 `;
 
 const MessageBubble = styled.div<StyledProps>`
-  max-width: 60%;
-  background: ${props => props.isMine ? '#0084ff' : '#e4e6eb'};
-  color: ${props => props.isMine ? '#ffffff' : '#050505'};
   padding: 8px 12px;
-  margin: 1px 0;
+  margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: inline-block;
+  background: ${props => props.isMine ? '#0084ff' : '#e4e6eb'};
+  color: ${props => props.isMine ? '#ffffff' : '#050505'};
+  border-radius: 18px;
 
-  /* First message in group */
-  border-radius: ${props => {
-    if (props.isFirst && props.isLast) return '18px';
-    if (props.isFirst) return props.isMine ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
-    if (props.isLast) return props.isMine ? '18px 4px 18px 18px' : '4px 18px 18px 18px';
-    return props.isMine ? '18px 4px 4px 18px' : '4px 18px 18px 4px';
-  }};
+  & + & {
+    margin-top: 1px;
+  }
 `;
-
-// const MessageItem = styled.div<StyledProps>`
-//   display: flex;
-//   flex-direction: column;
-//   width: 100%;
-//   margin: 4px 0;
-
-//   .message-wrapper {
-//     display: flex;
-//     justify-content: ${props => props.isMine ? 'flex-end' : 'flex-start'};
-//     width: 100%;
-//   }
-
-//   .message-content {
-//     max-width: 60%;
-//     background: ${props => props.isMine ? '#0084ff' : '#e4e6eb'};
-//     color: ${props => props.isMine ? '#ffffff' : '#050505'};
-//     padding: 8px 12px;
-//     border-radius: 18px;
-//     font-size: 14px;
-//     line-height: 1.4;
-//     word-wrap: break-word;
-//   }
-
-//   .message-meta {
-//     font-size: 11px;
-//     color: #65676b;
-//     margin-top: 4px;
-//     text-align: ${props => props.isMine ? 'right' : 'left'};
-//     padding: 0 12px;
-//   }
-// `;
 
 const InputArea = styled.div`
   padding: 16px;
@@ -254,6 +273,7 @@ const ChatPage: React.FC = () => {
   const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const messageListRef = useRef<HTMLDivElement>(null);
+  const [userOffset, setUserOffset] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -320,7 +340,7 @@ const ChatPage: React.FC = () => {
                 const updatedMessages = Array.isArray(room.messages)
                   ? [...room.messages, message]
                   : [...(room.messages?.$values || []), message];
-          
+
                 return {
                   ...room,
                   messages: updatedMessages,
@@ -335,8 +355,8 @@ const ChatPage: React.FC = () => {
             if (prev && prev.chatRoomID === message.chatRoomID) {
               const updatedMessages = Array.isArray(prev.messages)
                 ? [...prev.messages, message]
-                : [...(prev.messages?.$values || []), message]; // Chắc chắn messages luôn là một mảng
-          
+                : [...(prev.messages?.$values || []), message];
+
               return {
                 ...prev,
                 messages: updatedMessages,
@@ -351,19 +371,19 @@ const ChatPage: React.FC = () => {
           console.log('User came online:', userId);
           setOnlineUsers(prev =>
             prev.map(user =>
-              user.id === userId ? { ...user, isOnline: true } : user
+              user.userID === userId ? { ...user, isOnline: true } : user
             )
           );
 
           setRooms(prev => prev.map(room => ({
             ...room,
             participants: Array.isArray(room.participants)
-              ? room.participants.map(p => 
-                  p.id === userId ? { ...p, isOnline: true } : p
-                )
-              : room.participants?.$values.map(p => 
-                  p.id === userId ? { ...p, isOnline: true } : p
-                )
+              ? room.participants.map(p =>
+                p.userID === userId ? { ...p, isOnline: true } : p
+              )
+              : room.participants?.$values.map(p =>
+                p.userID === userId ? { ...p, isOnline: true } : p
+              )
           })));
         });
 
@@ -371,19 +391,19 @@ const ChatPage: React.FC = () => {
           console.log('User went offline:', userId);
           setOnlineUsers(prev =>
             prev.map(user =>
-              user.id === userId ? { ...user, isOnline: false } : user
+              user.userID === userId ? { ...user, isOnline: false } : user
             )
           );
 
           setRooms(prev => prev.map(room => ({
             ...room,
             participants: Array.isArray(room.participants)
-              ? room.participants.map(p => 
-                  p.id === userId ? { ...p, isOnline: true } : p
-                )
-              : room.participants?.$values.map(p => 
-                  p.id === userId ? { ...p, isOnline: true } : p
-                )
+              ? room.participants.map(p =>
+                p.userID === userId ? { ...p, isOnline: false } : p
+              )
+              : room.participants?.$values.map(p =>
+                p.userID === userId ? { ...p, isOnline: false } : p
+              )
           })));
         });
 
@@ -434,7 +454,27 @@ const ChatPage: React.FC = () => {
       const response = await axios.get<ApiResponse<User>>('/api/chat/users/online');
       console.log('Online users:', response.data);
       const users: User[] = (response.data.$values || response.data || []) as User[];
-      setOnlineUsers(users);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        setOnlineUsers([]);
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentUserId = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+        console.log('Current user ID:', currentUserId);
+
+        const filteredUsers = users.filter(user => user.userID !== currentUserId);
+        console.log('Filtered users (excluding current user):', filteredUsers);
+
+        setOnlineUsers(filteredUsers);
+      } catch (error) {
+        console.error('Error parsing token:', error);
+        setOnlineUsers([]);
+      }
     } catch (error) {
       console.error('Failed to load online users:', error);
       setOnlineUsers([]);
@@ -444,9 +484,14 @@ const ChatPage: React.FC = () => {
   const handleUserClick = async (userId: string) => {
     try {
       console.log('Creating chat with user:', userId);
-      const response = await axios.post<ChatRoom>('/api/chat/room/private', JSON.stringify(userId), {
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const response = await axios.post<ChatRoom>('/api/chat/room/private',
+        { otherUserId: userId },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
       console.log('Chat room created:', response.data);
       if (response.data) {
@@ -458,7 +503,11 @@ const ChatPage: React.FC = () => {
 
         setRooms(prev => {
           const exists = prev.some(room => room.chatRoomID === newRoom.chatRoomID);
-          return exists ? prev : [...prev, newRoom];
+          if (exists) {
+            handleRoomClick(newRoom);
+            return prev;
+          }
+          return [...prev, newRoom];
         });
         setActiveRoom(newRoom);
         if (connection) {
@@ -467,6 +516,10 @@ const ChatPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to create chat room:', error);
+      if (axios.isAxiosError(error) && error.response?.data) {
+        console.error('Error details:', error.response.data);
+        console.log('Full error response:', error.response);
+      }
     }
   };
 
@@ -514,6 +567,30 @@ const ChatPage: React.FC = () => {
     }
   };
 
+  const visibleUsers = onlineUsers.slice(userOffset, userOffset + USERS_PER_PAGE);
+  const canScrollLeft = userOffset > 0;
+  const canScrollRight = userOffset + USERS_PER_PAGE < onlineUsers.length;
+
+  const handleScrollLeft = () => {
+    setUserOffset(prev => Math.max(0, prev - USERS_PER_PAGE));
+  };
+
+  const handleScrollRight = () => {
+    setUserOffset(prev => Math.min(onlineUsers.length - USERS_PER_PAGE, prev + USERS_PER_PAGE));
+  };
+
+  const getCurrentUserIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return null;
+    }
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -534,16 +611,34 @@ const ChatPage: React.FC = () => {
           <CreateChatButton onClick={() => { }}>
             <FaPlus /> New Chat
           </CreateChatButton>
-          {onlineUsers.map(user => (
-            <UserAvatar
-              key={user.id}
-              isOnline={user.isOnline}
-              onClick={() => handleUserClick(user.id)}
-              title={user.userName}
+          {canScrollLeft && (
+            <NavigationButton
+              onClick={handleScrollLeft}
+              title={`Show previous ${USERS_PER_PAGE} users (${userOffset} previous)`}
             >
-              {user.userName?.[0]?.toUpperCase()}
-            </UserAvatar>
-          ))}
+              <FaChevronLeft />
+            </NavigationButton>
+          )}
+          <UsersContainer>
+            {visibleUsers.map(user => (
+              <UserAvatar
+                key={user.userID}
+                isOnline={user.isOnline}
+                onClick={() => handleUserClick(user.userID)}
+                title={user.userName}
+              >
+                {user.userName?.[0]?.toUpperCase()}
+              </UserAvatar>
+            ))}
+          </UsersContainer>
+          {canScrollRight && (
+            <NavigationButton
+              onClick={handleScrollRight}
+              title={`Show next ${USERS_PER_PAGE} users (${onlineUsers.length - (userOffset + USERS_PER_PAGE)} remaining)`}
+            >
+              <FaChevronRight />
+            </NavigationButton>
+          )}
         </OnlineUsers>
         <ChatList>
           {rooms.map(room => (
@@ -569,12 +664,12 @@ const ChatPage: React.FC = () => {
                 <h3>{activeRoom.roomName}</h3>
                 <small>
                   {activeRoom.isGroup
-                    ? `${(Array.isArray(activeRoom.participants) 
-                        ? activeRoom.participants.length 
-                        : activeRoom.participants?.$values?.length) || 0} members`
-                    : (Array.isArray(activeRoom.participants) 
-                        ? activeRoom.participants.some(p => p.isOnline)
-                        : activeRoom.participants?.$values?.some(p => p.isOnline))
+                    ? `${(Array.isArray(activeRoom.participants)
+                      ? activeRoom.participants.length
+                      : activeRoom.participants?.$values?.length) || 0} members`
+                    : (Array.isArray(activeRoom.participants)
+                      ? activeRoom.participants.some(p => p.isOnline)
+                      : activeRoom.participants?.$values?.some(p => p.isOnline))
                       ? 'Active now'
                       : 'Offline'}
                 </small>
@@ -582,7 +677,7 @@ const ChatPage: React.FC = () => {
             </ChatHeader>
 
             <MessageList ref={messageListRef}>
-            {(Array.isArray(activeRoom?.messages) ? activeRoom.messages : activeRoom?.messages?.$values || [])
+              {(Array.isArray(activeRoom?.messages) ? activeRoom.messages : activeRoom?.messages?.$values || [])
                 .sort((a, b) => new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime())
                 .reduce((groups, msg) => {
                   const lastGroup = groups[groups.length - 1];
@@ -594,7 +689,8 @@ const ChatPage: React.FC = () => {
                   return groups;
                 }, [] as Message[][])
                 .map((group, groupIndex) => {
-                  const isMine = group[0].senderID === localStorage.getItem('userId');
+                  const currentUserId = getCurrentUserIdFromToken();
+                  const isMine = group[0].senderID === currentUserId;
                   return (
                     <MessageGroup key={`group-${groupIndex}`} isMine={isMine}>
                       <div className="messages">
@@ -609,7 +705,7 @@ const ChatPage: React.FC = () => {
                           </MessageBubble>
                         ))}
                       </div>
-                      <div className="message-meta" style={{ textAlign: isMine ? 'right' : 'left' }}>
+                      <div className="message-meta">
                         {group[0].senderName} • {new Date(group[group.length - 1].createdDate).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit'
