@@ -83,9 +83,9 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                     <UserList>
                         {availableUsers.map(user => (
                             <UserItem
-                                key={user.id}
-                                selected={selectedUsers.includes(user.id)}
-                                onClick={() => toggleUser(user.id)}
+                                key={user.userID}
+                                selected={selectedUsers.includes(user.userID)}
+                                onClick={() => toggleUser(user.userID)}
                             >
                                 {user.userName}
                             </UserItem>
