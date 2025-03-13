@@ -96,7 +96,7 @@ const ProductDetails = () => {
       <div className="mb-16">
         <NavbarforP />
       </div>
-      <div className="bg-white w-[100%] h-[40px] fixed mb-10"></div>
+      <div className="bg-white dark:bg-gray-900 dark:text-white w-[100%] h-[40px] fixed mb-10"></div>
       <Breadcrumb paths={breadcrumbPaths} />
       <div className="max-w-5xl mx-auto p-6 grid md:grid-cols-2 gap-8 mt-36">
         {productItem ? (
@@ -114,9 +114,8 @@ const ProductDetails = () => {
                     key={index}
                     src={img}
                     alt="Product preview"
-                    className={`w-16 h-16 rounded cursor-pointer border-2 ${
-                      selectedImage === img ? "border-black" : "border-gray-300"
-                    }`}
+                    className={`w-16 h-16 rounded cursor-pointer border-2 ${selectedImage === img ? "border-black" : "border-gray-300"
+                      }`}
                     onClick={() => setSelectedImage(img)}
                   />
                 ))}
@@ -158,11 +157,10 @@ const ProductDetails = () => {
                           // Nếu là thuộc tính "Color", hiển thị nút tròn với màu nền
                           <button
                             key={index}
-                            className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${
-                              selectedColor === value
+                            className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${selectedColor === value
                                 ? "border-blue-400 bg-blue-50 text-blue-600"
                                 : "border-gray-300 text-gray-800"
-                            }`}
+                              }`}
                             onClick={() => setSelectedColor(value)}
                           >
                             <span
@@ -177,11 +175,10 @@ const ProductDetails = () => {
                           // Các thuộc tính khác hiển thị nút chữ nhật
                           <button
                             key={index}
-                            className={`px-4 py-2 border rounded ${
-                              selectedStorage === value
+                            className={`px-4 py-2 border rounded ${selectedStorage === value
                                 ? "border-black font-bold"
                                 : "border-gray-300"
-                            }`}
+                              }`}
                             onClick={() => setSelectedStorage(value)}
                           >
                             {value}
@@ -195,7 +192,7 @@ const ProductDetails = () => {
 
               {/* Action Buttons */}
               <div className="mt-6 flex gap-4">
-                <button  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800" onClick={() => HandleAddToCartClick(productItem)}>
+                <button className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800" onClick={() => HandleAddToCartClick(productItem)}>
                   Add To Cart
                 </button>
                 <Link to="/checkout" className="border px-6 py-3 rounded-lg hover:bg-gray-200">

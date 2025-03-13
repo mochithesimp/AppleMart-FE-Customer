@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 
 type BreadcrumbProps = {
-    paths: { name: string; link?: string }[];
-  };
+  paths: { name: string; link?: string }[];
+};
 
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ paths }) => {
   return (
-    <div className="text-gray-500 text-sm mb-4 mt-10  ml-56 fixed w-[100%] h-[40px] bg-white">
+    <div className="dark:bg-gray-900 dark:text-white text-gray-500 text-sm mb-4 mt-10  ml-56 fixed w-[100%] h-[40px] bg-white">
       {paths.map((path, index) => (
         <span key={index}>
           {index !== 0 && <span className="mx-1">›</span>}
@@ -15,7 +15,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ paths }) => {
               {path.name}
             </Link>
           ) : (
-            <span className="font-semibold text-black">{path.name}</span>
+            <span className="font-semibold dark:text-white text-black">{path.name}</span>
           )}
         </span>
       ))}

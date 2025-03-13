@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  //fetchSignInMethodsForEmail,
+} from "firebase/auth";
 import { auth, db } from "../components/Firebase";
 import { setDoc, doc } from "firebase/firestore";
 import GoogleLogin from "../GoogleLogin";
@@ -11,6 +14,7 @@ import { register } from "../../../apiServices/AccountServices/accountServices";
 interface ResgiterFormProps {
   activeForm: "login" | "register" | "forget";
 }
+
 const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -19,13 +23,23 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!", { position: "bottom-center" });
+      toast.error("Passwords do not match!", { position: "top-right" });
       return;
     }
+    setIsRegistering(true);
     try {
+      // // Kiểm tra email đã tồn tại
+      // const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      // if (signInMethods.length > 0) {
+      //   swal("Warning!", "Email is already in use!", "warning");
+      //   setIsRegistering(false);
+      //   return;
+      // }
+
       const registerValues = {
         name,
         email,
@@ -35,12 +49,16 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
 
       const response = await register(registerValues);
       if (!response) {
+        setIsRegistering(false);
         return;
       }
       console.log("User Registered Successfully!!");
-      toast.success("Registration successful! The system is processing, please wait...", {
-        position: "top-center",
-      });
+      toast.success(
+        "Registration successful! The system is processing, please wait...",
+        {
+          position: "top-center",
+        }
+      );
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
 
@@ -51,13 +69,16 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
           userName: name,
           phoneNumber: phoneNumber,
         });
-      }   
-      window.location.reload()
+      }
+      swal("Success!", "Registration successful!", "success").then(() => {
+        window.location.reload();
+      });
     } catch (error) {
       console.log(error);
       toast.error((error as Error).message, {
-        position: "bottom-center",
+        position: "top-center",
       });
+      setIsRegistering(false);
     }
   };
   return (
@@ -104,9 +125,8 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
                   required
                 />
                 <i
-                  className={`bx ${
-                    showPassword ? "bx-lock-open" : "bx-lock-alt"
-                  } icon`}
+                  className={`bx ${showPassword ? "bx-lock-open" : "bx-lock-alt"
+                    } icon`}
                   onClick={() => setShowPassword(!showPassword)}
                 ></i>
               </div>
@@ -119,9 +139,8 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
                   required
                 />
                 <i
-                  className={`bx ${
-                    showConfirmPassword ? "bx-hide" : "bx-show"
-                  } icon`}
+                  className={`bx ${showConfirmPassword ? "bx-hide" : "bx-show"
+                    } icon`}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 ></i>
               </div>
@@ -140,8 +159,16 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
               <Link to="/ForgetPass">Forgot Password?</Link>
             </div>
             <div className="input-box">
-              <button className="input-submit">
-                <span>Sign Up</span>
+              <button
+                className="input-submit"
+                disabled={isRegistering}
+                style={{
+                  backgroundColor: isRegistering ? "#ccc" : "", // Đổi màu khi đang xử lý
+                  cursor: isRegistering ? "not-allowed" : "pointer",
+                  opacity: isRegistering ? 0.7 : 1,
+                }}
+              >
+                <span>{isRegistering ? "Processing..." : "Sign Up"}</span>
                 <i className="bx bx-right-arrow-alt"></i>
               </button>
             </div>

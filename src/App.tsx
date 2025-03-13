@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { ToastContainer } from "react-toastify";
 import ProductDetails from "./pages/ProductDetails-page/ProductDetail";
+import MyOrderPage from "./pages/MyOrder-page/MyOrderPage";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
     path: "/Chat",
     element: <ChatPage />,
   },
+  {
+    path: "/MyOrderPage",
+    element: <MyOrderPage />,
+  }
 ]);
 
 function App() {

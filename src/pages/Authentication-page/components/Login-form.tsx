@@ -1,46 +1,70 @@
-// import { signInWithEmailAndPassword } from "firebase/auth";
-import ResgiterForm from "./Register-form";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
-// import { auth } from "../components/Firebase";
+import { auth, provider, signInWithPopup, db } from "../components/Firebase";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import GoogleLogin from "../GoogleLogin";
-import "../Style.css";
-import { login } from "../../../apiServices/AccountServices/loginServices";
+import { GoogleAuthProvider } from "firebase/auth";
+import { loginGoogle } from "../../../apiServices/AccountServices/loginGoogleServices";
 import { AxiosError } from "axios";
-interface LoginFormProps {
-  activeForm: "login" | "register" | "forget";
-  setActiveForm: (form: "login" | "register" | "forget") => void;
-}
-const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+import { useNavigate } from "react-router-dom";
+
+const GoogleLogin = () => {
   const navigate = useNavigate();
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      toast.error("Missing Email or Password");
-      return;
-    }
-
+  const handleLogin = async () => {
     try {
-      // await signInWithEmailAndPassword(auth, email, password);
-      // console.log("User logged in Successfully");
-      // window.location.href = "/profile";
-      // toast.success("User logged in Successfully", {
-      //   position: "top-center",
-      // });
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      const response = await login(email, password);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const idToken = credential?.idToken;
+      // console.log("idToken:", idToken );
 
-      if (response?.status === 200) {
-        const { accessToken, refreshToken } = response.data;
+      if (!idToken) {
+        console.error("Không thể lấy ID Token từ Google!");
+        return;
+      }
+      let userName = user.displayName; // Mặc định là tên từ Google
+      let phoneNumber = user.phoneNumber;
+      if (result.user) {
+        const userDocRef = doc(db, "Users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          const userNameFromFirestore = userDocSnap.data().userName;
+          if (userNameFromFirestore) userName = userNameFromFirestore;
+          const numberPhoneFromFirestore = userDocSnap.data().phoneNumber;
+          phoneNumber = numberPhoneFromFirestore;
+        } else {
+          console.log("User document not found!");
+        }
+        toast.info("Processing registration, please wait...", {
+          position: "top-center",
+          autoClose: 1000,
+        });
+        await setDoc(
+          doc(db, "Users", user.uid),
+          {
+            email: user.email,
+            name: user.displayName,
+          },
+          { merge: true }
+        );
 
-        localStorage.setItem("token", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        navigate("/");
+        const response = await loginGoogle(
+          idToken,
+          user.email ?? "",
+          userName ?? "",
+          phoneNumber ?? ""
+        );
+
+        if (response.status === 200) {
+          const { accessToken, refreshToken } = response.data;
+
+          localStorage.setItem("token", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+        }
+        if (!response) {
+          throw new Error("Failed to save user to database");
+        }
+
+        navigate("/profile");
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -53,68 +77,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <div
-          className="login-form"
-          style={{
-            left: activeForm === "login" ? "50%" : "150%",
-            opacity: activeForm === "login" ? 1 : 0,
-          }}
-        >
-          <div className="form-title">
-            <span>Sign In</span>
-          </div>
-          <div className="form-inputs">
-            <div className="input-box">
-              <input
-                type="text"
-                className="input-field"
-                placeholder="email"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <i className="bx bx-user icon"></i>
-            </div>
-            <div className="input-box">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="input-field"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <i
-                className={`bx ${
-                  showPassword ? "bx-lock-open" : "bx-lock-alt"
-                } icon`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></i>
-            </div>
-            <div className="forgot-pass">
-              <NavLink
-                to="/ForgetPass"
-                className={`${activeForm === "forget" ? "active-btn" : ""}`}
-                onClick={() => setActiveForm("forget")}
-              >
-                Forgot Password?
-              </NavLink>
-            </div>
-            <div className="input-box">
-              <button className="input-submit">
-                <span>Sign In</span>
-                <i className="bx bx-right-arrow-alt"></i>
-              </button>
-            </div>
-          </div>
-          <div className="social-login">
-            <GoogleLogin />
-            <i className="bx bxl-facebook"></i>
-            <i className="bx bxl-github"></i>
-          </div>
-        </div>
-      </form>
-      <ResgiterForm activeForm={activeForm} />
+      <button onClick={handleLogin}>
+        <i className="bx bxl-google"></i>
+      </button>
     </div>
   );
 };
-export default LoginForm;
+
+export default GoogleLogin;
