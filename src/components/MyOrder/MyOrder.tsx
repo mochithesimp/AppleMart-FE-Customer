@@ -19,7 +19,7 @@ const fakeOrders: Order[] = [
 ];
 
 const MyOrder = () => {
-    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [, setSearchTerm] = useState<string>("");
     const [orders, setOrders] = useState<Order[]>(fakeOrders);
 
 
