@@ -1,8 +1,7 @@
-// import { signInWithEmailAndPassword } from "firebase/auth";
 import ResgiterForm from "./Register-form";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-// import { auth } from "../components/Firebase";
+import swal from "sweetalert";
 import { toast } from "react-toastify";
 import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
@@ -26,12 +25,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
     }
 
     try {
-      // await signInWithEmailAndPassword(auth, email, password);
-      // console.log("User logged in Successfully");
-      // window.location.href = "/profile";
-      // toast.success("User logged in Successfully", {
-      //   position: "top-center",
-      // });
 
       const response = await login(email, password);
 
@@ -44,9 +37,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        console.error("Response error:", error.response?.data);
+        if (error.response?.status === 403) {
+          swal({
+            title: "Banned",
+            text: "Your account has been banned indefinitely and cannot log in.",
+            icon: "error",
+            buttons: {
+              ok: {
+                text: "OK",
+                value: true,
+                className: "swal-ok-button",
+              },
+            },
+          });
+        } else if (error.response?.status === 400) {
+          swal("Validation Error", "Incorrect Account or Password", "error");
+        } else {
+          // Handle other status codes
+          console.error("Login failed:", error.response?.status);
+          toast.error("Login failed. Please try again.");
+        }
       } else {
-        console.error("Unexpected error:", error);
+        console.error("An error occurred:", error);
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -84,9 +97,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
                 required
               />
               <i
-                className={`bx ${
-                  showPassword ? "bx-lock-open" : "bx-lock-alt"
-                } icon`}
+                className={`bx ${showPassword ? "bx-lock-open" : "bx-lock-alt"
+                  } icon`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>
