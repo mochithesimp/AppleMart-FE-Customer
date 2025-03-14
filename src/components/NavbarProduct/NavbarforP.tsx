@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
-import { FaBell, FaCartShopping } from "react-icons/fa6";
+import { FaBell, FaCartShopping, FaTrash } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
 import noface from "../../assets/NoFace.jpg";
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useNotification } from "../../context/NotificationContext";
 
 const MenuLinks = [
   {
@@ -52,19 +53,45 @@ const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
   const { cart } = useCart();
   const [orderPopup, setOrderPopup] = useState<boolean>(false);
+  const [notificationPopup, setNotificationPopup] = useState<boolean>(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const bellIconRef = useRef<HTMLButtonElement>(null);
+  const orderPopupRef = useRef<HTMLDivElement>(null);
   const token = localStorage.getItem("token");
 
-  //Get token login
+  const { notifications, unreadCount, markAsRead, deleteNotification, connectionState, testConnection } = useNotification();
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node) &&
+        !bellIconRef.current?.contains(event.target as Node)
+      ) {
+        setNotificationPopup(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleMarkAsRead = async (notificationId: number) => {
+    await markAsRead(notificationId);
+  };
+
+  const handleDeleteNotification = async (notificationId: number) => {
+    await deleteNotification(notificationId);
+  };
+
   const isLoggedIn = token;
 
-  //Renove token logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     // localStorage.removeItem("cart");
   };
 
-  // Calculate the total quantity in stock
   useEffect(() => {
     const totalQuantityInStock = cart.reduce(
       (total, product) => total + product.quantity,
@@ -73,34 +100,26 @@ const NavbarforP = () => {
     setCartCount(totalQuantityInStock);
   }, [cart]);
 
-  const handleOrderPopup = () => {
-    setOrderPopup(!orderPopup);
+  const formatUnreadCount = (count: number): string => {
+    return count > 99 ? "99+" : count.toString();
   };
-  const iconRef = useRef<HTMLButtonElement>(null);
-  const popupRef = useRef<HTMLDivElement | null>(null);
+
+  //debug connection signalR dung` xoa nhung~ dong` nay
+  useEffect(() => {
+    console.log("Current notification connection state:", connectionState);
+  }, [connectionState]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        (iconRef.current && iconRef.current.contains(event.target as Node)) ||
-        popupRef.current?.contains(event.target as Node)
-      ) {
-        return;
-      }
+    console.log("Current notifications:", notifications);
+  }, [notifications]);
 
-      setOrderPopup(false);
-    }
+  useEffect(() => {
+    console.log("Current unread count:", unreadCount);
+  }, [unreadCount]);
 
-    if (orderPopup) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [orderPopup]);
+  const handleTestConnection = async () => {
+    await testConnection();
+  };
 
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 fixed z-40 w-[100%]">
@@ -174,30 +193,115 @@ const NavbarforP = () => {
             {/* Search Bar section */}
             <div className="relative group hidden sm:block">
               <input type="text" placeholder="Search" className="search-bar" />
-              <IoMdSearch className="text-xl text-gray-600 group-hover:text-primary  dark:text-gray-400 absolute top-1/2 -translate-y-1/2 right-3 duration-200" />
+              <IoMdSearch className="text-xl text-gray-600 group-hover:text-primary dark:text-gray-400 absolute top-1/2 -translate-y-1/2 right-3 duration-200" />
             </div>
 
-            {/* Noti */}
-            <button
-              className="relative p-3 "
-              ref={iconRef}
-              onClick={handleOrderPopup}
-            >
-              <FaBell className="text-xl text-gray-600 dark:text-gray-400" />
+            {/* Notification Bell */}
+            <div className="relative">
+              <button
+                className="relative p-3"
+                ref={bellIconRef}
+                onClick={() => {
+                  setNotificationPopup(!notificationPopup);
+                  if (!notificationPopup) {
+                    handleTestConnection();
+                  }
+                }}
+              >
+                <FaBell className="text-xl text-gray-600 dark:text-gray-400" />
+                {unreadCount > 0 && (
+                  <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
+                    {formatUnreadCount(unreadCount)}
+                  </div>
+                )}
+              </button>
 
-              <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
-                {cartCount}
-              </div>
-            </button>
+              {/* Notification Popup */}
+              {notificationPopup && (
+                <div
+                  ref={notificationRef}
+                  className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50"
+                >
+                  {/* Arrow */}
+                  <div className="absolute -top-2 right-[12px] w-4 h-4 bg-white dark:bg-gray-800 transform rotate-45 border-t border-l border-gray-200 dark:border-gray-700"></div>
+
+                  {/* Content Container */}
+                  <div className="relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+                    {/* Header */}
+                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                        Notifications
+                      </h3>
+                    </div>
+
+                    {/* Notification Content */}
+                    <div className="max-h-[400px] overflow-y-auto">
+                      {!Array.isArray(notifications) || notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-8 px-4">
+                          <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+                            <span className="text-4xl text-orange-400">😕</span>
+                          </div>
+                          <p className="text-gray-600 dark:text-gray-400 text-center font-medium">
+                            No notifications yet
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                          {notifications.map((notification, index) => (
+                            <div
+                              key={notification.notificationID}
+                              className={`relative group hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!notification.isRead ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                                }`}
+                              onClick={() => handleMarkAsRead(notification.notificationID)}
+                            >
+                              <div className="p-4 cursor-pointer">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 pr-8">
+                                    <h4 className="font-semibold text-sm text-gray-800 dark:text-gray-200 mb-1">
+                                      {notification.header}
+                                    </h4>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-1">
+                                      {notification.content}
+                                    </p>
+                                    <span className="text-xs text-gray-500">
+                                      {new Date(notification.createdDate).toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteNotification(notification.notificationID);
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-all"
+                                    aria-label="Delete notification"
+                                  >
+                                    <FaTrash className="text-gray-500 hover:text-red-500 text-sm" />
+                                  </button>
+                                </div>
+                              </div>
+                              {index === 4 && notifications.length > 5 && (
+                                <div className="text-center py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Scroll to see {notifications.length - 5} more notifications
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Order-button */}
             <button
-              className="relative p-3 "
-              ref={iconRef}
-              onClick={handleOrderPopup}
+              className="relative p-3"
+              onClick={() => setOrderPopup(!orderPopup)}
             >
               <FaCartShopping className="text-xl text-gray-600 dark:text-gray-400" />
-
               <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
                 {cartCount}
               </div>
@@ -242,8 +346,8 @@ const NavbarforP = () => {
       </div>
       <Popup
         orderPopup={orderPopup}
-        popupRef={popupRef}
-        handleOrderPopup={handleOrderPopup}
+        popupRef={orderPopupRef}
+        handleOrderPopup={() => setOrderPopup(false)}
       />
     </div>
   );

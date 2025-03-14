@@ -4,6 +4,7 @@ import { CartProvider } from "./context/CartContext";
 import { ToastContainer } from "react-toastify";
 import ProductDetails from "./pages/ProductDetails-page/ProductDetail";
 import MyOrderPage from "./pages/MyOrder-page/MyOrderPage";
+import { NotificationProvider } from './context/NotificationContext';
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -85,10 +86,12 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <CartProvider>
-      <RouterProvider router={router} />
-      <ToastContainer />
-    </CartProvider>
+    <NotificationProvider>
+      <CartProvider>
+        <RouterProvider router={router} />
+        <ToastContainer />
+      </CartProvider>
+    </NotificationProvider>
   );
 }
 
