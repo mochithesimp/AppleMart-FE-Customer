@@ -10,10 +10,13 @@ import GoogleLogin from "../GoogleLogin";
 import { toast } from "react-toastify";
 import "../Style.css";
 import { register } from "../../../apiServices/AccountServices/accountServices";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 // import { register } from "../../../apiServices/AccountServices/accountServices";
 interface ResgiterFormProps {
   activeForm: "login" | "register" | "forget";
 }
+const MySwal = withReactContent(Swal);
 
 const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [email, setEmail] = useState("");
@@ -24,22 +27,43 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Kiểm tra số điện thoại
+    if (phoneNumber.charAt(0) !== "0" || phoneNumber.length !== 10) {
+      MySwal.fire({
+        icon: "error",
+        title: "Invalid Phone Number",
+        text: "Phone number must start with 0 and be exactly 10 digits long.",
+      });
+      return;
+    }
+
+    // Kiểm tra email hợp lệ
+    const email_pattern =
+      // eslint-disable-next-line no-useless-escape
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!email_pattern.test(email)) {
+      MySwal.fire({
+        icon: "error",
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!", { position: "top-right" });
+      MySwal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "Passwords do not match!",
+      });
       return;
     }
     setIsRegistering(true);
     try {
-      // // Kiểm tra email đã tồn tại
-      // const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-      // if (signInMethods.length > 0) {
-      //   swal("Warning!", "Email is already in use!", "warning");
-      //   setIsRegistering(false);
-      //   return;
-      // }
-
       const registerValues = {
         name,
         email,
@@ -47,18 +71,14 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
         confirmPassword,
       };
 
-      const response = await register(registerValues);
-      if (!response) {
-        setIsRegistering(false);
-        return;
-      }
-      console.log("User Registered Successfully!!");
-      toast.success(
-        "Registration successful! The system is processing, please wait...",
-        {
-          position: "top-center",
-        }
-      );
+      MySwal.fire({
+        title: "Processing...",
+        text: "Please wait a moment.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
 
@@ -70,14 +90,37 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
           phoneNumber: phoneNumber,
         });
       }
-      swal("Success!", "Registration successful!", "success").then(() => {
+
+      const response = await register(registerValues);
+      if (!response) {
+        setIsRegistering(false);
+        return;
+      }
+
+      MySwal.fire({
+        icon: "success",
+        title: "Registration successful!",
+        text: "Redirecting to login...",
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => {
         window.location.reload();
       });
     } catch (error) {
-      console.log(error);
-      toast.error((error as Error).message, {
-        position: "top-center",
-      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorCode = (error as any).code;
+      if (errorCode === "auth/email-already-in-use") {
+        MySwal.fire({
+          icon: "warning",
+          title: "Warning!",
+          text: "Email has already been registered !!!",
+        });
+      } else {
+        toast.error((error as Error).message, {
+          position: "top-center",
+        });
+      }
+    } finally {
       setIsRegistering(false);
     }
   };
@@ -125,8 +168,9 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
                   required
                 />
                 <i
-                  className={`bx ${showPassword ? "bx-lock-open" : "bx-lock-alt"
-                    } icon`}
+                  className={`bx ${
+                    showPassword ? "bx-lock-open" : "bx-lock-alt"
+                  } icon`}
                   onClick={() => setShowPassword(!showPassword)}
                 ></i>
               </div>
@@ -139,8 +183,9 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
                   required
                 />
                 <i
-                  className={`bx ${showConfirmPassword ? "bx-hide" : "bx-show"
-                    } icon`}
+                  className={`bx ${
+                    showConfirmPassword ? "bx-hide" : "bx-show"
+                  } icon`}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 ></i>
               </div>
