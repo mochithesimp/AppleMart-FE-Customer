@@ -15,17 +15,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      toast.error("Missing Email or Password");
-      return;
-    }
-
     try {
-
+      setIsLogin(true);
       const response = await login(email, password);
 
       if (response?.status === 200) {
@@ -34,6 +30,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
         localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         navigate("/");
+      } else {
+        setIsLogin(false);
+        return;
       }
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -50,16 +49,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
               },
             },
           });
+          setIsLogin(false);
         } else if (error.response?.status === 400) {
           swal("Validation Error", "Incorrect Account or Password", "error");
         } else {
           // Handle other status codes
           console.error("Login failed:", error.response?.status);
           toast.error("Login failed. Please try again.");
+          setIsLogin(false);
         }
       } else {
         console.error("An error occurred:", error);
         toast.error("An unexpected error occurred. Please try again.");
+        setIsLogin(false);
       }
     }
   };
@@ -82,7 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
               <input
                 type="text"
                 className="input-field"
-                placeholder="email"
+                placeholder="Email"
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
@@ -97,8 +99,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
                 required
               />
               <i
-                className={`bx ${showPassword ? "bx-lock-open" : "bx-lock-alt"
-                  } icon`}
+                className={`bx ${
+                  showPassword ? "bx-lock-open" : "bx-lock-alt"
+                } icon`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>
@@ -112,8 +115,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
               </NavLink>
             </div>
             <div className="input-box">
-              <button className="input-submit">
-                <span>Sign In</span>
+              <button
+                className="input-submit"
+                style={{
+                  backgroundColor: isLogin ? "#ccc" : "", // Đổi màu khi đang xử lý
+                  cursor: isLogin ? "not-allowed" : "pointer",
+                  opacity: isLogin ? 0.7 : 1,
+                }}
+              >
+                <span>{isLogin ? "Processing..." : "Sign In"}</span>
                 <i className="bx bx-right-arrow-alt"></i>
               </button>
             </div>

@@ -216,7 +216,13 @@ const NavbarforP = () => {
                       alt="Avatar"
                       className="w-10 h-10 rounded-full"
                     />
-                    <div className="hidden group-hover:block absolute right-0 mt-2 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
+                    <div className="hidden group-hover:block absolute right-0 mt-28 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
+                    <Link
+                        to="/MyOrderPage"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                      >
+                        MyOrder
+                      </Link>
                       <Link
                         to="/login"
                         onClick={handleLogout}
@@ -224,6 +230,7 @@ const NavbarforP = () => {
                       >
                         Logout
                       </Link>
+                      
                     </div>
                   </div>
                 </div>

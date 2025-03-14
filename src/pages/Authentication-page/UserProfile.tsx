@@ -4,9 +4,6 @@ import { doc, getDoc, DocumentData } from "firebase/firestore";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-
-
-
 const auth1 = getAuth();
 
 onAuthStateChanged(auth1, (user) => {
