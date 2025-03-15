@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import * as signalR from "@microsoft/signalr";
 
+const isDevelopment = window.location.hostname === 'localhost';
+
+const API_URL = isDevelopment
+    ? 'https://localhost:7140'
+    : 'https://deployed-backend-url.azurewebsites.net';
+
 interface Notification {
     notificationID: number;
     header: string;
@@ -50,11 +56,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         console.log("Setting up new SignalR connection...");
 
         try {
+            const hubUrl = `${API_URL}/notificationHub`;
+            console.log("Attempting to connect to:", hubUrl);
+
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://localhost:7140/notificationHub", {
+                .withUrl(hubUrl, {
                     accessTokenFactory: () => token,
-                    transport: signalR.HttpTransportType.WebSockets,
-                    skipNegotiation: true
+                    transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
                 })
                 .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
                 .configureLogging(signalR.LogLevel.Information)
@@ -135,20 +143,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 connection.invoke("LoadNotifications").catch(console.error);
             });
 
-            connection.onclose(() => {
-                console.log("Connection closed");
+            connection.onclose((error) => {
+                console.log("Connection closed with error:", error);
                 setConnectionState("Disconnected");
                 hubConnectionRef.current = null;
                 connectionAttemptRef.current = false;
-                // ket noi lai tranh timeout
                 setTimeout(handleReconnection, 5000);
             });
 
             await connection.start();
-            console.log("Connected to notification hub");
+            console.log("Connected to notification hub at:", hubUrl);
             setConnectionState("Connected");
             hubConnectionRef.current = connection;
 
+            // Try to load initial notifications after successful connection
+            try {
+                await connection.invoke("LoadNotifications");
+            } catch (error) {
+                console.error("Error loading initial notifications:", error);
+            }
 
         } catch (error) {
             console.error("Error setting up SignalR connection:", error);
@@ -164,7 +177,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 hubConnectionRef.current = null;
             }
 
-            // ket noi lai tranh timeout
             setTimeout(handleReconnection, 5000);
         }
     };
