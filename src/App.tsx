@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import ProductDetails from "./pages/ProductDetails-page/ProductDetail";
 import MyOrderPage from "./pages/MyOrder-page/MyOrderPage";
 import { NotificationProvider } from './context/NotificationContext';
+import BlogsPage from "./pages/Blogs-page/BlogsPage";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
   {
     path: "/MyOrderPage",
     element: <MyOrderPage />,
+  },
+  {
+    path: "/Blogs",
+    element: <BlogsPage/>
   }
 ]);
 

@@ -28,7 +28,7 @@ const MenuLinks = [
   {
     id: 4,
     name: "Blogs",
-    link: "/#blog",
+    link: "/Blogs",
   },
 ];
 const DropDownLinks = [
