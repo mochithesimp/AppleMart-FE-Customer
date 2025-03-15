@@ -1,44 +1,181 @@
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import p1 from "../../assets/Product/p-1.jpg";
-import p2 from "../../assets/Product/p-2.jpg";
-import p3 from "../../assets/Product/p-3.jpg";
 import imomo from "../../assets/Checkout/Primary logo@2x.png";
 import "./Style.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCheckoutAnimation } from "./useCheckoutAnimation";
 import Partners from "../../components/Partners/Partners";
 import Footer from "../../components/Footer/Footer";
+import { useCart } from "../../context/CartContext";
+import { getUserIdFromToken } from "../../utils/jwtHelper";
+import { orders } from "../../apiServices/OrderServices/OrderServices";
+import { refreshToken } from "../../apiServices/AccountServices/refreshTokenServices";
+import {
+  getUserId,
+  updateUser,
+} from "../../apiServices/UserServices/userServices";
+import { Iuser } from "../../interfaces";
 
 const CheckoutPage = () => {
+  const [userId, setUserId] = useState<string>("");
+  const [user, setUser] = useState<Partial<Iuser>>({});
+
+  const [ward, setWard] = useState<string>("");
+  const [district, setDistrict] = useState<string>("");
+  const [province, setProvince] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
+
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const truckRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const { cart } = useCart();
 
-  const handleRadioChange = (value: string) => {
-    setSelectedValue((prev) => (prev === value ? null : value));
+  const [selectedValue, setSelectedValue] = useState("option1");
+  const [paymentMethod, setPaymentMethod] = useState("By Cash");
+
+  // get data user -----------------------------------------------------------------------------
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!token) {
+      console.error("Token not found");
+      return;
+    }
+    const userIdFromToken = getUserIdFromToken(token) || "";
+    setUserId(userIdFromToken);
+  }, [token]);
+
+  //-----   get user by ID
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getUserId(userId);
+      if (result) {
+        setUser(result);
+      } else {
+        console.error("Data not found or invalid response structure");
+      }
+    };
+    fetchData();
+  }, [userId]);
+
+  // ---------  load data address 
+  useEffect(() => {
+    let storedAddress = localStorage.getItem("shippingAddress");
+  
+    if (!storedAddress && user.address) {
+
+      storedAddress = user.address;
+    }
+  
+    if (storedAddress) {
+      const addressParts = storedAddress.split(", ");
+      setWard(addressParts[0] || "");
+      setDistrict(addressParts[1] || "");
+      setProvince(addressParts[2] || "");
+      setCountry(addressParts[3] || "");
+    }
+  }, [user.address]); 
+
+  //------- Update user address ---------------------------------
+  useEffect(() => {
+    const newAddress = [ward, district, province, country]
+      .filter(Boolean) 
+      .join(", ");
+  
+    setUser(prevUser => ({
+      ...prevUser,
+      address: newAddress
+    }));
+  
+  }, [ward, district, province, country]);
+
+
+  //-------------------------------------------------------------------------------------------
+  const totalAmount = cart.reduce(
+    (total, product) => total + product.price * product.quantity,
+    0
+  );
+
+  // selected paymentMethod --------------------------------------------
+  const handleRadioChange = (option: string) => {
+    setSelectedValue(option);
+    setPaymentMethod(option === "option1" ? "By Cash" : "E-wallet");
   };
+
+  // animation ---------------------------------------------------------------------------------------
 
   const handleButtonClick = useCheckoutAnimation({
     button: buttonRef as React.RefObject<HTMLButtonElement>,
     box: boxRef as React.RefObject<HTMLDivElement>,
     truck: truckRef as React.RefObject<HTMLDivElement>,
   });
-  const cartItems = [
-    { id: 1, name: "Tai nghe Sony", price: 120.99, quantity: 1, image: p1 },
-    {
-      id: 2,
-      name: "Đồng hồ thông minh",
-      price: 199.99,
-      quantity: 2,
-      image: p2,
-    },
-    { id: 3, name: "Chuột không dây", price: 35.5, quantity: 1, image: p3 },
-    { id: 4, name: "Chuột không dây", price: 35.5, quantity: 1, image: p3 },
-    { id: 5, name: "Chuột không dây", price: 35.5, quantity: 1, image: p3 },
-    { id: 6, name: "Chuột không dây", price: 35.5, quantity: 1, image: p3 },
-  ];
+
+  // handle checkout ---------------------------------------------------------------------------------
+
+  const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const orderDate = new Date().toISOString();
+    const shippingMethodId = 1;
+    const voucherID = 0;
+    const productItems = cart.map((product) => ({
+      productItemID: product.productItemID,
+      quantity: product.quantity,
+      price: product.price,
+    }));
+
+    const order = {
+      userId,
+      orderDate,
+      address: user.address,
+      paymentMethod,
+      shippingMethodId,
+      total: totalAmount + 15,
+      voucherID,
+      orderDetails: productItems,
+    };
+
+    console.log(JSON.stringify(order));
+
+    const response = await orders(order);
+    if (!response) {
+      throw new Error("Failed to store cart data");
+    }
+
+    if (response.status === 401) {
+      await refreshToken();
+    }
+
+    const response2 = await updateUser(userId, user);
+    if (!response2) {
+      throw new Error("Error updating user");
+    }
+
+    localStorage.removeItem("storedCart");
+    localStorage.removeItem("shippingAddress");
+    localStorage.removeItem("currentQuantities");
+
+    // animation
+    handleButtonClick(e);
+
+    setTimeout(() => {
+      swal({
+        title: "Order Placed Successfully!",
+        text: "Thank you for your purchase. Please check your purchase order for order details.",
+        icon: "success",
+        buttons: {
+          ok: {
+            text: "OK",
+            value: true,
+            className: "swal-ok-button",
+          },
+        },
+      }).then(() => {
+        window.location.href = "/MyOrderPage";
+      });
+    }, 5000);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
       <NavbarforP />
@@ -57,55 +194,69 @@ const CheckoutPage = () => {
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={user.name}
                               placeholder="Name"
-                            ></input>
+                              readOnly
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={country || ""}
                               placeholder="Country"
-                            ></input>
+                              onChange={(e) => setCountry(e.target.value)}
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={province || ""}
                               placeholder="Province"
-                            ></input>
+                              onChange={(e) => setProvince(e.target.value)}
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={district || ""}
                               placeholder="District"
-                            ></input>
+                              onChange={(e) => setDistrict(e.target.value)}
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={ward || ""}
                               placeholder="Ward"
-                            ></input>
+                              onChange={(e) => setWard(e.target.value)}
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={user.phoneNumber ?? ""}
                               placeholder="Phone Number"
-                            ></input>
+                              onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+                            />
                           </span>
                         </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={user.email}
                               placeholder="Email"
+                              readOnly
                             ></input>
                           </span>
                         </p>
@@ -127,12 +278,12 @@ const CheckoutPage = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {cartItems.map((item) => (
-                            <tr key={item.id} className="cart_item">
+                          {cart.map((item, index) => (
+                            <tr key={index} className="cart_item">
                               <td className="product-name">
                                 <div className="product-image">
                                   <img
-                                    src={item.image}
+                                    src={p1}
                                     alt={item.name}
                                     className="attachment-thumbnail size-thumbnail"
                                   />
@@ -159,7 +310,7 @@ const CheckoutPage = () => {
                                   <span className="woocommerce-Price-currencySymbol">
                                     $
                                   </span>
-                                  375.98
+                                  {totalAmount.toFixed(2)}
                                 </bdi>
                               </span>
                             </td>
@@ -182,7 +333,7 @@ const CheckoutPage = () => {
                           <tr className="order-total">
                             <th>Total</th>
                             <td className="Price-amount ">
-                              <span>$390.98</span>
+                              <span>${(totalAmount + 15).toFixed(2)}</span>
                             </td>
                           </tr>
                         </tfoot>
@@ -276,7 +427,7 @@ const CheckoutPage = () => {
                           <button
                             ref={buttonRef}
                             className="truck-button"
-                            onClick={handleButtonClick}
+                            onClick={handleCheckout}
                           >
                             <span className="default">Pay Now</span>
                             <span className="success">

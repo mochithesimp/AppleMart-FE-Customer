@@ -100,6 +100,15 @@ export interface User {
   isOnline: boolean;
 }
 
+export interface Iuser {
+  name: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  avatar: string;
+  role: string;
+}
+
 export interface Message {
   chatID: number;
   chatRoomID: number;

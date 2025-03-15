@@ -26,14 +26,6 @@ interface Province {
   Districts: District[];
 }
 const CartPage = () => {
-  // const cartItems = [
-  //   { id: 1, name: "Tai nghe Sony", price: 120.99, image: p1 },
-  //   { id: 2, name: "Đồng hồ thông minh", price: 199.99, image: p2 },
-  //   { id: 3, name: "Chuột không dây", price: 35.5, image: p3 },
-  //   { id: 4, name: "Chuột không dây", price: 35.5, image: p3 },
-  //   { id: 5, name: "Chuột không dây", price: 35.5, image: p3 },
-  //   { id: 6, name: "Chuột không dây", price: 35.5, image: p3 },
-  // ];
   const { cart, decrementQuantity, incrementQuantity, removeItems } = useCart();
   const [showForm, setShowForm] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("VN");
@@ -97,7 +89,7 @@ const CartPage = () => {
 
     // Cập nhật địa chỉ hiển thị
     setShippingAddress(
-      `${wardName}, ${districtName}, ${provinceName}, ${selectedCountry}.`
+      `${wardName}, ${districtName}, ${provinceName}, ${selectedCountry}`
     );
   };
 
@@ -243,7 +235,7 @@ const CartPage = () => {
                             </ul>
                             <p className="shipping-destination">
                               Shipping to{" "}
-                              <strong>{shippingAddress || "..."}</strong>
+                              <strong>{shippingAddress || "..."}.</strong>
                             </p>
                             <div className="shipping-calculator">
                               <button
@@ -363,7 +355,11 @@ const CartPage = () => {
                       </tbody>
                     </table>
                     <div className="proceed-to-checkout">
-                      <Link to="/Checkout" className="button-checkout">
+                      <Link to="/Checkout" className="button-checkout" 
+                      onClick={() => {           
+                        localStorage.setItem("shippingAddress", shippingAddress);
+                      }}
+                      >
                         Proceed to Checkout
                       </Link>
                     </div>
