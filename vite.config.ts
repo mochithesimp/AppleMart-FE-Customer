@@ -19,7 +19,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("react")) return "react-vendor"; // React riêng
+            // if (id.includes("react")) return "react-vendor"; // React riêng
             if (id.includes("lodash")) return "lodash-vendor"; // Lodash riêng
             if (id.includes("firebase")) return "firebase-vendor"; // Firebase riêng
             return "vendor"; // Còn lại gom vào vendor
