@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@microsoft/signalr": "^8.0.7",
+    "@paypal/react-paypal-js": "^8.8.2",
     "@types/gsap": "^3.0.0",
     "aos": "^2.3.4",
     "axios": "^1.7.9",

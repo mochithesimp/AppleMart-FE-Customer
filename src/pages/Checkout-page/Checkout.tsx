@@ -15,6 +15,9 @@ import {
   updateUser,
 } from "../../apiServices/UserServices/userServices";
 import { Iuser } from "../../interfaces";
+import { createPaypalTransaction } from "../../apiServices/PaypalServices/PaypalServices";
+import PaypalButton from "../../components/PaypalButton/PaypalButton";
+import { AxiosError } from "axios";
 
 const CheckoutPage = () => {
   const [userId, setUserId] = useState<string>("");
@@ -63,12 +66,12 @@ const CheckoutPage = () => {
   // ---------  load data address 
   useEffect(() => {
     let storedAddress = localStorage.getItem("shippingAddress");
-  
+
     if (!storedAddress && user.address) {
 
       storedAddress = user.address;
     }
-  
+
     if (storedAddress) {
       const addressParts = storedAddress.split(", ");
       setWard(addressParts[0] || "");
@@ -76,19 +79,19 @@ const CheckoutPage = () => {
       setProvince(addressParts[2] || "");
       setCountry(addressParts[3] || "");
     }
-  }, [user.address]); 
+  }, [user.address]);
 
   //------- Update user address ---------------------------------
   useEffect(() => {
     const newAddress = [ward, district, province, country]
-      .filter(Boolean) 
+      .filter(Boolean)
       .join(", ");
-  
+
     setUser(prevUser => ({
       ...prevUser,
       address: newAddress
     }));
-  
+
   }, [ward, district, province, country]);
 
 
@@ -125,14 +128,15 @@ const CheckoutPage = () => {
     }));
 
     const order = {
-      userId,
+      userID: userId,
+      shipperID: null,
       orderDate,
-      address: user.address,
+      address: user.address || "",
       paymentMethod,
-      shippingMethodId,
+      shippingMethodID: shippingMethodId,
       total: totalAmount + 15,
       voucherID,
-      orderDetails: productItems,
+      orderDetails: productItems
     };
 
     console.log(JSON.stringify(order));
@@ -174,6 +178,122 @@ const CheckoutPage = () => {
         window.location.href = "/MyOrderPage";
       });
     }, 5000);
+  };
+
+  const handlePaypalSuccess = async (paypalPaymentId: string) => {
+    try {
+      console.log("PayPal payment successful with ID:", paypalPaymentId);
+
+      const orderDate = new Date().toISOString();
+      const shippingMethodId = 1;
+      const voucherID = 0;
+      const productItems = cart.map((product) => ({
+        productItemID: product.productItemID,
+        quantity: product.quantity,
+        price: product.price,
+      }));
+
+      const order = {
+        userID: userId,
+        shipperID: null,
+        orderDate,
+        address: user.address || "",
+        paymentMethod: "E-Wallet Paypal",
+        shippingMethodID: shippingMethodId,
+        total: totalAmount + 15,
+        voucherID,
+        orderDetails: productItems
+      };
+
+      console.log("Attempting to create order with data:", JSON.stringify(order, null, 2));
+
+      const orderResponse = await orders(order);
+      console.log("Order creation response:", orderResponse);
+
+      if (!orderResponse) {
+        throw new Error("Failed to store cart data");
+      }
+
+      if (orderResponse.status === 401) {
+        console.log("Token expired, refreshing...");
+        await refreshToken();
+      }
+
+      if (!orderResponse.data || !orderResponse.data.orderID) {
+        console.error("No orderId received from order creation:", orderResponse);
+        throw new Error("Failed to get orderId from order creation");
+      }
+
+      const orderId = orderResponse.data.orderID;
+      console.log("Received orderId:", orderId);
+
+      const paypalTransaction = {
+        orderId: orderId,
+        paypalPaymentId,
+        status: "COMPLETED",
+        amount: totalAmount + 15,
+        currency: "USD",
+        createdDate: new Date(),
+        isDeleted: false
+      };
+
+      console.log("Creating PayPal transaction with data:", JSON.stringify(paypalTransaction, null, 2));
+      try {
+        const transactionResponse = await createPaypalTransaction(paypalTransaction);
+        console.log("PayPal transaction creation successful:", transactionResponse);
+      } catch (error) {
+        console.error("Failed to create PayPal transaction:", {
+          error: error instanceof Error ? error.message : "Unknown error",
+          transactionData: paypalTransaction
+        });
+        throw error;
+      }
+
+      const response2 = await updateUser(userId, user);
+      if (!response2) {
+        throw new Error("Error updating user");
+      }
+
+      localStorage.removeItem("storedCart");
+      localStorage.removeItem("shippingAddress");
+      localStorage.removeItem("currentQuantities");
+
+      swal({
+        title: "Order Placed Successfully!",
+        text: "Thank you for your purchase. Please check your purchase order for order details.",
+        icon: "success",
+        buttons: {
+          ok: {
+            text: "OK",
+            value: true,
+            className: "swal-ok-button",
+          },
+        },
+      }).then(() => {
+        window.location.href = "/MyOrderPage";
+      });
+    } catch (error) {
+      console.error("Error in handlePaypalSuccess:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        response: (error as AxiosError)?.response?.data,
+        status: (error as AxiosError)?.response?.status,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      swal({
+        title: "Payment Failed",
+        text: "There was an error processing your payment. Please try again.",
+        icon: "error",
+      });
+    }
+  };
+
+  const handlePaypalError = (error: Error | unknown) => {
+    console.error("PayPal error:", error);
+    swal({
+      title: "Payment Failed",
+      text: "There was an error processing your payment. Please try again.",
+      icon: "error",
+    });
   };
 
   return (
@@ -373,41 +493,13 @@ const CheckoutPage = () => {
                         </li>
                         {selectedValue === "option2" && (
                           <div className="E-wallet-payment">
-                            <div
-                              className="paypal-container"
-                              style={{ marginTop: "15px" }}
-                            >
-                              <table
-                                style={{ border: "0" }}
-                                cellPadding="10"
-                                cellSpacing="0"
-                                align="center"
-                              >
-                                <tbody>
-                                  <tr>
-                                    <td align="center">
-                                      <a
-                                        href="https://www.paypal.com/webapps/mpp/paypal-popup"
-                                        title="How PayPal Works"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          window.open(
-                                            "https://www.paypal.com/webapps/mpp/paypal-popup",
-                                            "WIPaypal",
-                                            "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1060,height=700"
-                                          );
-                                        }}
-                                      >
-                                        <img
-                                          src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-                                          alt="PayPal Logo"
-                                          style={{ border: 0 }}
-                                        />
-                                      </a>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
+                            <div className="paypal-container" style={{ marginTop: "15px" }}>
+                              <PaypalButton
+                                amount={totalAmount + 15}
+                                currency="USD"
+                                onSuccess={handlePaypalSuccess}
+                                onError={handlePaypalError}
+                              />
                             </div>
                             <div className="momo-container">
                               <img src={imomo} alt="momo-img" />
