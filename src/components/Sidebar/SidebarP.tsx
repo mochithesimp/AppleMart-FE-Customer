@@ -14,7 +14,7 @@ const SidebarP: React.FC = () => {
             {/* Sidebar */}
             <div
                 className={classNames(
-                    " dark:text-white sticky top-20 mt-5 left-7 h-80 bg-gray-100 dark:bg-zinc-700 shadow-lg z-30 w-64 p-4 transition-transform duration-300 lg:w-56 rounded-[15px]",
+                    " dark:text-white sticky top-20 mt-5 left-7  bg-gray-100 dark:bg-zinc-700 shadow-lg z-30 w-64 p-4 transition-transform duration-300 lg:w-56 rounded-[15px]",
                     {
                         "translate-x-0": openSidebar, 
                         "-translate-x-full lg:translate-x-0": !openSidebar 

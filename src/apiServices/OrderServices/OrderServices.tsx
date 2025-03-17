@@ -36,6 +36,25 @@ interface OrderResponse {
   };
 }
 
+export const ordersByCash = async (order: any) => {
+  try {
+    const res = await axios.post(
+      `https://localhost:7140/api/Order`,order,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+      
+    );
+    //console.log("check data search: ", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 export const orders = async (order: OrderRequest) => {
   try {
     console.log("Sending order data to API:", JSON.stringify(order, null, 2));

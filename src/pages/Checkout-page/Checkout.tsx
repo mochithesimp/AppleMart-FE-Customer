@@ -8,7 +8,7 @@ import Partners from "../../components/Partners/Partners";
 import Footer from "../../components/Footer/Footer";
 import { useCart } from "../../context/CartContext";
 import { getUserIdFromToken } from "../../utils/jwtHelper";
-import { orders } from "../../apiServices/OrderServices/OrderServices";
+import { orders, ordersByCash } from "../../apiServices/OrderServices/OrderServices";
 import { refreshToken } from "../../apiServices/AccountServices/refreshTokenServices";
 import {
   getUserId,
@@ -27,6 +27,7 @@ const CheckoutPage = () => {
   const [district, setDistrict] = useState<string>("");
   const [province, setProvince] = useState<string>("");
   const [country, setCountry] = useState<string>("");
+  const [newAddress, setNewAddress] = useState<string>("");
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
@@ -65,11 +66,11 @@ const CheckoutPage = () => {
 
   // ---------  load data address 
   useEffect(() => {
-    let storedAddress = localStorage.getItem("shippingAddress");
+    const storedAddress = localStorage.getItem("shippingAddress");
 
     if (!storedAddress && user.address) {
-
-      storedAddress = user.address;
+      
+      setNewAddress(user.address);
     }
 
     if (storedAddress) {
@@ -78,6 +79,7 @@ const CheckoutPage = () => {
       setDistrict(addressParts[1] || "");
       setProvince(addressParts[2] || "");
       setCountry(addressParts[3] || "");
+      setNewAddress(storedAddress);
     }
   }, [user.address]);
 
@@ -87,13 +89,9 @@ const CheckoutPage = () => {
       .filter(Boolean)
       .join(", ");
 
-    setUser(prevUser => ({
-      ...prevUser,
-      address: newAddress
-    }));
+      setNewAddress(newAddress);
 
   }, [ward, district, province, country]);
-
 
   //-------------------------------------------------------------------------------------------
   const totalAmount = cart.reduce(
@@ -131,7 +129,7 @@ const CheckoutPage = () => {
       userID: userId,
       shipperID: null,
       orderDate,
-      address: user.address || "",
+      address: newAddress,
       paymentMethod,
       shippingMethodID: shippingMethodId,
       total: totalAmount + 15,
@@ -141,7 +139,7 @@ const CheckoutPage = () => {
 
     console.log(JSON.stringify(order));
 
-    const response = await orders(order);
+    const response = await ordersByCash(order);
     if (!response) {
       throw new Error("Failed to store cart data");
     }
@@ -149,8 +147,8 @@ const CheckoutPage = () => {
     if (response.status === 401) {
       await refreshToken();
     }
-
-    const response2 = await updateUser(userId, user);
+    const updatedUser = { ...user, address: newAddress };
+    const response2 = await updateUser(userId, updatedUser);
     if (!response2) {
       throw new Error("Error updating user");
     }
@@ -324,6 +322,37 @@ const CheckoutPage = () => {
                           <span className="input-wrapper">
                             <input
                               className="input-text"
+                              value={user.email}
+                              placeholder="Email"
+                              readOnly
+                            ></input>
+                          </span>
+                        </p>                     
+                        <p className="form-row form-row-wide">
+                          <span className="input-wrapper">
+                            <input
+                              className="input-text"
+                              value={user.phoneNumber ?? ""}
+                              placeholder="Phone Number"
+                              onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+                            />
+                          </span>
+                        </p>  
+                        <p className="form-row form-row-wide">
+                          <span className="input-wrapper">
+                            <input
+                              className="input-text"
+                              value={user.address}
+                              placeholder="Old Adress"
+                              readOnly
+                            ></input>
+                          </span>
+                        </p>
+                        <h3 className="adress"> New Adress</h3>      
+                        <p className="form-row form-row-wide">
+                          <span className="input-wrapper">
+                            <input
+                              className="input-text"
                               value={country || ""}
                               placeholder="Country"
                               onChange={(e) => setCountry(e.target.value)}
@@ -359,27 +388,7 @@ const CheckoutPage = () => {
                               onChange={(e) => setWard(e.target.value)}
                             />
                           </span>
-                        </p>
-                        <p className="form-row form-row-wide">
-                          <span className="input-wrapper">
-                            <input
-                              className="input-text"
-                              value={user.phoneNumber ?? ""}
-                              placeholder="Phone Number"
-                              onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
-                            />
-                          </span>
-                        </p>
-                        <p className="form-row form-row-wide">
-                          <span className="input-wrapper">
-                            <input
-                              className="input-text"
-                              value={user.email}
-                              placeholder="Email"
-                              readOnly
-                            ></input>
-                          </span>
-                        </p>
+                        </p>                                     
                       </div>
                     </div>
                   </div>

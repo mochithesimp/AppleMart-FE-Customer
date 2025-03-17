@@ -13,7 +13,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
 }) => {
   return (
     <div
-      className="dark:text-white flex items-center gap-2 p-2 text-black cursor-pointer hover:bg-gray-300 rounded-lg transition"
+      className="dark:text-white flex items-center gap-2 p-1 mb-2 text-black cursor-pointer hover:bg-gray-300 rounded-lg transition"
       onClick={onClick}
     >
       <Icon size={24} />
@@ -21,5 +21,5 @@ const CategoryItem: React.FC<CategoryItemProps> = ({
     </div>
   );
 };
-
+//pl-2 pr-2 mb-3
 export default CategoryItem;
