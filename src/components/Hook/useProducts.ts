@@ -20,6 +20,7 @@ export const useProducts = (itemsPerPage: number) => {
   const [visibleProducts, setVisibleProducts] = useState(itemsPerPage);
   const [loading, setLoading] = useState(false);
   const { product, allProduct, productItems, filterProduct, setProduct, selectedProduct, selectedFilter, setSelectedFilter} = useAllProduct();
+ 
   const [productsWithItems, setProductsWithItems] =
     useState<aProduct[]>(allProduct);
   useEffect(() => {

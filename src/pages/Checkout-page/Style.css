@@ -10,6 +10,22 @@
   transition: background-color 0.3s ease-in-out;
 }
 
+.heading-title {
+  color: #000000ff;
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 120%;
+}
+
+.adress {
+  color: #000000ff;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 120%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
 .checkout-container > .e-checkout {
   flex-wrap: initial;
   justify-content: initial;
