@@ -17,7 +17,7 @@ const ProductDetails = () => {
   >([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [productItem, setProductItem] = useState<ProductItem>();
-
+// console.log("productItemId: ", productItems)
   const { handleAddToCart } = HandleAddToCart();
   const HandleAddToCartClick = (productItem: ProductItem) => {
     handleAddToCart(productItem);

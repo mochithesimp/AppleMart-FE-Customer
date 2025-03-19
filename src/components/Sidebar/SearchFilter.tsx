@@ -1,17 +1,19 @@
-import { useState } from "react";
 
-const SearchFilter: React.FC = () => {
-    const [search, setSearch] = useState("");
+type SearchFilterProps = {
+    searchTerm: string;
+    setSearchTerm: (val: string) => void;
+  };
 
+const SearchFilter: React.FC<SearchFilterProps> = ({ searchTerm, setSearchTerm }) => {
     return (
-        <div className="mt-2">
-            <label className="text-sm font-medium">Tên sản phẩm:</label>
+        <div className="mt-2 ">
+            <label className="text-sm font-medium">Product name:</label>
             <input
                 type="text"
-                placeholder="Tìm kiếm..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full p-1 border rounded-md"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full p-1 border rounded-md dark:text-black"
             />
         </div>
     );

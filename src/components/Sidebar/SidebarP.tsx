@@ -4,8 +4,9 @@ import FilterSection from "./FilterSection";
 import { useSidebar } from "./SidebarContext";
 import classNames from "classnames";
 import { useState } from "react";
+import useProductFilter from "../ProductsSection/useProductFilter";
 
-const SidebarP: React.FC = () => {
+const SidebarP: React.FC<{ productFilter: ReturnType<typeof useProductFilter> }> = ({ productFilter }) => {
     const { openSidebar, toggleSidebar } = useSidebar();
     const [showFilter, setShowFilter] = useState(false);
 
@@ -48,7 +49,7 @@ const SidebarP: React.FC = () => {
                         onMouseEnter={() => setShowFilter(true)}
                         onMouseLeave={() => setShowFilter(false)}
                     >
-                        <FilterSection />
+                        <FilterSection productFilter={productFilter} />
                     </div>
                 </div>
 
