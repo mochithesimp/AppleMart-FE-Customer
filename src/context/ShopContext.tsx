@@ -31,7 +31,6 @@ export const ShopContextProvider = ({ children }: { children: React.ReactNode })
 useEffect(() => {
     const fetchData = async () => {
       const productItems = await getProductItems();
-      console.log("cc",  productItems.$values)
       if (productItems && productItems.items.$values) {
         setProductItems(productItems.items.$values);
       } else {

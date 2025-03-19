@@ -3,21 +3,6 @@ import img1 from "../../assets/Product/earphone.png";
 import {  ProductItem } from "../../interfaces";
 import { HandleAddToCart } from "../../pages/Cart-page/components/HandleAddToCart";
 import { Link } from "react-router-dom";
-// interface ProductProps {
-//   image: string;
-//   name: string;
-//   price: number;
-//   oldPrice?: number;
-//   discount?: number;
-//   rating: number | string;
-//   sold: number;
-//   storageOptions: string[];
-// }
-
-// interface ProductItemCardProps {
-//   products: aProduct;  // Định nghĩa kiểu dữ liệu chính xác
-//   productItems: ProductItem[]; 
-// }
 
 const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }) => {
   const { handleAddToCart } = HandleAddToCart();
