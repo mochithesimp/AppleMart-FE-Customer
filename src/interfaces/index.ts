@@ -10,7 +10,14 @@ export interface aProduct {
   description: string;
   isDeleted: boolean;
   displayIndex: boolean;
-  productItems?: ProductItem[]
+  productItems?: ProductItem[];
+}
+
+export interface ProductImg {
+  productImgID: number;
+  productItemID: number;
+  imageUrl: string;
+  isDeleted: boolean;
 }
 
 export interface ProductItem {
@@ -23,6 +30,7 @@ export interface ProductItem {
   stock: number;
   isDeleted: boolean;
   displayIndex: boolean;
+  productImgs: ProductImg[];
   productItemAttributes: ProductItemAttribute[];
 }
 
@@ -49,7 +57,6 @@ export interface iCategory {
   description: string;
   isDeleted: boolean;
   displayIndex: boolean;
-
 }
 
 export interface ImageProduct {
@@ -146,4 +153,26 @@ export function unwrapValues<T>(data: T[] | { $values: T[] } | undefined): T[] {
   if (!data) return [];
   if (Array.isArray(data)) return data;
   return data.$values || [];
+}
+
+export interface aOrder {
+  orderID: number;
+  userID: string;
+  shipperID: number;
+  orderDate: string;
+  address: string;
+  paymentMethod: string;
+  shippingMethodId: number;
+  total: number;
+  orderStatus: string;
+  voucherID: number;
+  orderDetails: OrderDetail[];
+}
+
+export interface OrderDetail {
+  orderDetailID: number;
+  orderID: number;
+  productItemID: number;
+  quantity: number;
+  price: number;
 }

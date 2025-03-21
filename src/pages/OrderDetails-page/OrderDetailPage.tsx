@@ -1,13 +1,13 @@
-import MyOrder from '../../components/MyOrder/MyOrder';
+import OrderDetails from '../../components/MyOrder/OrderDetails';
 import NavbarforP from '../../components/NavbarProduct/NavbarforP';
-const MyOrderPage = () => {
+const OrderDetailPage = () => {
   
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-hidden">
       <NavbarforP />
-      <MyOrder />
+      <OrderDetails />
     </div>
   )
 }
 
-export default MyOrderPage
+export default OrderDetailPage
