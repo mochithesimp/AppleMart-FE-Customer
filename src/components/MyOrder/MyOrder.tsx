@@ -1,68 +1,67 @@
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useState } from "react";
 import "./MyOrder.css";
-
-
-interface Order {
-    orderID: number;
-    product: string;
-    status: string;
-    date: string;
-}
-
-
-const fakeOrders: Order[] = [
-    { orderID: 101, product: "Laptop", status: "Delivered", date: "2025-03-12" },
-    { orderID: 102, product: "Headphones", status: "Pending", date: "2025-03-10" },
-    { orderID: 103, product: "T-shirt", status: "Shipped", date: "2025-03-11" },
-];
+import useOrderData from "./components/useOrderData";
+import { Link } from "react-router-dom";
 
 const MyOrder = () => {
-    const [, setSearchTerm] = useState<string>("");
-    const [orders, setOrders] = useState<Order[]>(fakeOrders);
+  const { orderData, searchTerm, setSearchTerm } = useOrderData();
 
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const term = e.target.value.toLowerCase();
-        setSearchTerm(term);
-        const filtered = fakeOrders.filter((order) =>
-            order.product.toLowerCase().includes(term)
-        );
-        setOrders(filtered);
-    };
-
-    return (
-        <motion.div className="order-table-container bg-white dark:bg-gray-700 dark:text-white" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="order-table-header">
-                <h2 className="font-semibold">My Orders</h2>
-                <div className="search-box">
-                    <input type="text" placeholder="Search orders..." onChange={handleSearch} />
-                    <Search className="search-icon" size={18} />
-                </div>
-            </div>
-            <table className="order-table">
-                <thead>
-                    <tr className="dark:bg-zinc-700 dark:text-black">
-                        <th>Order ID</th>
-                        <th>Product</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {orders.map((order) => (
-                        <tr key={order.orderID}>
-                            <td>{order.orderID}</td>
-                            <td>{order.product}</td>
-                            <td>{order.status}</td>
-                            <td>{order.date}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </motion.div>
-    );
+  return (
+    <motion.div
+      className="order-table-container bg-white dark:bg-gray-700 dark:text-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <div className="order-table-header">
+        <h2 className="font-semibold">My Orders</h2>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Search status orders..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="search-icon" size={18} />
+        </div>
+      </div>
+      <table className="order-table">
+        <thead>
+          <tr className="dark:bg-zinc-700 dark:text-black">
+            <th>Date</th>
+            <th>Order ID</th>
+            <th>Address</th>
+            <th>Payment Method</th>
+            <th>Shipping Method</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orderData.map((order, index) => (
+            <tr key={index}>
+              <td>
+                <Link
+                  to={`/orderdetails/${order.orderID}`}
+                  state={{ orderStatus: order.orderStatus }}
+                >
+                  {order.orderDate}
+                </Link>
+              </td>
+              <td>{order.orderID}</td>
+              <td>{order.address}</td>
+              <td>{order.paymentMethod}</td>
+              <td>{order.shippingMethodId}</td>
+              <td>{order.total}</td>
+              <td>{order.orderStatus}</td>
+              <td></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </motion.div>
+  );
 };
 
 export default MyOrder;

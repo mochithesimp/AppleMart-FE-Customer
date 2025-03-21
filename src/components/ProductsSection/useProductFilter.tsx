@@ -127,7 +127,7 @@ const useProductFilter = () => {
   const handlePageChange = (newPage: number) => {
     setPageNumber(newPage);
   };
-console.log("sdfsdfsdfsdfsdfsdf:", productItems)
+
   return {
     productItems,
     activePrice,
@@ -138,13 +138,12 @@ console.log("sdfsdfsdfsdfsdfsdf:", productItems)
     pageNumber,
     handlePriceSort,
     handleColorSort,
-    handleRamSort, 
+    handleRamSort,
     handleRomSort,
     handlePageChange,
     setSearchTerm,
     setPageNumber,
     resetFilters,
-
   };
 };
 
