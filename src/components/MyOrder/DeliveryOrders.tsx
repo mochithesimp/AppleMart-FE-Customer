@@ -1,56 +1,15 @@
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import useOrderData from "../../components/MyOrder/components/useOrderData";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../../components/MyOrder/MyOrder.css";
-import { orderConfirm } from "../../apiServices/OrderServices/OrderServices";
+import { useHandleOrderConfirm } from "./components/HandleOrder";
+import useOrderData2 from "./components/userOrderData2";
 
 const DeliveryOrders = () => {
-const navigate = useNavigate();
-  const { orderData, searchTerm, setSearchTerm } = useOrderData();
 
-  const handleConfirmClick = async (orderId: number) => {
-    try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          await swal({
-            title: "Oops!",
-            text: "You haven't logged in yet! Redirecting to Login Page...",
-            icon: "warning",
-            buttons: {
-              ok: {
-                text: "OK",
-                value: true,
-                className: "swal-ok-button",
-              },
-            },
-          });
-          window.location.href = "/login";
-          return;
-        }
-      swal({
-        title: "This can not be undo!",
-        text: "You are about to confirm the order!",
-        icon: "warning",
-        buttons: ["Cancel", "Confirm"],
-        dangerMode: true,
-      }).then(async (confirm) => {
-        if (confirm) {
-          const response = await orderConfirm(orderId, token);
-          if (response) {
-            swal("Success!", "The order has been confirmed!", "success").then(() => {
-              navigate("/MyOrderPage");
-            });
-          } else {
-            throw new Error("Failed to confirm order");
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error confirming order:", error);
-    }
-  };
+  const { orderData, searchTerm, setSearchTerm } = useOrderData2();
+  const { handleConfirmClick } = useHandleOrderConfirm();
+  
 
   return (
     <motion.div
@@ -63,7 +22,7 @@ const navigate = useNavigate();
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search status orders..."
+            placeholder="Search orders by day..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -101,12 +60,12 @@ const navigate = useNavigate();
               <td>{order.total}</td>
               <td>{order.orderStatus}</td>
               <td>
-                {order.orderStatus === "Pending"  && (
+                {order.orderStatus === "Shipped"  && (
                   <button
                     className="confirm-button"
                     onClick={() => handleConfirmClick(order.orderID)}
                   >
-                    Cancel
+                    Delivered
                   </button>
                 )}
               </td>

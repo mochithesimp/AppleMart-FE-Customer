@@ -3,10 +3,15 @@ import { Search } from "lucide-react";
 import "./MyOrder.css";
 import useOrderData from "./components/useOrderData";
 import { Link } from "react-router-dom";
+import {
+  useHandleCancelOrder,
+  useHandleOrderReceived,
+} from "./components/HandleOrder";
 
 const MyOrder = () => {
   const { orderData, searchTerm, setSearchTerm } = useOrderData();
-
+  const { handleCancelOrder } = useHandleCancelOrder();
+  const { handleOrderReceived } = useHandleOrderReceived();
   return (
     <motion.div
       className="order-table-container bg-white dark:bg-gray-700 dark:text-white"
@@ -18,7 +23,7 @@ const MyOrder = () => {
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search status orders..."
+            placeholder="Search orders by status..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -32,7 +37,7 @@ const MyOrder = () => {
             <th>Order ID</th>
             <th>Address</th>
             <th>Payment Method</th>
-            <th>Shipping Method</th>
+            {/* <th>Shipping Method</th> */}
             <th>Total</th>
             <th>Status</th>
             <th>Actions</th>
@@ -52,10 +57,27 @@ const MyOrder = () => {
               <td>{order.orderID}</td>
               <td>{order.address}</td>
               <td>{order.paymentMethod}</td>
-              <td>{order.shippingMethodId}</td>
+              {/* <td>{order.shippingMethodId}</td> */}
               <td>{order.total}</td>
               <td>{order.orderStatus}</td>
-              <td></td>
+              <td>
+                {order.orderStatus === "Pending" && (
+                  <button
+                    className="cancel-button"
+                    onClick={() => handleCancelOrder(order.orderID)}
+                  >
+                    Cancel
+                  </button>
+                )}
+                {order.orderStatus === "Delivered" && (
+                  <button
+                    className="received-button cursor-pointer"
+                    onClick={() => handleOrderReceived(order.orderID)}
+                  >
+                    Received
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

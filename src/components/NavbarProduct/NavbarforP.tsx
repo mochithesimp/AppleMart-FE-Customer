@@ -8,6 +8,7 @@ import Popup from "../Popup/Popup";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useNotification } from "../../context/NotificationContext";
+import { getRoleFromToken } from "../../utils/jwtHelper";
 
 const MenuLinks = [
   {
@@ -52,6 +53,7 @@ const DropDownLinks = [
 const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
   const { cart } = useCart();
+  const [role, setRole] = useState<string | null>();
   const [orderPopup, setOrderPopup] = useState<boolean>(false);
   const [notificationPopup, setNotificationPopup] = useState<boolean>(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -59,7 +61,19 @@ const NavbarforP = () => {
   const orderPopupRef = useRef<HTMLDivElement>(null);
   const token = localStorage.getItem("token");
 
-  const { notifications, unreadCount, markAsRead, deleteNotification, connectionState, testConnection } = useNotification();
+  useEffect(() => {
+    const roleIdentifier = token ? getRoleFromToken(token) : null;
+    setRole(roleIdentifier);
+  }, [token]);
+
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    deleteNotification,
+    connectionState,
+    testConnection,
+  } = useNotification();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -236,7 +250,8 @@ const NavbarforP = () => {
 
                     {/* Notification Content */}
                     <div className="max-h-[400px] overflow-y-auto">
-                      {!Array.isArray(notifications) || notifications.length === 0 ? (
+                      {!Array.isArray(notifications) ||
+                      notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 px-4">
                           <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
                             <span className="text-4xl text-orange-400">😕</span>
@@ -250,9 +265,14 @@ const NavbarforP = () => {
                           {notifications.map((notification, index) => (
                             <div
                               key={notification.notificationID}
-                              className={`relative group hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!notification.isRead ? "bg-blue-50 dark:bg-blue-900/20" : ""
-                                }`}
-                              onClick={() => handleMarkAsRead(notification.notificationID)}
+                              className={`relative group hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                                !notification.isRead
+                                  ? "bg-blue-50 dark:bg-blue-900/20"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                handleMarkAsRead(notification.notificationID)
+                              }
                             >
                               <div className="p-4 cursor-pointer">
                                 <div className="flex items-start justify-between">
@@ -264,13 +284,17 @@ const NavbarforP = () => {
                                       {notification.content}
                                     </p>
                                     <span className="text-xs text-gray-500">
-                                      {new Date(notification.createdDate).toLocaleString()}
+                                      {new Date(
+                                        notification.createdDate
+                                      ).toLocaleString()}
                                     </span>
                                   </div>
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      handleDeleteNotification(notification.notificationID);
+                                      handleDeleteNotification(
+                                        notification.notificationID
+                                      );
                                     }}
                                     className="opacity-0 group-hover:opacity-100 absolute right-2 top-2 p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-all"
                                     aria-label="Delete notification"
@@ -282,7 +306,8 @@ const NavbarforP = () => {
                               {index === 4 && notifications.length > 5 && (
                                 <div className="text-center py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                                    Scroll to see {notifications.length - 5} more notifications
+                                    Scroll to see {notifications.length - 5}{" "}
+                                    more notifications
                                   </span>
                                 </div>
                               )}
@@ -321,12 +346,23 @@ const NavbarforP = () => {
                       className="w-10 h-10 rounded-full"
                     />
                     <div className="hidden group-hover:block absolute right-0 mt-28 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
-                    <Link
-                        to="/MyOrderPage"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                      >
-                        MyOrder
-                      </Link>
+                      {role === "Shipper" && (
+                        <Link
+                          to="/MyOrderPage"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                        >
+                          Delivery
+                        </Link>
+                      )}
+                      {role !== "Shipper" && (
+                        <Link
+                          to="/MyOrderPage"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                        >
+                          My Order
+                        </Link>
+                      )}
+
                       <Link
                         to="/login"
                         onClick={handleLogout}
@@ -334,16 +370,13 @@ const NavbarforP = () => {
                       >
                         Logout
                       </Link>
-                      
                     </div>
                   </div>
                 </div>
               ) : (
                 <li className="list-none">
                   <Link to="/login">
-                    <button className="">
-                      Login
-                    </button>
+                    <button className="">Login</button>
                   </Link>
                 </li>
               )}

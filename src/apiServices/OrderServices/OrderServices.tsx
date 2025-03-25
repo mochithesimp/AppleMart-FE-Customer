@@ -118,16 +118,4 @@ export const search = async (queryParams: URLSearchParams) => {
   }
 };
 
-export const orderConfirm = async (orderId: number, shipperId: string) => {
-  try {
-    const res = await axios.put(`https://localhost:7140/api/Order/${orderId}/status/${shipperId}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    //console.log("check data search: ", res);
-    return res;
-  } catch (error) {
-    console.log(error);
-  }
-};
+

@@ -1,15 +1,15 @@
 import Footer from '../../components/Footer/Footer';
-import MyOrder from '../../components/MyOrder/MyOrder';
+import DeliveryOrders from '../../components/MyOrder/DeliveryOrders';
 import NavbarforP from '../../components/NavbarProduct/NavbarforP';
-const MyOrderPage = () => {
+const DeliveryOrderPage = () => {
   
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-hidden">
       <NavbarforP />
-      <MyOrder />
+      <DeliveryOrders />
       <Footer />
     </div>
   )
 }
 
-export default MyOrderPage
+export default DeliveryOrderPage
