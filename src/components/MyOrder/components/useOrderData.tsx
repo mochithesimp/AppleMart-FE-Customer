@@ -49,7 +49,7 @@ const useOrderData = () => {
 
     fetchOrderData();
   }, [searchTerm]);
-console.log("orderData<<<<<<<<<<<<<", orderData)
+
   return { orderData, searchTerm, setOrderData, setSearchTerm };
 };
 

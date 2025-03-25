@@ -18,6 +18,8 @@ import { Iuser } from "../../interfaces";
 import { createPaypalTransaction } from "../../apiServices/PaypalServices/PaypalServices";
 import PaypalButton from "../../components/PaypalButton/PaypalButton";
 import { AxiosError } from "axios";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
   const [userId, setUserId] = useState<string>("");
@@ -114,8 +116,37 @@ const CheckoutPage = () => {
   });
 
   // handle checkout ---------------------------------------------------------------------------------
+  const MySwal = withReactContent(Swal);
 
   const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+
+    if (!user || !user.phoneNumber) {
+      MySwal.fire({
+        icon: "error",
+        title: "Missing Phone Number",
+        text: "Please provide a valid phone number before proceeding.",
+      });
+      return;
+    }
+
+    if (user.phoneNumber.charAt(0) !== "0" || user.phoneNumber.length !== 10) {
+      MySwal.fire({
+        icon: "error",
+        title: "Invalid Phone Number",
+        text: "Phone number must start with 0 and be exactly 10 digits long.",
+      });
+      return;
+    }
+    if (!newAddress) {
+      if (!user || !user.address ) {
+        MySwal.fire({
+          icon: "error",
+          title: "Missing Address",
+          text: "Please enter your delivery address before proceeding.",
+        });
+        return;
+      }
+    }
     const orderDate = new Date().toISOString();
     const shippingMethodId = 1;
     const voucherID = 0;

@@ -47,3 +47,38 @@ export const updateUser = async (userId: string, formData: unknown) => {
   }
 };
 
+export const orderCancel = async (orderId: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.put(
+      `https://localhost:7140/api/User/${orderId}/status?NewStatus=Cancelled`,
+      {}, // Phải có body, dù là object rỗng
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const orderCompleted = async (orderId: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.put(
+      `https://localhost:7140/api/User/${orderId}/status?NewStatus=Completed`,
+      {}, // Phải có body, dù là object rỗng
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};

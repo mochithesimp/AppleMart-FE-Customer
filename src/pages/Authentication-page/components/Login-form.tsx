@@ -36,7 +36,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
         if (role === "Customer") {
           navigate("/");
         } else if (role === "Shipper") {
-          navigate("/DeliveryOrders");
+          navigate("/DeliveryOrderPage");
         } 
       } else {
         setIsLogin(false);
