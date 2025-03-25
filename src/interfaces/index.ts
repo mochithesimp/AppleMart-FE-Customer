@@ -176,3 +176,23 @@ export interface OrderDetail {
   quantity: number;
   price: number;
 }
+
+export interface bBlogs{
+  blogID: number;
+  title: string;
+  content: string;
+  author: string;
+  productId: string;
+  uploadDate: string;
+  updateDate: string;
+  view: number;
+  like: number;
+  isDeleted: boolean;
+  blogImages: blogImages[];
+}
+export interface blogImages
+{
+  blogImageID: number;
+  imageUrl: string;
+  blogId: number;
+}
