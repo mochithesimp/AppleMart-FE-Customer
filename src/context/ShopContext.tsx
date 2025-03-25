@@ -1,15 +1,18 @@
 import { createContext, useState, useContext, useEffect } from "react";
 // import { aProduct, ShopContextType } from "../interfaces";
 // import { getProduct } from "../apiServices/ProductServices/productServices";
-import { aProduct, ProductItem, ShopContextType } from "../interfaces";
+import { aProduct, ProductImg, ProductItem, ShopContextType } from "../interfaces";
 import { getProduct } from "../apiServices/ProductServices/productServices";
 import { getProductItems } from "../apiServices/ProductServices/productItemServices";
+import { getProductImgs } from "../apiServices/ProductServices/productImgSevices";
 
+const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
-const ShopContext = createContext<ShopContextType| undefined>(undefined);
-
-
-export const ShopContextProvider = ({ children }: { children: React.ReactNode }) => {
+export const ShopContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [allProduct, setAllProduct] = useState<aProduct[]>([]);
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
   const [product, setProduct] = useState<aProduct[]>([]);
@@ -28,11 +31,40 @@ export const ShopContextProvider = ({ children }: { children: React.ReactNode })
     fetchData();
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       const productItems = await getProductItems();
+
+      const productImgsResult = await getProductImgs();
+
+      const productImgs = productImgsResult.$values;
+
+      // Nhóm ảnh theo productItemID
+      const imagesByProductItemID = productImgs.reduce(
+        (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          acc: { [x: string]: any[] },
+          img: { productItemID: string | number }
+        ) => {
+          if (!acc[img.productItemID]) {
+            acc[img.productItemID] = [];
+          }
+          acc[img.productItemID].push(img);
+          return acc;
+        },
+        {} as Record<number, ProductImg[]>
+      );
+      // Gán danh sách ảnh vào productItem tương ứng
+      const mergedData: ProductItem[] = productItems.items.$values.map(
+        (item: ProductItem) => ({
+          ...item, // Giữ nguyên dữ liệu từ API
+          productImgs: imagesByProductItemID[item.productItemID] || [], // Thêm danh sách ảnh
+        })
+      );
+
+     
       if (productItems && productItems.items.$values) {
-        setProductItems(productItems.items.$values);
+        setProductItems(mergedData);
       } else {
         console.error("Data not found or invalid response structure");
       }
@@ -41,7 +73,21 @@ useEffect(() => {
   }, []);
 
   return (
-    <ShopContext.Provider value={{ allProduct, productItems, product, filterProduct, selectedProduct, selectedFilter, setProduct, setAllProduct, setFilterProduct, setSelectedProduct, setSelectedFilter}}>
+    <ShopContext.Provider
+      value={{
+        allProduct,
+        productItems,
+        product,
+        filterProduct,
+        selectedProduct,
+        selectedFilter,
+        setProduct,
+        setAllProduct,
+        setFilterProduct,
+        setSelectedProduct,
+        setSelectedFilter,
+      }}
+    >
       {children}
     </ShopContext.Provider>
   );

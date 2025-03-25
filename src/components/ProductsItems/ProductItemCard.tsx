@@ -1,5 +1,4 @@
 import React from "react";
-import img1 from "../../assets/Product/earphone.png";
 import {  ProductItem } from "../../interfaces";
 import { HandleAddToCart } from "../../pages/Cart-page/components/HandleAddToCart";
 import { Link } from "react-router-dom";
@@ -15,7 +14,7 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
       {/* Hình ảnh sản phẩm */}
       <div className="relative overflow-hidden rounded-lg">
         <img
-          src={img1}
+          src={productItem.productImgs[0].imageUrl}
           alt={productItem.name}
           className="w-full h-48 object-cover rounded-lg group-hover:brightness-75 transition-all duration-300"
         />

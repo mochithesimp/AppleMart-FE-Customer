@@ -3,7 +3,7 @@ const colorFilters = [
   { label: "Black", value: "Black" },
   { label: "White", value: "White" },
   { label: "Blue", value: "Blue" },
-  { label: "Red", value: "Red" },
+  { label: "Pink", value: "Pink" },
   { label: "Silver", value: "Silver" },
   { label: "Gold", value: "Gold" },
 ];

@@ -68,8 +68,7 @@ export const useOrderDetails = () => {
 
       const productImgs = productImgsResult.$values;
 
-      // Nhóm ảnh theo productItemID
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // Nhóm ảnh theo productItemID  
       const imagesByProductItemID = productImgs.reduce(
         (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

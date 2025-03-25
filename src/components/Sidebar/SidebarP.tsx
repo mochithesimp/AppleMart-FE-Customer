@@ -54,7 +54,7 @@ const SidebarP: React.FC<{ productFilter: ReturnType<typeof useProductFilter> }>
                 </div>
 
                 {/* Danh mục */}
-                <CategoryList />
+                <CategoryList activeCate={productFilter.activeCate} handleCateSort={productFilter.handleCateSort} />
             </div>
 
             {/* Overlay khi sidebar mở trên mobile */}

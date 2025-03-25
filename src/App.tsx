@@ -6,6 +6,7 @@ import ProductDetails from "./pages/ProductDetails-page/ProductDetail";
 import MyOrderPage from "./pages/MyOrder-page/MyOrderPage";
 import { NotificationProvider } from "./context/NotificationContext";
 import OrderDetailPage from "./pages/OrderDetails-page/OrderDetailPage";
+import DeliveryOrders from "./pages/DeliveryOrder-page/DeliveryOrders";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
   {
     path: "/orderDetails/:orderId",
     element: <OrderDetailPage />,
+  },
+  {
+    path: "/DeliveryOrders",
+    element: <DeliveryOrders />,
   },
 ]);
 

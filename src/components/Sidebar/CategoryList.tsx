@@ -12,7 +12,6 @@ import CategoryItem from "./CategoryItem";
 import { useEffect, useState } from "react";
 import { getCategory } from "../../apiServices/CategoryServices/categoryServices";
 import { iCategory } from "../../interfaces";
-import { useAllProduct } from "../../context/ShopContext";
 
 const categoryIcons: { [key: string]: LucideIcon } = {
   iPhone: Smartphone,
@@ -24,11 +23,14 @@ const categoryIcons: { [key: string]: LucideIcon } = {
   Accessories: LayoutGrid,
 };
 
-const CategoryList: React.FC = () => {
+type CateFilterProps = {
+  activeCate: number | string;
+  handleCateSort: (value: number) => void;
+};
+
+const CategoryList: React.FC<CateFilterProps> = ({ activeCate, handleCateSort }) => {
   const [categories, setCategories] = useState<iCategory[]>([]);
   // const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  // const [products, setProducts] = useState<aProduct[]>([]);
-  ;const { allProduct, setProduct, setSelectedProduct } = useAllProduct()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +39,7 @@ const CategoryList: React.FC = () => {
         // Gán icon dựa trên tên danh mục
         const updatedCategories = categories.$values.map((cat: iCategory) => ({
           ...cat,
-          icon: categoryIcons[cat.name] || Headphones
+          icon: categoryIcons[cat.name] || Headphones,
         }));
         setCategories(updatedCategories);
       }
@@ -45,13 +47,6 @@ const CategoryList: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleCategoryClick = (categoryId: number) => {
-    const products = allProduct.filter( 
-      product => product.categoryID === categoryId
-    );
-    setProduct(products);
-    setSelectedProduct(true);
-  };
   return (
     <div className="mt-4">
       {categories.map((cat, index) => (
@@ -59,7 +54,8 @@ const CategoryList: React.FC = () => {
           key={index}
           icon={categoryIcons[cat.name] || Headphones}
           name={cat.name}
-          onClick={() => handleCategoryClick(cat.categoryID)}
+          isActive={activeCate === cat.categoryID}
+          onClick={() => handleCateSort(cat.categoryID)}
         />
       ))}
     </div>
