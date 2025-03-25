@@ -79,18 +79,22 @@ const ProductDetails = () => {
     images: [img1, img1, img1, img1],
     storage: ["268GB", "64GB"],
   };
-
+  const firstWord = productItem?.name?.split(" ")[0] || "";
   const breadcrumbPaths = [
-    { name: "Homepage", link: "/" },
-    { name: "Women", link: "/women" },
-    { name: "Women's Shirts & Tops", link: "/women/shirts-tops" },
-    { name: "Long Sleeve Overshirt, Khaki, 6" },
+    { name: "Home", link: "/" },
+    { name: firstWord, link: "/ProductMenu" },
+    { name: productItem?.name || "Loading...", link: "/women/shirts-tops" },
   ];
 
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedStorage, setSelectedStorage] = useState(product.storage[0]);
-  const [selectedImage, setSelectedImage] = useState(product.images[0]);
+  const [selectedImage, setSelectedImage] = useState<string>("");
 
+  useEffect(() => {
+    if (productItem?.productImgs?.length) {
+      setSelectedImage(productItem.productImgs[0].imageUrl);
+    }
+  }, [productItem]);
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-hidden">
       <div className="mb-16">
@@ -109,14 +113,14 @@ const ProductDetails = () => {
                 className="w-full rounded-lg shadow"
               />
               <div className="flex gap-2 mt-4">
-                {product.images.map((img, index) => (
+                {productItem.productImgs .map((img, index) => (
                   <img
                     key={index}
-                    src={img}
+                    src={img.imageUrl}
                     alt="Product preview"
-                    className={`w-16 h-16 rounded cursor-pointer border-2 ${selectedImage === img ? "border-black" : "border-gray-300"
+                    className={`w-16 h-16 rounded cursor-pointer border-2 ${selectedImage === img.imageUrl ? "border-black" : "border-gray-300"
                       }`}
-                    onClick={() => setSelectedImage(img)}
+                    onClick={() => setSelectedImage(img.imageUrl)}
                   />
                 ))}
               </div>
@@ -125,7 +129,7 @@ const ProductDetails = () => {
             {/* Right: Product Details */}
             <div>
               <h2 className="text-2xl font-bold">{productItem.name}</h2>
-              <p className="text-gray-500">{productItem.description}</p>
+              <p className="text-gray-500">Available: {productItem.quantity}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="line-through text-gray-400">
                   ${productItem.price.toFixed(2)}
@@ -137,7 +141,7 @@ const ProductDetails = () => {
               <p className="text-sm text-gray-600">
                 {product.sold} Sold ⭐ {product.rating}
               </p>
-              <p className="mt-4 text-gray-700">{product.description}</p>
+              <p className="mt-4 text-gray-700">{productItem.description}</p>
               {attributes.map((attribute) => {
                 // Lọc tất cả các giá trị liên quan đến attributeID
                 const relatedValues = productItem?.productItemAttributes

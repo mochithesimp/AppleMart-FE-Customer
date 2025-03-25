@@ -7,6 +7,7 @@ import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
 import { login } from "../../../apiServices/AccountServices/loginServices";
 import { AxiosError } from "axios";
+import { getRoleFromToken } from "../../../utils/jwtHelper";
 interface LoginFormProps {
   activeForm: "login" | "register" | "forget";
   setActiveForm: (form: "login" | "register" | "forget") => void;
@@ -29,7 +30,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm, setActiveForm }) => {
 
         localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        navigate("/");
+
+        const role = getRoleFromToken(accessToken);
+        
+        if (role === "Customer") {
+          navigate("/");
+        } else if (role === "Shipper") {
+          navigate("/DeliveryOrders");
+        } 
       } else {
         setIsLogin(false);
         return;

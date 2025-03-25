@@ -1,15 +1,18 @@
+import { getProductImgs } from "../../apiServices/ProductServices/productImgSevices";
 import { search } from "../../apiServices/ProductServices/productItemServices";
 import { useEffect, useState } from "../../import/import-another";
-import { ProductItem } from "../../interfaces";
+import { ProductImg, ProductItem } from "../../interfaces";
 
 const useProductFilter = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [cateBy, setCateBy] = useState<number>(0);
   const [sortBy, setSortBy] = useState("");
   const [colorBy, setColorBy] = useState("");
   const [RamBy, setRamBy] = useState("");
   const [RomBy, setRomBy] = useState("");
   const [activeColor, setActiveColor] = useState("");
   const [activePrice, setActivePrice] = useState("");
+  const [activeCate, setActiveCate] = useState<string | number>("");
   const [activeRam, setActiveRam] = useState("");
   const [activeRom, setActiveRom] = useState("");
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
@@ -41,7 +44,7 @@ const useProductFilter = () => {
         Black: { Colors: "Black" },
         White: { Colors: "White" },
         Blue: { Colors: "Blue" },
-        Red: { Colors: "Blue" },
+        Pink: { Colors: "Pink" },
         Silver: { Colors: "Silver" },
         Gold: { Colors: "Gold" },
       };
@@ -79,6 +82,10 @@ const useProductFilter = () => {
         });
       }
 
+      if (cateBy) {
+        queryParams.append("CategoryId", cateBy.toString());
+      }
+
       if (searchTerm) {
         queryParams.append("SearchTerm", searchTerm);
       }
@@ -87,10 +94,35 @@ const useProductFilter = () => {
 
       // console.log(`Fetching from URL: https://localhost:7140/api/ProductItem?${queryParams.toString()}`);
       const response = await search(queryParams);
-      setProductItems(response?.items?.$values || []);
+
+      const productImgsResult = await getProductImgs();
+
+      const productImgs = productImgsResult.$values;
+
+      const imagesByProductItemID = productImgs.reduce(
+        (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          acc: { [x: string]: any[] },
+          img: { productItemID: string | number }
+        ) => {
+          if (!acc[img.productItemID]) {
+            acc[img.productItemID] = [];
+          }
+          acc[img.productItemID].push(img);
+          return acc;
+        },
+        {} as Record<number, ProductImg[]>
+      );
+      // Gán danh sách ảnh vào productItem tương ứng
+      const mergedData: ProductItem[] = response?.items?.$values.map((item: ProductItem) => ({
+        ...item, // Giữ nguyên dữ liệu từ API
+        productImgs: imagesByProductItemID[item.productItemID] || [], // Thêm danh sách ảnh
+      }));
+
+      setProductItems(mergedData);
     };
     fetchProductsByFilter();
-  }, [RamBy, RomBy, colorBy, pageNumber, searchTerm, sortBy]);
+  }, [RamBy, RomBy, cateBy, colorBy, pageNumber, searchTerm, sortBy]);
 
   const handlePriceSort = (value: string) => {
     setSortBy(value);
@@ -112,7 +144,13 @@ const useProductFilter = () => {
     setActiveRom(value || "");
   };
 
+  const handleCateSort = (value: number) => {
+    setCateBy(value || 0);
+    setActiveCate(value || "");
+  };
+
   const resetFilters = () => {
+    setCateBy(0);
     setSearchTerm("");
     setSortBy("");
     setColorBy("");
@@ -122,6 +160,7 @@ const useProductFilter = () => {
     setActiveColor("");
     setActiveRam("");
     setActiveRom("");
+    setActiveCate("");
   };
 
   const handlePageChange = (newPage: number) => {
@@ -134,6 +173,7 @@ const useProductFilter = () => {
     activeColor,
     activeRam,
     activeRom,
+    activeCate,
     searchTerm,
     pageNumber,
     handlePriceSort,
@@ -141,6 +181,7 @@ const useProductFilter = () => {
     handleRamSort,
     handleRomSort,
     handlePageChange,
+    handleCateSort,
     setSearchTerm,
     setPageNumber,
     resetFilters,

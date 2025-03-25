@@ -5,7 +5,7 @@ const PaginationControls: React.FC<{
   totalProductItems: number;
   handlePageChange: (newPage: number) => void;
 }> = ({ pageNumber, totalProductItems, handlePageChange }) => {
-  const isNextDisabled = (pageNumber + 1) > totalProductItems;
+  const isNextDisabled = (pageNumber + 1) > totalProductItems / 8;
 // const totalPages = Math.ceil(totalProductItems / 8);
 
   return (
