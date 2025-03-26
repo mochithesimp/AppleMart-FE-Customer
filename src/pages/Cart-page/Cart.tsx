@@ -171,7 +171,7 @@ const CartPage = () => {
                           </td>
                           <td className="product-name">{item.name}</td>
                           <td className="product-price">
-                            ${item.price.toFixed(2)}
+                            ${item.price.toLocaleString()}
                           </td>
                           <td className="product-quantity">
                             <div className="quantity flex items-center">
@@ -200,7 +200,7 @@ const CartPage = () => {
                             </div>
                           </td>
                           <td className="product-subtotal">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ${(item.price * item.quantity).toLocaleString()}
                           </td>
                         </tr>
                       ))}
@@ -218,7 +218,7 @@ const CartPage = () => {
                           <th>Subtotal</th>
                           <td data-title="Subtotal">
                             <span className="price-amount">
-                              ${totalAmount.toFixed(2)}
+                              ${totalAmount.toLocaleString()}
                             </span>
                           </td>
                         </tr>
@@ -230,7 +230,7 @@ const CartPage = () => {
                               className="shipping-methods"
                             >
                               <li>
-                                <label>Flat Rate: $15.00</label>
+                                <label>Standard: $6</label>
                               </li>
                             </ul>
                             <p className="shipping-destination">
@@ -348,7 +348,7 @@ const CartPage = () => {
                           <th>Total</th>
                           <td data-title="Total">
                             <span className="Price-amount">
-                              ${totalAmount.toFixed(2)}
+                            ${(totalAmount + 6).toLocaleString()}
                             </span>
                           </td>
                         </tr>

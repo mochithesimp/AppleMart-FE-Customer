@@ -32,12 +32,12 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
 
       {productItem.price && (
         <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
-          ${productItem.price.toFixed(2)}
+          ${productItem.price.toLocaleString()}
         </p>
       )}
 
       <p className="text-red-500 font-bold text-xl">
-        {productItem.price ? `$${productItem.price.toFixed(2)}` : "Liên hệ"}
+        {productItem.price ? `$${productItem.price.toLocaleString()}` : "Liên hệ"}
       </p>
 
       <p className="text-sm text-gray-500 dark:text-gray-400">

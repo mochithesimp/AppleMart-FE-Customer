@@ -188,10 +188,14 @@ export interface bBlogs{
   view: number;
   like: number;
   isDeleted: boolean;
-  blogImages: blogImages[];
+  blogImages: BlogImages;
 }
-export interface blogImages
-{
+
+interface BlogImages {
+  $values: BlogImage[];
+}
+
+interface BlogImage {
   blogImageID: number;
   imageUrl: string;
   blogId: number;

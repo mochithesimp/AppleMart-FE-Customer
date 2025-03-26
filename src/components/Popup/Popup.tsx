@@ -59,7 +59,7 @@ const Popup: React.FC<{
                           {item.name}
                         </div>
                         <div className="menu-cart__product-price">
-                          {item.quantity} × ${item.price.toFixed(2)}
+                          {item.quantity} × ${item.price.toLocaleString()}
                         </div>
                         <button className="menu-cart__product-remove" onClick={() => {
                             removeItems(item.productItemID);
@@ -71,7 +71,7 @@ const Popup: React.FC<{
 
                 <div className="menu-cart__subtotal dark:border-white">
                   <span>Subtotal: </span> $
-                  {totalAmount.toFixed(2)}
+                  {totalAmount.toLocaleString()}
                 </div>
 
                 <div className="menu-cart__footer-buttons">
