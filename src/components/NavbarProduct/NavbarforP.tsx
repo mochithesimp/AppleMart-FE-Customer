@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { FaBell, FaCartShopping, FaTrash } from "react-icons/fa6";
-import { FaCaretDown } from "react-icons/fa";
 import noface from "../../assets/NoFace.jpg";
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
@@ -32,23 +31,7 @@ const MenuLinks = [
     link: "/Blogs",
   },
 ];
-const DropDownLinks = [
-  {
-    id: 1,
-    name: "Trending Product",
-    link: "/#",
-  },
-  {
-    id: 2,
-    name: "Best Selling",
-    link: "/#",
-  },
-  {
-    id: 3,
-    name: "Top Rated",
-    link: "/#",
-  },
-];
+
 
 const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
