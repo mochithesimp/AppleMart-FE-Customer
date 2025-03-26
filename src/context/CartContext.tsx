@@ -1,7 +1,8 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { CartContextType, CartProductItem, ProductItem } from "../interfaces"
+import { CartContextType, CartProductItem, ProductItem } from "../interfaces";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getUserIdFromToken } from "../utils/jwtHelper";
 
 interface CartData {
   [orderId: string]: CartProductItem[];
@@ -9,6 +10,10 @@ interface CartData {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const token = localStorage.getItem("token");
+
+const userIdFromToken = token ? getUserIdFromToken(token) : null;
+const userId = userIdFromToken;
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
@@ -24,56 +29,55 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [totals, setTotals] = useState<{ [productId: number]: number }>({});
 
   //------------------------------------------------- localStorage orderData ------------------------------------------
- 
-  // useEffect(() => {
-  //   const storedCart = localStorage.getItem("cart");
 
-  //   if (storedCart) {
-  //     setCart(JSON.parse(storedCart));
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (userId && cart.length > 0) {
+      const cartData: CartData = {
+        ...JSON.parse(localStorage.getItem("storedCart") || "{}"),
+        [userId]: cart,
+      };
+      localStorage.setItem("storedCart", JSON.stringify(cartData));
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    const cartData: CartData = JSON.parse(localStorage.getItem("storedCart") || "{}");
+    const userCartKey = userId || "guest"; // Fix lỗi userId null
+    setCart(cartData[userCartKey] || []);
+}, []);
 
   //----------------------------------------------------------------------------------------------------------------------
 
   const [isToastVisible, setIsToastVisible] = useState(false);
 
-  const addToCart = (ProductItem: ProductItem) => {
+ const addToCart = (ProductItem: ProductItem) => {
+    const userCartKey = userId || "guest";
+    const cartData: CartData = JSON.parse(localStorage.getItem("storedCart") || "{}");
+
     const existingProduct = cart.find(
-      (item) => item.productItemID === ProductItem.productItemID
+        (item) => item.productItemID === ProductItem.productItemID
     );
 
+    let updatedCart;
     if (!existingProduct) {
-      const updatedCart = [
-        ...cart,
-        {
-          productItemID: ProductItem.productItemID,
-          name: ProductItem.name,         
-          quantity: 1,
-          price: ProductItem.price,
-          stock: ProductItem.stock,
-          isDeleted: ProductItem.isDeleted,
-        },
-      ];
-
-      setCart(updatedCart);
-      // localStorage.setItem("cart", JSON.stringify(updatedCart));
-      setTotals(calculateTotals(updatedCart));
-      showToast(ProductItem.name);
+        updatedCart = [...cart, { ...ProductItem, quantity: 1 }];
     } else {
-      const updatedCart = cart.map((item) =>
-        item.productItemID === ProductItem.productItemID
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-      setCart(updatedCart);
-      // localStorage.setItem("cart", JSON.stringify(updatedCart));
-      setTotals(calculateTotals(updatedCart));
-
-      if (!isToastVisible) {
-        showToast(ProductItem.name);
-      }
+        updatedCart = cart.map((item) =>
+            item.productItemID === ProductItem.productItemID
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+        );
     }
-  };
+
+    setCart(updatedCart);
+    cartData[userCartKey] = updatedCart; // Cập nhật dữ liệu trong localStorage
+    localStorage.setItem("storedCart", JSON.stringify(cartData));
+
+    setTotals(calculateTotals(updatedCart));
+    if (!isToastVisible) {
+        showToast(ProductItem.name);
+    }
+};
 
   const showToast = (productItemName: string) => {
     setIsToastVisible(true);
@@ -90,34 +94,39 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
- 
   const incrementQuantity = (productItemID: number) => {
+    const userCartKey = userId || "guest";
+    const cartData: CartData = JSON.parse(localStorage.getItem("storedCart") || "{}");
+
     const updatedCart = cart.map((item) =>
-      item.productItemID === productItemID
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
+        item.productItemID === productItemID
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
     );
+    
     setCart(updatedCart);
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
+    cartData[userCartKey] = updatedCart;
+    localStorage.setItem("storedCart", JSON.stringify(cartData));
+
     setTotals(calculateTotals(updatedCart));
-  };
+};
 
-  const decrementQuantity = (productItemID: number) => {
-    const updatedCart = cart.map((item) =>
+const decrementQuantity = (productItemID: number) => {
+  const userCartKey = userId || "guest";
+  const cartData: CartData = JSON.parse(localStorage.getItem("storedCart") || "{}");
+
+  const updatedCart = cart.map((item) =>
       item.productItemID === productItemID && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
-    setCart(updatedCart);
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+  );
 
-    const existingProduct = cart.find((item) => item.productItemID === productItemID);
-    if (existingProduct && existingProduct.quantity > 1) {
-      setTotals(calculateTotals(updatedCart));
-    }
+  setCart(updatedCart);
+  cartData[userCartKey] = updatedCart;
+  localStorage.setItem("storedCart", JSON.stringify(cartData));
 
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+  setTotals(calculateTotals(updatedCart));
+};
 
   const calculateTotals = (cart: CartProductItem[]) => {
     const newTotals: { [productItemID: number]: number } = {};
@@ -133,18 +142,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setTotals(newTotals);
   }, [cart]);
 
+  //-------------------------------------------------------
   const removeItems = (productItemID: number) => {
-    const updatedCart = cart.filter((item) => item.productItemID !== productItemID);
+    const updatedCart = cart.filter(
+      (item) => item.productItemID !== productItemID
+    );
     setCart(updatedCart);
 
     const cartData: CartData = JSON.parse(
       localStorage.getItem("storedCart") || "{}"
     );
-    // delete cartData[userId];
-    localStorage.setItem("storedCart", JSON.stringify(cartData));
+    const userCartKey = userId || "guest";
 
-    // localStorage.removeItem("cart");
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
+    cartData[userCartKey] = updatedCart;
+    localStorage.setItem("storedCart", JSON.stringify(cartData));
 
     const storedQuantitiesStr = localStorage.getItem("currentQuantities");
     const storedQuantities = storedQuantitiesStr

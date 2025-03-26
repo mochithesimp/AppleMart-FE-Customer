@@ -14,12 +14,16 @@ import {
   getUserId,
   updateUser,
 } from "../../apiServices/UserServices/userServices";
-import { Iuser } from "../../interfaces";
+import { CartProductItem, Iuser } from "../../interfaces";
 import { createPaypalTransaction } from "../../apiServices/PaypalServices/PaypalServices";
 import PaypalButton from "../../components/PaypalButton/PaypalButton";
 import { AxiosError } from "axios";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+
+interface CartData {
+  [orderId: string]: CartProductItem[];
+}
 
 const CheckoutPage = () => {
   const [userId, setUserId] = useState<string>("");
@@ -163,7 +167,7 @@ const CheckoutPage = () => {
       address: newAddress,
       paymentMethod,
       shippingMethodID: shippingMethodId,
-      total: totalAmount + 15,
+      total: totalAmount + 6,
       voucherID,
       orderDetails: productItems
     };
@@ -183,6 +187,12 @@ const CheckoutPage = () => {
     if (!response2) {
       throw new Error("Error updating user");
     }
+
+    const cartData: CartData = JSON.parse(
+      localStorage.getItem("storedCart") || "{}"
+    );
+    delete cartData[ userId || "guest"];
+    localStorage.setItem("storedCart", JSON.stringify(cartData));
 
     localStorage.removeItem("storedCart");
     localStorage.removeItem("shippingAddress");
@@ -229,7 +239,7 @@ const CheckoutPage = () => {
         address: user.address || "",
         paymentMethod: "E-Wallet Paypal",
         shippingMethodID: shippingMethodId,
-        total: totalAmount + 15,
+        total: totalAmount + 6,
         voucherID,
         orderDetails: productItems
       };
@@ -260,7 +270,7 @@ const CheckoutPage = () => {
         orderId: orderId,
         paypalPaymentId,
         status: "COMPLETED",
-        amount: totalAmount + 15,
+        amount: totalAmount + 6,
         currency: "USD",
         createdDate: new Date(),
         isDeleted: false
@@ -282,6 +292,12 @@ const CheckoutPage = () => {
       if (!response2) {
         throw new Error("Error updating user");
       }
+
+      const cartData: CartData = JSON.parse(
+        localStorage.getItem("storedCart") || "{}"
+      );
+      delete cartData[ userId || "guest"];
+      localStorage.setItem("storedCart", JSON.stringify(cartData));
 
       localStorage.removeItem("storedCart");
       localStorage.removeItem("shippingAddress");
@@ -470,7 +486,7 @@ const CheckoutPage = () => {
                                   <span className="woocommerce-Price-currencySymbol">
                                     $
                                   </span>
-                                  {totalAmount.toFixed(2)}
+                                  {totalAmount.toLocaleString()}
                                 </bdi>
                               </span>
                             </td>
@@ -483,17 +499,17 @@ const CheckoutPage = () => {
                             <th>
                               <label>
                                 <span className="shipping-method-label">
-                                  Flat Rate
+                                Standard
                                 </span>
                               </label>
                             </th>
-                            <td className="shipping-method-cost">$15.00</td>
+                            <td className="shipping-method-cost">$6</td>
                           </tr>
 
                           <tr className="order-total">
                             <th>Total</th>
                             <td className="Price-amount ">
-                              <span>${(totalAmount + 15).toFixed(2)}</span>
+                              <span>${(totalAmount + 6).toLocaleString()}</span>
                             </td>
                           </tr>
                         </tfoot>
@@ -535,7 +551,7 @@ const CheckoutPage = () => {
                           <div className="E-wallet-payment">
                             <div className="paypal-container" style={{ marginTop: "15px" }}>
                               <PaypalButton
-                                amount={totalAmount + 15}
+                                amount={totalAmount + 6}
                                 currency="USD"
                                 onSuccess={handlePaypalSuccess}
                                 onError={handlePaypalError}

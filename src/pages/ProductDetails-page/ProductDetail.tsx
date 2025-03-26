@@ -132,10 +132,10 @@ const ProductDetails = () => {
               <p className="text-gray-500">Available: {productItem.quantity}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="line-through text-gray-400">
-                  ${productItem.price.toFixed(2)}
+                  ${productItem.price.toLocaleString()}
                 </span>
                 <span className="text-xl font-semibold text-red-600">
-                  ${product.discountedPrice.toFixed(2)}
+                  ${product.discountedPrice.toLocaleString()}
                 </span>
               </div>
               <p className="text-sm text-gray-600">

@@ -6,7 +6,12 @@ import Popup from "../Popup/Popup";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useNotification } from "../../context/NotificationContext";
-import { getRoleFromToken } from "../../utils/jwtHelper";
+import { getRoleFromToken, getUserIdFromToken } from "../../utils/jwtHelper";
+import { CartProductItem } from "../../interfaces";
+
+interface CartData {
+  [orderId: string]: CartProductItem[];
+}
 
 const MenuLinks = [
   {
@@ -36,6 +41,7 @@ const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
   const { cart } = useCart();
   const [role, setRole] = useState<string | null>();
+  const [userId, setUserId] = useState<string | null>();
   const [orderPopup, setOrderPopup] = useState<boolean>(false);
   const [notificationPopup, setNotificationPopup] = useState<boolean>(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -45,6 +51,8 @@ const NavbarforP = () => {
 
   useEffect(() => {
     const roleIdentifier = token ? getRoleFromToken(token) : null;
+    const userIdFromToken = token ? getUserIdFromToken(token) : null;
+    setUserId(userIdFromToken);
     setRole(roleIdentifier);
   }, [token]);
 
@@ -83,6 +91,12 @@ const NavbarforP = () => {
   const isLoggedIn = token;
 
   const handleLogout = () => {
+    const cartData: CartData = JSON.parse(
+      localStorage.getItem("storedCart") || "{}"
+    );
+    delete cartData[ userId || "guest"];
+    localStorage.setItem("storedCart", JSON.stringify(cartData));
+
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     // localStorage.removeItem("cart");
