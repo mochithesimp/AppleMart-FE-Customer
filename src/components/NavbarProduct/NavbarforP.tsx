@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { IoMdSearch } from "react-icons/io";
 import { FaBell, FaCartShopping, FaTrash } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
 import noface from "../../assets/NoFace.jpg";
