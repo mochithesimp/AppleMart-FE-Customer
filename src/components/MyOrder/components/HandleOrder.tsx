@@ -10,6 +10,7 @@ const useHandleCancelOrder = () => {
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("Token not found");
+        swal("Error", "You must be logged in to cancel an order.", "error");
         return;
       }
 
@@ -21,18 +22,26 @@ const useHandleCancelOrder = () => {
         dangerMode: true,
       }).then(async (confirmCancel) => {
         if (confirmCancel) {
-          const response = await orderCancel(orderId);
-          if (response) {
-            swal("Success!", "Order was canceled!", "success").then(() => {
-              navigate("/MyOrderPage");
-            });
-          } else {
-            throw new Error("Failed to cancel order");
+          try {
+            const response = await orderCancel(orderId);
+            if (response && response.status >= 200 && response.status < 300) {
+              // The server will handle sending the notification - no need to do it here
+
+              swal("Success!", "Order was canceled!", "success").then(() => {
+                navigate("/MyOrderPage");
+              });
+            } else {
+              throw new Error(response?.data?.message || "Failed to cancel order");
+            }
+          } catch (cancelError) {
+            console.error("Error canceling order:", cancelError);
+            swal("Error", "Failed to cancel the order. Please try again later.", "error");
           }
         }
       });
     } catch (error) {
-      console.error("Error canceling order:", error);
+      console.error("Error in handleCancelOrder:", error);
+      swal("Error", "An unexpected error occurred. Please try again later.", "error");
     }
   };
 
@@ -42,47 +51,47 @@ const useHandleCancelOrder = () => {
 const useHandleOrderConfirm = () => {
 
   const handleConfirmClick = async (orderId: number) => {
-      try {
-          const token = localStorage.getItem("token");
-  
-          if (!token) {
-            await swal({
-              title: "Oops!",
-              text: "You haven't logged in yet! Redirecting to Login Page...",
-              icon: "warning",
-              buttons: {
-                ok: {
-                  text: "OK",
-                  value: true,
-                  className: "swal-ok-button",
-                },
-              },
-            });
-            window.location.href = "/login";
-            return;
-          }
-        swal({
-          title: "This can not be undo!",
-          text: "You are about to mark this order as Delivered!",
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        await swal({
+          title: "Oops!",
+          text: "You haven't logged in yet! Redirecting to Login Page...",
           icon: "warning",
-          buttons: ["Cancel", "Confirm"],
-          dangerMode: true,
-        }).then(async (confirm) => {
-          if (confirm) {
-            const response = await orderConfirm(orderId, token);
-            if (response) {
-              swal("Success!", "The order has been marked as Delivered!", "success").then(() => {
-               window.location.reload();
-              });
-            } else {
-              throw new Error("Failed to update order status");
-            }
-          }
+          buttons: {
+            ok: {
+              text: "OK",
+              value: true,
+              className: "swal-ok-button",
+            },
+          },
         });
-      } catch (error) {
-        console.error("Error updating order status:", error);
+        window.location.href = "/login";
+        return;
       }
-    };
+      swal({
+        title: "This can not be undo!",
+        text: "You are about to mark this order as Delivered!",
+        icon: "warning",
+        buttons: ["Cancel", "Confirm"],
+        dangerMode: true,
+      }).then(async (confirm) => {
+        if (confirm) {
+          const response = await orderConfirm(orderId, token);
+          if (response) {
+            swal("Success!", "The order has been marked as Delivered!", "success").then(() => {
+              window.location.reload();
+            });
+          } else {
+            throw new Error("Failed to update order status");
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
 
   return { handleConfirmClick };
 };

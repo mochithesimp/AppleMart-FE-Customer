@@ -71,7 +71,7 @@ const CheckoutPage = () => {
     const storedAddress = localStorage.getItem("shippingAddress");
 
     if (!storedAddress && user.address) {
-      
+
       setNewAddress(user.address);
     }
 
@@ -91,7 +91,7 @@ const CheckoutPage = () => {
       .filter(Boolean)
       .join(", ");
 
-      setNewAddress(newAddress);
+    setNewAddress(newAddress);
 
   }, [ward, district, province, country]);
 
@@ -138,7 +138,7 @@ const CheckoutPage = () => {
       return;
     }
     if (!newAddress) {
-      if (!user || !user.address ) {
+      if (!user || !user.address) {
         MySwal.fire({
           icon: "error",
           title: "Missing Address",
@@ -178,6 +178,7 @@ const CheckoutPage = () => {
     if (response.status === 401) {
       await refreshToken();
     }
+
     const updatedUser = { ...user, address: newAddress };
     const response2 = await updateUser(userId, updatedUser);
     if (!response2) {
@@ -358,7 +359,7 @@ const CheckoutPage = () => {
                               readOnly
                             ></input>
                           </span>
-                        </p>                     
+                        </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
@@ -368,7 +369,7 @@ const CheckoutPage = () => {
                               onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
                             />
                           </span>
-                        </p>  
+                        </p>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
@@ -379,7 +380,7 @@ const CheckoutPage = () => {
                             ></input>
                           </span>
                         </p>
-                        <h3 className="adress"> New Adress</h3>      
+                        <h3 className="adress"> New Adress</h3>
                         <p className="form-row form-row-wide">
                           <span className="input-wrapper">
                             <input
@@ -419,7 +420,7 @@ const CheckoutPage = () => {
                               onChange={(e) => setWard(e.target.value)}
                             />
                           </span>
-                        </p>                                     
+                        </p>
                       </div>
                     </div>
                   </div>
