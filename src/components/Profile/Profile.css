@@ -1,0 +1,46 @@
+.profile-U-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .profile-U-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #4a90e2;
+  }
+  
+  .profile-U-info {
+    text-align: center;
+    
+  }
+  
+  .profile-U-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000;
+  }
+  
+  .profile-U-email {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .profile-U-edit-btn {
+    margin-top: 15px;
+    background: #4a90e2;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+  }
+  
+  .profile-U-edit-btn:hover {
+    background: #357abd;
+  }
+  

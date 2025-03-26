@@ -161,7 +161,7 @@ const NavbarforP = () => {
                   </li>
                 ))}
                 {/* dropdown */}
-                <li className="relative cursor-pointer group">
+                {/* <li className="relative cursor-pointer group">
                   <a
                     href="#"
                     className="flex items-center gap-[2px] font-semibold text-gray-500 dark:hover:text-white py-2"
@@ -170,9 +170,9 @@ const NavbarforP = () => {
                     <span>
                       <FaCaretDown className="group-hover:rotate-180 duration-300" />
                     </span>
-                  </a>
+                  </a> */}
                   {/* Dropdown Link */}
-                  <div className="absolute z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md dark:bg-gray-900 p-2 dark:text-white ">
+                  {/* <div className="absolute z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md dark:bg-gray-900 p-2 dark:text-white "> */}
                     {/* <ul className=" space-y-2">
                       {DropDownLinks.map((data) => (
                         <li>
@@ -185,7 +185,7 @@ const NavbarforP = () => {
                         </li>
                       ))}
                     </ul> */}
-                    <ul className="space-y-2">
+                    {/* <ul className="space-y-2">
                       {DropDownLinks.map((data, index) => (
                         <li key={index}>
                           <a
@@ -196,9 +196,9 @@ const NavbarforP = () => {
                           </a>
                         </li>
                       ))}
-                    </ul>
-                  </div>
-                </li>
+                    </ul> */}
+                  {/* </div> */}
+                {/* </li> */}
               </ul>
             </div>
           </div>

@@ -1,0 +1,35 @@
+.profilesection-container {
+    background: rgba(188, 196, 207, 0.7);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    width: 20vw;
+    margin-left: 0;
+}
+
+.profilesection-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+
+.profilesection-icon {
+    color: #8bc4ff;
+    margin-right: 12px;
+}
+
+
+.profilesection-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(45, 43, 43);
+}
+
+
+.profilesection-content {
+    color: #d1d5db;
+}

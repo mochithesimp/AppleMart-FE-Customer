@@ -1,0 +1,71 @@
+.account-section-container {
+    background: rgba(188, 196, 207, 0.7);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.account-section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.account-section-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.account-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.account-input-group label {
+    font-size: 14px;
+    color: rgb(45, 43, 43);
+    margin-bottom: 5px;
+}
+
+.account-input-group input,
+.account-input-group select {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px;
+    color: rgb(45, 43, 43);
+}
+
+.account-input-group input:read-only,
+.account-input-group select:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.account-edit-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    margin-top: 24px;
+}
+
+.account-edit-button:hover {
+    background-color: #2563eb;
+}
+
+@media (max-width: 768px) {
+    .account-section-grid {
+        grid-template-columns: 1fr;
+    }
+}
