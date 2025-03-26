@@ -24,7 +24,6 @@ const ProductSection: React.FC<{
         <Spinner />
       ) : (
         <>
-          {/* <ProductList products={productsWithItems} visibleProducts={visibleProducts} /> */}
           <ProductItemList productItems={productItems} />
           {productItems.length > 0 && (
             <PaginationControls
@@ -33,7 +32,6 @@ const ProductSection: React.FC<{
               handlePageChange={productFilter.handlePageChange}
             />
           )}
-          {/* <LoadMoreButton onClick={handleLoadMore} isDisabled={visibleProducts >= productsWithItems.length} /> */}
         </>
       )}
     </div>

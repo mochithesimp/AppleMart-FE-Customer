@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   //fetchSignInMethodsForEmail,
@@ -201,7 +200,7 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
               </div>
             </div>
             <div className="forgot-pass">
-              <Link to="/ForgetPass">Forgot Password?</Link>
+              {/* <Link to="/ForgetPass">Forgot Password?</Link> */}
             </div>
             <div className="input-box">
               <button
@@ -220,8 +219,8 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
           </div>
           <div className="social-login">
             <GoogleLogin />
-            <i className="bx bxl-facebook"></i>
-            <i className="bx bxl-github"></i>
+            {/* <i className="bx bxl-facebook"></i>
+            <i className="bx bxl-github"></i> */}
           </div>
         </div>
       </form>

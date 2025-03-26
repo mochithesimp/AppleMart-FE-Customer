@@ -9,6 +9,8 @@ import OrderDetailPage from "./pages/OrderDetails-page/OrderDetailPage";
 import BlogsPage from "./pages/Blogs-page/BlogsPage";
 import BlogsDetailPage from "./pages/Blogs-page/BlogsDetailPage";
 import DeliveryOrdersPage from "./pages/DeliveryOrder-page/DeliveryOrdersPage";
+
+import ProtectedRoute from "./utils/protectedRoute";
 import ProfilePage from "./pages/Profile-page/ProfilePage";
 
 // Lazy load các trang
@@ -65,7 +67,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/Checkout",
-    element: <CheckoutPage />,
+    element: (
+      <ProtectedRoute>
+        <CheckoutPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/productDetails/:productItemId",
@@ -97,7 +103,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/Blogs",
-    element: <BlogsPage/>
+    element: <BlogsPage />,
   },
   {
     path: "/Blogs/detail",

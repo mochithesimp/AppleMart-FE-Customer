@@ -11,7 +11,7 @@ const ProductItemList: React.FC<ProductItemListProps> = ({ productItems }) => {
       {productItems.map((item) => (
         <ProductItemCard 
           key={item.productItemID} 
-          productItem={item}  // Truyền từng item đơn lẻ
+          productItem={item} 
         />
       ))}
     </div>
