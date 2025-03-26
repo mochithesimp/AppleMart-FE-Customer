@@ -51,8 +51,8 @@ export const orderCancel = async (orderId: number) => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.put(
-      `https://localhost:7140/api/User/${orderId}/status?NewStatus=Cancelled`,
-      {}, // Phải có body, dù là object rỗng
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Cancelled`,
+      {}, // Empty body is required
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,6 +62,7 @@ export const orderCancel = async (orderId: number) => {
     return res;
   } catch (error) {
     console.log(error);
+    throw error; // Rethrow to handle in the caller
   }
 };
 
@@ -69,8 +70,8 @@ export const orderCompleted = async (orderId: number) => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.put(
-      `https://localhost:7140/api/User/${orderId}/status?NewStatus=Completed`,
-      {}, // Phải có body, dù là object rỗng
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Completed`,
+      {}, // Empty body is required
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -80,5 +81,6 @@ export const orderCompleted = async (orderId: number) => {
     return res;
   } catch (error) {
     console.log(error);
+    throw error; // Rethrow to handle in the caller
   }
 };
