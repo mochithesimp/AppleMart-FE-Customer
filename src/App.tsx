@@ -9,6 +9,7 @@ import OrderDetailPage from "./pages/OrderDetails-page/OrderDetailPage";
 import BlogsPage from "./pages/Blogs-page/BlogsPage";
 import BlogsDetailPage from "./pages/Blogs-page/BlogsDetailPage";
 import DeliveryOrdersPage from "./pages/DeliveryOrder-page/DeliveryOrdersPage";
+import ProfilePage from "./pages/Profile-page/ProfilePage";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -101,6 +102,10 @@ const router = createBrowserRouter([
   {
     path: "/Blogs/detail",
     element: <BlogsDetailPage />,
+  },
+  {
+    path: "/ProfileUser",
+    element: <ProfilePage />,
   },
 ]);
 
