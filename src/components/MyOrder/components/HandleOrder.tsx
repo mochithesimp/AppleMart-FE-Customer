@@ -25,7 +25,6 @@ const useHandleCancelOrder = () => {
           try {
             const response = await orderCancel(orderId);
             if (response && response.status >= 200 && response.status < 300) {
-              // The server will handle sending the notification - no need to do it here
 
               swal("Success!", "Order was canceled!", "success").then(() => {
                 navigate("/MyOrderPage");
@@ -49,7 +48,6 @@ const useHandleCancelOrder = () => {
 };
 
 const useHandleOrderConfirm = () => {
-
   const handleConfirmClick = async (orderId: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -79,7 +77,7 @@ const useHandleOrderConfirm = () => {
       }).then(async (confirm) => {
         if (confirm) {
           const response = await orderConfirm(orderId, token);
-          if (response) {
+          if (response && response.status >= 200 && response.status < 300) {
             swal("Success!", "The order has been marked as Delivered!", "success").then(() => {
               window.location.reload();
             });
@@ -97,7 +95,6 @@ const useHandleOrderConfirm = () => {
 };
 
 const useHandleOrderReceived = () => {
-
   const handleOrderReceived = async (orderId: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -115,12 +112,17 @@ const useHandleOrderReceived = () => {
       }).then(async (confirmReceived) => {
         if (confirmReceived) {
           const response = await orderCompleted(orderId);
-          if (response) {
-            swal("Order Completed!", "Thank you for shopping at AppleMart. We hope to see you again!", "success").then(
-              () => {
-                window.location.reload();
-              }
-            );
+          if (response && response.status >= 200 && response.status < 300) {
+            let successMessage = "Thank you for shopping at AppleMart. We hope to see you again!";
+
+            if (response.data && response.data.shipperName) {
+              const shipperName = response.data.shipperName;
+              successMessage = `Thank you for confirming delivery from ${shipperName}. We hope to see you again!`;
+            }
+
+            swal("Order Completed!", successMessage, "success").then(() => {
+              window.location.reload();
+            });
           } else {
             throw new Error("Failed to complete order");
           }
