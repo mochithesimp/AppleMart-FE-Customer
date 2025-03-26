@@ -1,5 +1,17 @@
-import {Project, mail, coin, stars, mess, setting, store, call, safari} from "../../../import/Import-assets";
+import { Link } from "react-router-dom";
+import {
+  Project,
+  mail,
+  coin,
+  stars,
+  mess,
+  setting,
+  store,
+  call,
+  safari,
+} from "../../../import/Import-assets";
 import "../Style.css";
+import { ArrowLeft } from "lucide-react";
 interface Col1Props {
   activeForm: "login" | "register" | "forget" | "changePass";
 }
@@ -11,6 +23,10 @@ const Col1: React.FC<Col1Props> = ({ activeForm }) => {
         borderRadius: activeForm === "login" ? "0 30% 20% 0" : "0 20% 30% 0",
       }}
     >
+      <Link to="/" style={{ transform: "translate(-250px, 15px)" }}>
+        <ArrowLeft size={30} color="white" />
+      </Link>
+
       <div className="image-layer">
         <img src={coin} className="form-image coin" alt="coin" />
         <img src={Project} className="form-image-main" alt="main" />
