@@ -1,0 +1,26 @@
+.pro-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+    overflow-y: auto;
+    width: 100vw;
+    margin-left: 0;
+    /* background-color: #1a202c; */
+    /* margin-bottom: 10px; */
+}
+
+
+.pro-content {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.5rem;
+    flex-grow: 1;
+    margin-top: 80px;
+}
+
+@media (min-width: 1024px) {
+    .pro-content {
+        padding: 1.5rem 2rem;
+    }
+}
