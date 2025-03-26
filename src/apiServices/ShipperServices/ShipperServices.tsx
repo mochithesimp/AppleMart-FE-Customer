@@ -32,9 +32,9 @@ export const orderConfirm = async (orderId: number, token: string) => {
         },
       }
     );
-    //console.log("check data search: ", res);
     return res;
   } catch (error) {
-    console.log(error);
+    console.error("Error in orderConfirm:", error);
+    return null;
   }
 };

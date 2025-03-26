@@ -61,8 +61,8 @@ export const orderCancel = async (orderId: number) => {
     );
     return res;
   } catch (error) {
-    console.log(error);
-    throw error; // Rethrow to handle in the caller
+    console.error("Error in orderCancel:", error);
+    return null;
   }
 };
 
@@ -80,7 +80,7 @@ export const orderCompleted = async (orderId: number) => {
     );
     return res;
   } catch (error) {
-    console.log(error);
-    throw error; // Rethrow to handle in the caller
+    console.error("Error in orderCompleted:", error);
+    return null;
   }
 };
