@@ -54,9 +54,15 @@ export const ordersByCash = async (order: any) => {
 export const orders = async (order: OrderRequest) => {
   try {
     console.log("Sending order data to API:", JSON.stringify(order, null, 2));
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const res = await axios.post(`https://localhost:7140/api/Order`, order, {
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
     });
     console.log("Order API Response:", {

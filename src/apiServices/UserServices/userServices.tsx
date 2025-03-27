@@ -51,7 +51,7 @@ export const orderCancel = async (orderId: number) => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.put(
-      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Cancelled`,
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Cancelled&isCancelledByCustomer=true`,
       {}, // Empty body is required
       {
         headers: {
