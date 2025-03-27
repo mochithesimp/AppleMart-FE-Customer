@@ -93,7 +93,7 @@ export const requestRefund = async (orderId: number, reason: string) => {
     }
 
     const response = await axios.put(
-      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=RefundRequested&reason=${encodeURIComponent(reason)}`,
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=RefundRequested&RefundReason=${encodeURIComponent(reason)}`,
       {},
       {
         headers: {
