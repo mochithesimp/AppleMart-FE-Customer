@@ -10,13 +10,13 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
     handleAddToCart(productItem);
   };
   return (
-    <div className="border rounded-xl shadow-md p-4 bg-white dark:bg-zinc-800 relative group transition-all duration-300 hover:scale-105 hover:shadow-xl">
+    <div className="border rounded-xl shadow-md p-4 bg-white dark:bg-zinc-800 relative group transition-all min-h-[410px] duration-300 hover:scale-105 hover:shadow-xl">
       {/* Hình ảnh sản phẩm */}
       <div className="relative overflow-hidden rounded-lg">
         <img
           src={productItem.productImgs[0].imageUrl}
           alt={productItem.name}
-          className="w-full h-48 object-cover rounded-lg group-hover:brightness-75 transition-all duration-300"
+          className="w-full h-60 object-cover rounded-lg group-hover:brightness-75 transition-all duration-300"
         />
         {/* Nút "Add to Cart" */}
         <div className="absolute inset-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">

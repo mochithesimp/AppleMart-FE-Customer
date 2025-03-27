@@ -7,19 +7,11 @@ const AccountSection = () => {
       <div className="account-section-grid">
         <div className="account-section-column">
           <div className="account-input-group">
-            <label>First Name</label>
+            <label>Name</label>
             <input 
               type="text" 
-              placeholder="Enter first name" 
-              defaultValue="Thanh"
-            />
-          </div>
-          <div className="account-input-group">
-            <label>Middle Name</label>
-            <input 
-              type="text" 
-              placeholder="Enter middle name" 
-              defaultValue="Joker"
+              placeholder="Enter Name" 
+              defaultValue="VU CO"
             />
           </div>
           <div className="account-input-group">
@@ -30,31 +22,18 @@ const AccountSection = () => {
               defaultValue="+84 123456789"
             />
           </div>
-          <div className="account-input-group">
-            <label>Password</label>
-            <input 
-              type="password" 
-              placeholder="********"
-            />
-          </div>
+          
         </div>
         <div className="account-section-column">
           <div className="account-input-group">
-            <label>Last Name</label>
+            <label>Adress</label>
             <input 
               type="text" 
-              placeholder="Enter last name" 
-              defaultValue="Vũ"
+              placeholder="Enter Address" 
+              defaultValue="1 Wall Street HCM City"
             />
           </div>
-          <div className="account-input-group">
-            <label>Gender</label>
-            <select defaultValue="female">
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+
           <div className="account-input-group">
             <label>Email Address</label>
             <input 

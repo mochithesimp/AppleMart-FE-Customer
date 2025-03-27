@@ -58,7 +58,9 @@ const HomePage = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {productItems.length > 0 ? (
             productItems.slice(0,8).map((product) => (
-              <ProductItemCard key={product.productItemID} productItem={product} />
+              <div key={product.productItemID} className="h-[400px] flex flex-col">
+              <ProductItemCard  productItem={product} />
+              </div>
             ))
           ) : (
             <p className="text-center col-span-full">Không có sản phẩm nào</p>
