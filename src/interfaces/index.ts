@@ -28,6 +28,7 @@ export interface ProductItem {
   quantity: number;
   price: number;
   stock: number;
+  totalItems: number;
   isDeleted: boolean;
   displayIndex: boolean;
   productImgs: ProductImg[];

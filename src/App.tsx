@@ -12,6 +12,8 @@ import DeliveryOrdersPage from "./pages/DeliveryOrder-page/DeliveryOrdersPage";
 
 import ProtectedRoute from "./utils/protectedRoute";
 import ProfilePage from "./pages/Profile-page/ProfilePage";
+import PaymentWrapper from "./utils/protectedRoutePayment";
+import ProtecteDeliveryRoute from "./utils/protecteDeliveryRoute";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
@@ -43,7 +45,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile",
-    element: <UserProfile />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
+        <UserProfile />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/Product",
@@ -68,8 +74,10 @@ const router = createBrowserRouter([
   {
     path: "/Checkout",
     element: (
-      <ProtectedRoute>
-        <CheckoutPage />
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <PaymentWrapper>
+          <CheckoutPage />
+        </PaymentWrapper>
       </ProtectedRoute>
     ),
   },
@@ -87,19 +95,35 @@ const router = createBrowserRouter([
   },
   {
     path: "/Chat",
-    element: <ChatPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
+        <ChatPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/MyOrderPage",
-    element: <MyOrderPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <MyOrderPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/orderDetails/:orderId",
-    element: <OrderDetailPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <OrderDetailPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/DeliveryOrderPage",
-    element: <DeliveryOrdersPage />,
+    element: (
+      <ProtecteDeliveryRoute>
+        <DeliveryOrdersPage />
+      </ProtecteDeliveryRoute>
+    ),
   },
   {
     path: "/Blogs",
@@ -111,7 +135,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/ProfileUser",
-    element: <ProfilePage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
+        <ProfilePage />{" "}
+      </ProtectedRoute>
+    ),
   },
 ]);
 

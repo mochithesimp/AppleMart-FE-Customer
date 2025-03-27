@@ -2,10 +2,10 @@ import React from "react";
 
 const PaginationControls: React.FC<{
   pageNumber: number;
-  totalProductItems: number;
+  totalPages: number;
   handlePageChange: (newPage: number) => void;
-}> = ({ pageNumber, totalProductItems, handlePageChange }) => {
-  const isNextDisabled = (pageNumber + 1) > totalProductItems / 8;
+}> = ({ pageNumber, totalPages, handlePageChange }) => {
+
 // const totalPages = Math.ceil(totalProductItems / 8);
 
   return (
@@ -19,7 +19,7 @@ const PaginationControls: React.FC<{
       </button>
       <span className="dark:text-white px-3 py-1">{pageNumber}</span>
       <button
-        disabled={isNextDisabled}
+        disabled={pageNumber >= totalPages }
         onClick={() => handlePageChange(pageNumber + 1)}
         className="dark:bg-zinc-700 dark:text-white px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
       >
