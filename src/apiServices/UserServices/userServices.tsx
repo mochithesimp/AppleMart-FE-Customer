@@ -85,15 +85,15 @@ export const orderCompleted = async (orderId: number) => {
   }
 };
 
-export const requestRefund = async (orderId: number) => {
+export const requestRefund = async (orderId: number, reason: string) => {
   try {
     const token = localStorage.getItem("token");
     if (!token) {
-      throw new Error("No token found");
+      throw new Error("Token not found");
     }
 
     const response = await axios.put(
-      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=RefundRequested`,
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=RefundRequested&reason=${encodeURIComponent(reason)}`,
       {},
       {
         headers: {
@@ -101,6 +101,7 @@ export const requestRefund = async (orderId: number) => {
         },
       }
     );
+
     return response;
   } catch (error) {
     console.error("Error requesting refund:", error);

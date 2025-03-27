@@ -149,29 +149,28 @@ const useHandleRefundRequest = () => {
         return;
       }
 
-      swal({
+      const { value: reason } = await swal({
         title: "Request Refund",
-        text: "Are you sure you want to request a refund for this order?",
-        icon: "warning",
-        buttons: ["Cancel", "Confirm"],
+        text: "Please provide a reason for your refund request:",
+        buttons: ["Cancel", "Submit Request"],
         dangerMode: true,
-      }).then(async (confirmRefund) => {
-        if (confirmRefund) {
-          try {
-            const response = await requestRefund(orderId);
-            if (response && response.status >= 200 && response.status < 300) {
-              swal("Success!", "Refund request submitted successfully!", "success").then(() => {
-                window.location.reload();
-              });
-            } else {
-              throw new Error(response?.data?.message || "Failed to submit refund request");
-            }
-          } catch (refundError) {
-            console.error("Error requesting refund:", refundError);
-            swal("Error", "Failed to submit refund request. Please try again later.", "error");
-          }
-        }
       });
+
+      if (reason) {
+        try {
+          const response = await requestRefund(orderId, reason);
+          if (response && response.status >= 200 && response.status < 300) {
+            swal("Success!", "Refund request submitted successfully!", "success").then(() => {
+              window.location.reload();
+            });
+          } else {
+            throw new Error(response?.data?.message || "Failed to submit refund request");
+          }
+        } catch (refundError) {
+          console.error("Error requesting refund:", refundError);
+          swal("Error", "Failed to submit refund request. Please try again later.", "error");
+        }
+      }
     } catch (error) {
       console.error("Error in handleRefundRequest:", error);
       swal("Error", "An unexpected error occurred. Please try again later.", "error");
