@@ -6,14 +6,10 @@ import Services from "../../components/Services/Services";
 import Banner from "../../components/Banner/Banner";
 import headphone from "../../assets/Product/headphone.png";
 import smartwatch2 from "../../assets/Product/smartwatch2-removebg-preview.png";
-import Products from "../../components/Products/Products";
-import Blogs from "../../components/Blogs/Blogs";
 import Partners from "../../components/Partners/Partners";
 import Footer from "../../components/Footer/Footer";
-import { useEffect, useState } from "react";
-import { getProductItems } from "../../apiServices/ProductServices/productItemServices";
+import { useState } from "react";
 import ProductItemCard from "../../components/ProductsItems/ProductItemCard";
-import { ProductItem } from "../../interfaces";
 import useProductFilter from "../../components/ProductsSection/useProductFilter";
 import BlogsCard from "../../components/Blogs/BlogsCard";
 const BannerData2 = {
@@ -48,20 +44,6 @@ const HomePage = () => {
     productItems
   } = useProductFilter();
   
-  const [products, setProducts] = useState<ProductItem[]>([]);;
-  
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await getProductItems();
-        setProducts(response); // Cập nhật state với dữ liệu từ API
-      } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-hidden">
       <NavbarforP />
