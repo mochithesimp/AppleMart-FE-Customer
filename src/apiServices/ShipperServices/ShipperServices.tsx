@@ -24,7 +24,7 @@ export const orderConfirm = async (orderId: number, token: string) => {
     const userIdIdentifier = getUserIdFromToken(token);
     const userId = userIdIdentifier;
     const res = await axios.put(
-      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Delivered&ShipperId=${userId}`,
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Completed&ShipperId=${userId}`,
       {},
       {
         headers: {

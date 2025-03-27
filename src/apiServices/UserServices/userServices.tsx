@@ -84,3 +84,26 @@ export const orderCompleted = async (orderId: number) => {
     return null;
   }
 };
+
+export const requestRefund = async (orderId: number) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.put(
+      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=RefundRequested`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error requesting refund:", error);
+    throw error;
+  }
+};

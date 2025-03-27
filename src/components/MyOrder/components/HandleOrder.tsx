@@ -1,6 +1,6 @@
 // import { orderRating } from "../../../apiServices/OrderServices/OrderServices";
 import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
-import { orderCancel, orderCompleted } from "../../../apiServices/UserServices/userServices";
+import { orderCancel, orderCompleted, requestRefund } from "../../../apiServices/UserServices/userServices";
 import { useNavigate, swal } from "../../../import/import-another";
 
 const useHandleCancelOrder = () => {
@@ -134,10 +134,53 @@ const useHandleOrderReceived = () => {
     }
   };
 
-  
+
 
   return { handleOrderReceived };
 };
+
+const useHandleRefundRequest = () => {
+  const handleRefundRequest = async (orderId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found");
+        swal("Error", "You must be logged in to request a refund.", "error");
+        return;
+      }
+
+      swal({
+        title: "Request Refund",
+        text: "Are you sure you want to request a refund for this order?",
+        icon: "warning",
+        buttons: ["Cancel", "Confirm"],
+        dangerMode: true,
+      }).then(async (confirmRefund) => {
+        if (confirmRefund) {
+          try {
+            const response = await requestRefund(orderId);
+            if (response && response.status >= 200 && response.status < 300) {
+              swal("Success!", "Refund request submitted successfully!", "success").then(() => {
+                window.location.reload();
+              });
+            } else {
+              throw new Error(response?.data?.message || "Failed to submit refund request");
+            }
+          } catch (refundError) {
+            console.error("Error requesting refund:", refundError);
+            swal("Error", "Failed to submit refund request. Please try again later.", "error");
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error in handleRefundRequest:", error);
+      swal("Error", "An unexpected error occurred. Please try again later.", "error");
+    }
+  };
+
+  return { handleRefundRequest };
+};
+
 // const useHandleOrderRating = () => {
 //   const [productRating, setProductRating] = useState(0);
 //   const [productComment, setProductComment] = useState('');
@@ -152,59 +195,59 @@ const useHandleOrderReceived = () => {
 //         return;
 //       }
 
-  //     const response = await orderRating(orderId, {
-  //       productRating,
-  //       productComment,
-  //       shipperRating: 0,
-  //       shipperComment: ''
-  //     });
+//     const response = await orderRating(orderId, {
+//       productRating,
+//       productComment,
+//       shipperRating: 0,
+//       shipperComment: ''
+//     });
 
-  //     if (response && response.status >= 200 && response.status < 300) {
-  //       swal("Success", "Product rating submitted!", "success");
-  //       // Reset rating state
-  //       setProductRating(0);
-  //       setProductComment('');
-  //       return true;
-  //     } else {
-  //       throw new Error("Failed to submit product rating");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error rating product:", error);
-  //     swal("Error", "Failed to submit rating. Please try again.", "error");
-  //     return false;
-  //   }
-  // };
+//     if (response && response.status >= 200 && response.status < 300) {
+//       swal("Success", "Product rating submitted!", "success");
+//       // Reset rating state
+//       setProductRating(0);
+//       setProductComment('');
+//       return true;
+//     } else {
+//       throw new Error("Failed to submit product rating");
+//     }
+//   } catch (error) {
+//     console.error("Error rating product:", error);
+//     swal("Error", "Failed to submit rating. Please try again.", "error");
+//     return false;
+//   }
+// };
 
-  // const handleShipperRating = async (orderId: number) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       swal("Error", "You must be logged in to rate.", "error");
-  //       return;
-  //     }
+// const handleShipperRating = async (orderId: number) => {
+//   try {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       swal("Error", "You must be logged in to rate.", "error");
+//       return;
+//     }
 
-  //     const response = await orderRating(orderId, {
-  //       productRating: 0,
-  //       productComment: '',
-  //       shipperRating,
-  //       shipperComment
-  //     });
+//     const response = await orderRating(orderId, {
+//       productRating: 0,
+//       productComment: '',
+//       shipperRating,
+//       shipperComment
+//     });
 
-  //     if (response && response.status >= 200 && response.status < 300) {
-  //       swal("Success", "Shipper rating submitted!", "success");
-  //       // Reset rating state
-  //       setShipperRating(0);
-  //       setShipperComment('');
-  //       return true;
-  //     } else {
-  //       throw new Error("Failed to submit shipper rating");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error rating shipper:", error);
-  //     swal("Error", "Failed to submit rating. Please try again.", "error");
-  //     return false;
-  //   }
-  // };
+//     if (response && response.status >= 200 && response.status < 300) {
+//       swal("Success", "Shipper rating submitted!", "success");
+//       // Reset rating state
+//       setShipperRating(0);
+//       setShipperComment('');
+//       return true;
+//     } else {
+//       throw new Error("Failed to submit shipper rating");
+//     }
+//   } catch (error) {
+//     console.error("Error rating shipper:", error);
+//     swal("Error", "Failed to submit rating. Please try again.", "error");
+//     return false;
+//   }
+// };
 
 //   return { 
 //     handleProductRating, 
@@ -221,4 +264,4 @@ const useHandleOrderReceived = () => {
 // };
 
 
-export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderReceived};
+export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderReceived, useHandleRefundRequest };
