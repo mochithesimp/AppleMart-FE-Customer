@@ -1,6 +1,6 @@
 // import { orderRating } from "../../../apiServices/OrderServices/OrderServices";
-import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
 import { orderCancel, orderCompleted, requestRefund } from "../../../apiServices/UserServices/userServices";
+import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
 import { swal } from "../../../import/import-another";
 
 const useHandleCancelOrder = () => {
@@ -47,6 +47,7 @@ const useHandleCancelOrder = () => {
   return { handleCancelOrder };
 };
 
+// This hook is for customers to confirm receipt of their order (change from Delivered to Completed)
 const useHandleOrderConfirm = () => {
   const handleConfirmClick = async (orderId: number) => {
     try {
@@ -69,10 +70,65 @@ const useHandleOrderConfirm = () => {
         return;
       }
       swal({
-        title: "This can not be undo!",
-        text: "You are about to mark this order as Delivered!",
+        title: "Confirm Order Receipt",
+        text: "Are you confirming that you've received this order in good condition?",
         icon: "warning",
-        buttons: ["Cancel", "Confirm"],
+        buttons: ["Cancel", "Yes, I confirm"],
+        dangerMode: true,
+      }).then(async (confirm) => {
+        if (confirm) {
+          const response = await orderCompleted(orderId);
+          if (response && response.status >= 200 && response.status < 300) {
+            let successMessage = "Thank you for confirming receipt of your order!";
+
+            if (response.data && response.data.shipperName) {
+              const shipperName = response.data.shipperName;
+              successMessage = `Thank you for confirming delivery from ${shipperName}. We hope to see you again!`;
+            }
+
+            swal("Order Completed!", successMessage, "success").then(() => {
+              window.location.reload();
+            });
+          } else {
+            throw new Error("Failed to update order status");
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  return { handleConfirmClick };
+};
+
+// This hook is for shippers to mark an order as delivered (change from Shipped to Delivered)
+const useHandleOrderDelivered = () => {
+  const handleDeliveredClick = async (orderId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        await swal({
+          title: "Oops!",
+          text: "You haven't logged in yet! Redirecting to Login Page...",
+          icon: "warning",
+          buttons: {
+            ok: {
+              text: "OK",
+              value: true,
+              className: "swal-ok-button",
+            },
+          },
+        });
+        window.location.href = "/login";
+        return;
+      }
+      swal({
+        title: "Mark as Delivered",
+        text: "Are you confirming that you've delivered this order to the customer?",
+        icon: "warning",
+        buttons: ["Cancel", "Yes, Delivered"],
         dangerMode: true,
       }).then(async (confirm) => {
         if (confirm) {
@@ -88,10 +144,11 @@ const useHandleOrderConfirm = () => {
       });
     } catch (error) {
       console.error("Error updating order status:", error);
+      swal("Error", "Failed to mark order as delivered. Please try again.", "error");
     }
   };
 
-  return { handleConfirmClick };
+  return { handleDeliveredClick };
 };
 
 const useHandleOrderReceived = () => {
@@ -290,4 +347,4 @@ const useHandleRefundRequest = () => {
 // };
 
 
-export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderReceived, useHandleRefundRequest };
+export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderDelivered, useHandleOrderReceived, useHandleRefundRequest };

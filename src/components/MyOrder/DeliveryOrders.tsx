@@ -2,14 +2,14 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import "../../components/MyOrder/MyOrder.css";
-import { useHandleOrderConfirm } from "./components/HandleOrder";
+import { useHandleOrderDelivered } from "./components/HandleOrder";
 import useOrderData2 from "./components/userOrderData2";
 
 const DeliveryOrders = () => {
 
   const { orderData, searchTerm, setSearchTerm } = useOrderData2();
-  const { handleConfirmClick } = useHandleOrderConfirm();
-  
+  const { handleDeliveredClick } = useHandleOrderDelivered();
+
 
   return (
     <motion.div
@@ -60,10 +60,10 @@ const DeliveryOrders = () => {
               <td>{order.total}</td>
               <td>{order.orderStatus}</td>
               <td>
-                {order.orderStatus === "Shipped"  && (
+                {order.orderStatus === "Shipped" && (
                   <button
                     className="confirm-button"
-                    onClick={() => handleConfirmClick(order.orderID)}
+                    onClick={() => handleDeliveredClick(order.orderID)}
                   >
                     Delivered
                   </button>

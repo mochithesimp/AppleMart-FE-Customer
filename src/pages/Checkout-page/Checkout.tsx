@@ -238,7 +238,7 @@ const CheckoutPage = () => {
         shipperID: null,
         orderDate,
         address: user.address || "",
-        paymentMethod: "E-Wallet Paypal",
+        paymentMethod: "PayPal",
         shippingMethodID: shippingMethodId,
         total: totalAmount + 6,
         voucherID,
