@@ -32,7 +32,7 @@ const BlogsCard: React.FC<BlogsCardProps> = ({ limit }) => {
                                     <img
                                        src={blogs.blogImages?.$values?.[0]?.imageUrl}
                                         alt={blogs.title}
-                                        className="w-full h-[220px] object-cover rounded-2xl hover:scale-105 duration-500"
+                                        className="w-full h-[250px] object-cover rounded-2xl hover:scale-105 duration-500"
                                     />
                                 </div>
                             </Link>

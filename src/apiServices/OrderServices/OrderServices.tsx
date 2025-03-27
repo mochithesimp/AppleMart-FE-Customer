@@ -37,32 +37,20 @@ interface OrderResponse {
   };
 }
 
-export const ordersByCash = async (order: OrderRequest) => {
+export const ordersByCash = async (order: any) => {
   try {
-    console.log("Sending order data to API:", JSON.stringify(order, null, 2));
+    const token = localStorage.getItem("token");
     const res = await axios.post(`https://localhost:7140/api/Order`, order, {
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Order API Response:", {
-      status: res.status,
-      data: res.data,
-    });
-    return {
-      status: res.status,
-      data: res.data as OrderResponse,
-    };
+    //console.log("check data search: ", res);
+    return res;
   } catch (error) {
-    console.error("Order API Error:", {
-      message: error instanceof Error ? error.message : "Unknown error",
-      response: (error as AxiosError)?.response?.data,
-      status: (error as AxiosError)?.response?.status,
-    });
-    throw error;
+    console.log(error);
   }
 };
-
 export const orders = async (order: OrderRequest) => {
   try {
     console.log("Sending order data to API:", JSON.stringify(order, null, 2));
@@ -129,5 +117,7 @@ export const search = async (queryParams: URLSearchParams) => {
     console.log(error);
   }
 };
+
+
 
 

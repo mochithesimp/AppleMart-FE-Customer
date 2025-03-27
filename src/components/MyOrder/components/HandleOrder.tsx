@@ -1,3 +1,4 @@
+// import { orderRating } from "../../../apiServices/OrderServices/OrderServices";
 import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
 import { orderCancel, orderCompleted } from "../../../apiServices/UserServices/userServices";
 import { useNavigate, swal } from "../../../import/import-another";
@@ -133,8 +134,91 @@ const useHandleOrderReceived = () => {
     }
   };
 
+  
+
   return { handleOrderReceived };
 };
+// const useHandleOrderRating = () => {
+//   const [productRating, setProductRating] = useState(0);
+//   const [productComment, setProductComment] = useState('');
+//   const [shipperRating, setShipperRating] = useState(0);
+//   const [shipperComment, setShipperComment] = useState('');
+
+//   const handleProductRating = async (orderId: number) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       if (!token) {
+//         swal("Error", "You must be logged in to rate.", "error");
+//         return;
+//       }
+
+  //     const response = await orderRating(orderId, {
+  //       productRating,
+  //       productComment,
+  //       shipperRating: 0,
+  //       shipperComment: ''
+  //     });
+
+  //     if (response && response.status >= 200 && response.status < 300) {
+  //       swal("Success", "Product rating submitted!", "success");
+  //       // Reset rating state
+  //       setProductRating(0);
+  //       setProductComment('');
+  //       return true;
+  //     } else {
+  //       throw new Error("Failed to submit product rating");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error rating product:", error);
+  //     swal("Error", "Failed to submit rating. Please try again.", "error");
+  //     return false;
+  //   }
+  // };
+
+  // const handleShipperRating = async (orderId: number) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       swal("Error", "You must be logged in to rate.", "error");
+  //       return;
+  //     }
+
+  //     const response = await orderRating(orderId, {
+  //       productRating: 0,
+  //       productComment: '',
+  //       shipperRating,
+  //       shipperComment
+  //     });
+
+  //     if (response && response.status >= 200 && response.status < 300) {
+  //       swal("Success", "Shipper rating submitted!", "success");
+  //       // Reset rating state
+  //       setShipperRating(0);
+  //       setShipperComment('');
+  //       return true;
+  //     } else {
+  //       throw new Error("Failed to submit shipper rating");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error rating shipper:", error);
+  //     swal("Error", "Failed to submit rating. Please try again.", "error");
+  //     return false;
+  //   }
+  // };
+
+//   return { 
+//     handleProductRating, 
+//     handleShipperRating,
+//     productRating,
+//     setProductRating,
+//     productComment,
+//     setProductComment,
+//     shipperRating,
+//     setShipperRating,
+//     shipperComment,
+//     setShipperComment
+//   };
+// };
 
 
-export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderReceived };
+export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderReceived};

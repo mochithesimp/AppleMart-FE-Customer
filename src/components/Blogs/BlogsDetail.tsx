@@ -15,7 +15,7 @@ const BlogDetail: React.FC = () => {
         <img
           src={blogData.blogImages?.$values?.[0]?.imageUrl}
           alt={blogData.title}
-          className="w-full h-[300px] object-cover rounded-2xl"
+          className="w-full h-[400px] object-cover rounded-2xl"
         />
       </div>
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
