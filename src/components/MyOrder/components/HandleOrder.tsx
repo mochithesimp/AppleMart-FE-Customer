@@ -148,27 +148,55 @@ const useHandleRefundRequest = () => {
         return;
       }
 
-      const { value: reason } = await swal({
+      const refundDialog = await swal({
         title: "Request Refund",
         text: "Please provide a reason for your refund request:",
-        buttons: ["Cancel", "Submit Request"],
+        content: {
+          element: "input",
+          attributes: {
+            placeholder: "Enter your reason here...",
+            type: "text",
+          },
+        },
+        buttons: {
+          cancel: {
+            text: "Cancel",
+            value: null,
+            visible: true,
+          },
+          confirm: {
+            text: "Submit Request",
+            value: true,
+          }
+        },
         dangerMode: true,
       });
 
-      if (reason) {
-        try {
-          const response = await requestRefund(orderId, reason);
-          if (response && response.status >= 200 && response.status < 300) {
-            swal("Success!", "Refund request submitted successfully!", "success").then(() => {
-              window.location.reload();
-            });
-          } else {
-            throw new Error(response?.data?.message || "Failed to submit refund request");
-          }
-        } catch (refundError) {
-          console.error("Error requesting refund:", refundError);
-          swal("Error", "Failed to submit refund request. Please try again later.", "error");
+      // If user cancels or doesn't provide a reason
+      if (!refundDialog) {
+        return;
+      }
+
+      const reason = refundDialog.toString().trim();
+
+      // Validate the reason
+      if (!reason) {
+        swal("Error", "You must provide a reason for your refund request.", "error");
+        return;
+      }
+
+      try {
+        const response = await requestRefund(orderId, reason);
+        if (response && response.status >= 200 && response.status < 300) {
+          swal("Success!", "Refund request submitted successfully!", "success").then(() => {
+            window.location.reload();
+          });
+        } else {
+          throw new Error(response?.data?.message || "Failed to submit refund request");
         }
+      } catch (refundError) {
+        console.error("Error requesting refund:", refundError);
+        swal("Error", "Failed to submit refund request. Please try again later.", "error");
       }
     } catch (error) {
       console.error("Error in handleRefundRequest:", error);
