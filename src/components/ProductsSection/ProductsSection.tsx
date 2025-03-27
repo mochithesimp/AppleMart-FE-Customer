@@ -11,7 +11,7 @@ const itemsPerPage = 8; // Số lượng sản phẩm hiển thị ban đầu
 
 const ProductSection: React.FC<{ 
   productItems: ProductItem[], 
-  productFilter: { pageNumber: number; handlePageChange: (newPage: number) => void } 
+  productFilter: { pageNumber: number; totalPages: number; handlePageChange: (newPage: number) => void } 
 }> = ({ productItems, productFilter }) => {
   const { loading } =
     useProducts(itemsPerPage);
@@ -27,8 +27,8 @@ const ProductSection: React.FC<{
           <ProductItemList productItems={productItems} />
           {productItems.length > 0 && (
             <PaginationControls
-              totalProductItems={productItems.length}
               pageNumber={productFilter.pageNumber}
+              totalPages={productFilter.totalPages}
               handlePageChange={productFilter.handlePageChange}
             />
           )}

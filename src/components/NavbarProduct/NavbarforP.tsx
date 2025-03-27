@@ -3,7 +3,7 @@ import { FaBell, FaCartShopping, FaTrash } from "react-icons/fa6";
 import noface from "../../assets/NoFace.jpg";
 import DarkMode from "./DarkMode";
 import Popup from "../Popup/Popup";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useNotification } from "../../context/NotificationContext";
 import { getRoleFromToken, getUserIdFromToken } from "../../utils/jwtHelper";
@@ -12,7 +12,6 @@ import { CartProductItem } from "../../interfaces";
 interface CartData {
   [orderId: string]: CartProductItem[];
 }
-
 const MenuLinks = [
   {
     id: 1,
@@ -36,7 +35,6 @@ const MenuLinks = [
   },
 ];
 
-
 const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
   const { cart } = useCart();
@@ -47,8 +45,12 @@ const NavbarforP = () => {
   const notificationRef = useRef<HTMLDivElement>(null);
   const bellIconRef = useRef<HTMLButtonElement>(null);
   const orderPopupRef = useRef<HTMLDivElement>(null);
-  const token = localStorage.getItem("token");
 
+  const location = useLocation();
+  // Kiểm tra nếu đường dẫn hiện tại là "/checkout" thì ẩn nút giỏ hàng
+  const isCheckoutPage = location.pathname === "/checkout";
+
+  const token = localStorage.getItem("token");
   useEffect(() => {
     const roleIdentifier = token ? getRoleFromToken(token) : null;
     const userIdFromToken = token ? getUserIdFromToken(token) : null;
@@ -94,7 +96,7 @@ const NavbarforP = () => {
     const cartData: CartData = JSON.parse(
       localStorage.getItem("storedCart") || "{}"
     );
-    delete cartData[ userId || "guest"];
+    delete cartData[userId || "guest"];
     localStorage.setItem("storedCart", JSON.stringify(cartData));
 
     localStorage.removeItem("token");
@@ -167,9 +169,9 @@ const NavbarforP = () => {
                       <FaCaretDown className="group-hover:rotate-180 duration-300" />
                     </span>
                   </a> */}
-                  {/* Dropdown Link */}
-                  {/* <div className="absolute z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md dark:bg-gray-900 p-2 dark:text-white "> */}
-                    {/* <ul className=" space-y-2">
+                {/* Dropdown Link */}
+                {/* <div className="absolute z-[9999] hidden group-hover:block w-[200px] rounded-md bg-white shadow-md dark:bg-gray-900 p-2 dark:text-white "> */}
+                {/* <ul className=" space-y-2">
                       {DropDownLinks.map((data) => (
                         <li>
                           <a
@@ -181,7 +183,7 @@ const NavbarforP = () => {
                         </li>
                       ))}
                     </ul> */}
-                    {/* <ul className="space-y-2">
+                {/* <ul className="space-y-2">
                       {DropDownLinks.map((data, index) => (
                         <li key={index}>
                           <a
@@ -193,7 +195,7 @@ const NavbarforP = () => {
                         </li>
                       ))}
                     </ul> */}
-                  {/* </div> */}
+                {/* </div> */}
                 {/* </li> */}
               </ul>
             </div>
@@ -318,15 +320,17 @@ const NavbarforP = () => {
             </div>
 
             {/* Order-button */}
-            <button
-              className="relative p-3"
-              onClick={() => setOrderPopup(!orderPopup)}
-            >
-              <FaCartShopping className="text-xl text-gray-600 dark:text-gray-400" />
-              <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
-                {cartCount}
-              </div>
-            </button>
+            {!isCheckoutPage && (
+              <button
+                className="relative p-3"
+                onClick={() => setOrderPopup((prev) => !prev)}
+              >
+                <FaCartShopping className="text-xl text-gray-600 dark:text-gray-400" />
+                <div className="w-4 h-4 bg-red-500 text-white rounded-full absolute top-0 right-0 flex items-center justify-center text-xs">
+                  {cartCount}
+                </div>
+              </button>
+            )}
             {/* Dark Mode section */}
             <div>
               <DarkMode />
