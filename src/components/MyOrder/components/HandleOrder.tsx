@@ -1,10 +1,9 @@
 // import { orderRating } from "../../../apiServices/OrderServices/OrderServices";
 import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
 import { orderCancel, orderCompleted, requestRefund } from "../../../apiServices/UserServices/userServices";
-import { useNavigate, swal } from "../../../import/import-another";
+import { swal } from "../../../import/import-another";
 
 const useHandleCancelOrder = () => {
-  const navigate = useNavigate();
 
   const handleCancelOrder = async (orderId: number) => {
     try {
@@ -28,7 +27,7 @@ const useHandleCancelOrder = () => {
             if (response && response.status >= 200 && response.status < 300) {
 
               swal("Success!", "Order was canceled!", "success").then(() => {
-                navigate("/MyOrderPage");
+                window.location.reload();
               });
             } else {
               throw new Error(response?.data?.message || "Failed to cancel order");

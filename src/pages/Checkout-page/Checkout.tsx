@@ -8,7 +8,10 @@ import Partners from "../../components/Partners/Partners";
 import Footer from "../../components/Footer/Footer";
 import { useCart } from "../../context/CartContext";
 import { getUserIdFromToken } from "../../utils/jwtHelper";
-import { orders, ordersByCash } from "../../apiServices/OrderServices/OrderServices";
+import {
+  orders,
+  ordersByCash,
+} from "../../apiServices/OrderServices/OrderServices";
 import { refreshToken } from "../../apiServices/AccountServices/refreshTokenServices";
 import {
   getUserId,
@@ -70,12 +73,11 @@ const CheckoutPage = () => {
     fetchData();
   }, [userId]);
 
-  // ---------  load data address 
+  // ---------  load data address
   useEffect(() => {
     const storedAddress = localStorage.getItem("shippingAddress");
 
     if (!storedAddress && user.address) {
-
       setNewAddress(user.address);
     }
 
@@ -96,7 +98,6 @@ const CheckoutPage = () => {
       .join(", ");
 
     setNewAddress(newAddress);
-
   }, [ward, district, province, country]);
 
   //-------------------------------------------------------------------------------------------
@@ -123,7 +124,6 @@ const CheckoutPage = () => {
   const MySwal = withReactContent(Swal);
 
   const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
-
     if (!user || !user.phoneNumber) {
       MySwal.fire({
         icon: "error",
@@ -169,7 +169,7 @@ const CheckoutPage = () => {
       shippingMethodID: shippingMethodId,
       total: totalAmount + 6,
       voucherID,
-      orderDetails: productItems
+      orderDetails: productItems,
     };
 
     console.log(JSON.stringify(order));
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
     const cartData: CartData = JSON.parse(
       localStorage.getItem("storedCart") || "{}"
     );
-    delete cartData[ userId || "guest"];
+    delete cartData[userId || "guest"];
     localStorage.setItem("storedCart", JSON.stringify(cartData));
 
     localStorage.removeItem("storedCart");
@@ -242,10 +242,13 @@ const CheckoutPage = () => {
         shippingMethodID: shippingMethodId,
         total: totalAmount + 6,
         voucherID,
-        orderDetails: productItems
+        orderDetails: productItems,
       };
 
-      console.log("Attempting to create order with data:", JSON.stringify(order, null, 2));
+      console.log(
+        "Attempting to create order with data:",
+        JSON.stringify(order, null, 2)
+      );
 
       const orderResponse = await orders(order);
       console.log("Order creation response:", orderResponse);
@@ -260,7 +263,10 @@ const CheckoutPage = () => {
       }
 
       if (!orderResponse.data || !orderResponse.data.orderID) {
-        console.error("No orderId received from order creation:", orderResponse);
+        console.error(
+          "No orderId received from order creation:",
+          orderResponse
+        );
         throw new Error("Failed to get orderId from order creation");
       }
 
@@ -274,17 +280,25 @@ const CheckoutPage = () => {
         amount: totalAmount + 6,
         currency: "USD",
         createdDate: new Date(),
-        isDeleted: false
+        isDeleted: false,
       };
 
-      console.log("Creating PayPal transaction with data:", JSON.stringify(paypalTransaction, null, 2));
+      console.log(
+        "Creating PayPal transaction with data:",
+        JSON.stringify(paypalTransaction, null, 2)
+      );
       try {
-        const transactionResponse = await createPaypalTransaction(paypalTransaction);
-        console.log("PayPal transaction creation successful:", transactionResponse);
+        const transactionResponse = await createPaypalTransaction(
+          paypalTransaction
+        );
+        console.log(
+          "PayPal transaction creation successful:",
+          transactionResponse
+        );
       } catch (error) {
         console.error("Failed to create PayPal transaction:", {
           error: error instanceof Error ? error.message : "Unknown error",
-          transactionData: paypalTransaction
+          transactionData: paypalTransaction,
         });
         throw error;
       }
@@ -297,7 +311,7 @@ const CheckoutPage = () => {
       const cartData: CartData = JSON.parse(
         localStorage.getItem("storedCart") || "{}"
       );
-      delete cartData[ userId || "guest"];
+      delete cartData[userId || "guest"];
       localStorage.setItem("storedCart", JSON.stringify(cartData));
 
       localStorage.removeItem("storedCart");
@@ -323,7 +337,7 @@ const CheckoutPage = () => {
         message: error instanceof Error ? error.message : "Unknown error",
         response: (error as AxiosError)?.response?.data,
         status: (error as AxiosError)?.response?.status,
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       swal({
         title: "Payment Failed",
@@ -382,7 +396,12 @@ const CheckoutPage = () => {
                               className="input-text"
                               value={user.phoneNumber ?? ""}
                               placeholder="Phone Number"
-                              onChange={(e) => setUser({ ...user, phoneNumber: e.target.value })}
+                              onChange={(e) =>
+                                setUser({
+                                  ...user,
+                                  phoneNumber: e.target.value,
+                                })
+                              }
                             />
                           </span>
                         </p>
@@ -500,7 +519,7 @@ const CheckoutPage = () => {
                             <th>
                               <label>
                                 <span className="shipping-method-label">
-                                Standard
+                                  Standard
                                 </span>
                               </label>
                             </th>
@@ -550,7 +569,10 @@ const CheckoutPage = () => {
                         </li>
                         {selectedValue === "option2" && (
                           <div className="E-wallet-payment">
-                            <div className="paypal-container" style={{ marginTop: "15px" }}>
+                            <div
+                              className="paypal-container"
+                              style={{ marginTop: "15px" }}
+                            >
                               <PaypalButton
                                 amount={totalAmount + 6}
                                 currency="USD"
@@ -573,25 +595,27 @@ const CheckoutPage = () => {
                           </p>
                         </div>
                         <div>
-                          <button
-                            ref={buttonRef}
-                            className="truck-button"
-                            onClick={handleCheckout}
-                          >
-                            <span className="default">Pay Now</span>
-                            <span className="success">
-                              Order Placed
-                              <svg viewBox="0 0 12 10">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                              </svg>
-                            </span>
-                            <div className="truck" ref={truckRef}>
-                              <div className="wheel"></div>
-                              <div className="back"></div>
-                              <div className="front"></div>
-                              <div className="box" ref={boxRef}></div>
-                            </div>
-                          </button>
+                          {paymentMethod !== "E-wallet" && (
+                            <button
+                              ref={buttonRef}
+                              className="truck-button"
+                              onClick={handleCheckout}
+                            >
+                              <span className="default">Pay Now</span>
+                              <span className="success">
+                                Order Placed
+                                <svg viewBox="0 0 12 10">
+                                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                </svg>
+                              </span>
+                              <div className="truck" ref={truckRef}>
+                                <div className="wheel"></div>
+                                <div className="back"></div>
+                                <div className="front"></div>
+                                <div className="box" ref={boxRef}></div>
+                              </div>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

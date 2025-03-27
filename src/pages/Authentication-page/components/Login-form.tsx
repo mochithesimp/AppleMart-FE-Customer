@@ -32,12 +32,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm }) => {
         localStorage.setItem("refreshToken", refreshToken);
 
         const role = getRoleFromToken(accessToken);
-        
+
+        if (role === "Staff" || role === "Admin") {
+          swal({
+            title: "Access Denied",
+            text: "Incorrect Account or Password.",
+            icon: "warning",
+            buttons: {
+              ok: {
+                text: "OK",
+                value: true,
+                className: "swal-ok-button",
+              },
+            },
+          });
+          setIsLogin(false);
+          return;
+        }
         if (role === "Customer") {
           navigate("/");
         } else if (role === "Shipper") {
           navigate("/DeliveryOrderPage");
-        } 
+        }
       } else {
         setIsLogin(false);
         return;
@@ -58,8 +74,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm }) => {
             },
           });
           setIsLogin(false);
-        } else if (error.response?.status === 400) {
+        } else if (
+          error.response?.status === 400 ||
+          error.response?.status === 401
+        ) {
           swal("Validation Error", "Incorrect Account or Password", "error");
+          setIsLogin(false);
         } else {
           // Handle other status codes
           console.error("Login failed:", error.response?.status);
