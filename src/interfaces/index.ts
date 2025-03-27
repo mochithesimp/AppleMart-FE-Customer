@@ -200,3 +200,6 @@ interface BlogImage {
   imageUrl: string;
   blogId: number;
 }
+export interface BlogsCardProps {
+  limit?: number;
+}
