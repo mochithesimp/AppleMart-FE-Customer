@@ -64,3 +64,7 @@
     background-color: rgb(255, 102, 0);
     font-size: 15px;
 }
+
+.product-image{
+    height: 100px;
+}
