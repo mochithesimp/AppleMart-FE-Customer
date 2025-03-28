@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 interface CreatePaypalTransactionRequest {
     orderId: number;
     paypalPaymentId: string;
@@ -14,7 +14,7 @@ export const createPaypalTransaction = async (transaction: CreatePaypalTransacti
     try {
         console.log("Creating PayPal transaction with data:", JSON.stringify(transaction, null, 2));
         const response = await axios.post(
-            `https://localhost:7140/api/Paypal/create-transaction`,
+            `${API_BASE_URL}/api/Paypal/create-transaction`,
             transaction,
             {
                 headers: {
@@ -38,7 +38,7 @@ export const createPaypalTransaction = async (transaction: CreatePaypalTransacti
 export const updatePaypalTransactionStatus = async (transactionId: number, status: string) => {
     try {
         const response = await axios.put(
-            `https://localhost:7140/api/Paypal/transaction/${transactionId}/status`,
+            `${API_BASE_URL}/api/Paypal/transaction/${transactionId}/status`,
             JSON.stringify(status),
             {
                 headers: {

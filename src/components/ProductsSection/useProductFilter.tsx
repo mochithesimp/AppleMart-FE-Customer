@@ -17,6 +17,7 @@ const useProductFilter = () => {
   const [activeRom, setActiveRom] = useState("");
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
   const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
     const fetchProductsByFilter = async () => {
@@ -47,6 +48,14 @@ const useProductFilter = () => {
         Pink: { Colors: "Pink" },
         Silver: { Colors: "Silver" },
         Gold: { Colors: "Gold" },
+        "Navy Blue": { Colors: "Navy Blue" }, // Xanh đen
+        Orange: { Colors: "Orange" }, // Cam
+        Green: { Colors: "Green" }, // Xanh lá
+        Brown: { Colors: "Brown" }, // Nâu
+        Beige: { Colors: "Beige" }, // Kem
+        Cyan: { Colors: "Cyan" }, // Xanh dương nhạt / Xanh cyan
+        Red: { Colors: "Red" }, // Đỏ
+        Yellow: { Colors: "Yellow" }, // Vàng
       };
 
       if (colorBy in filterColorMap) {
@@ -92,9 +101,8 @@ const useProductFilter = () => {
 
       queryParams.append("PageNumber", pageNumber.toString());
 
-      // console.log(`Fetching from URL: https://localhost:7140/api/ProductItem?${queryParams.toString()}`);
       const response = await search(queryParams);
-
+      setTotalPages(response.totalPages)
       const productImgsResult = await getProductImgs();
 
       const productImgs = productImgsResult.$values;
@@ -176,6 +184,7 @@ const useProductFilter = () => {
     activeCate,
     searchTerm,
     pageNumber,
+    totalPages,
     handlePriceSort,
     handleColorSort,
     handleRamSort,

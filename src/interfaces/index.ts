@@ -28,10 +28,13 @@ export interface ProductItem {
   quantity: number;
   price: number;
   stock: number;
+  totalItems: number;
   isDeleted: boolean;
   displayIndex: boolean;
   productImgs: ProductImg[];
   productItemAttributes: ProductItemAttribute[];
+  averageRating?: number;
+  totalReviewers?: number;
 }
 
 export interface ProductItemAttribute {
@@ -94,6 +97,7 @@ export interface CartProductItem {
   quantity: number;
   price: number;
   stock: number;
+  productImgs: ProductImg[];
   isDeleted: boolean;
 }
 
@@ -159,6 +163,7 @@ export interface aOrder {
   orderID: number;
   userID: string;
   shipperID: number;
+  shipperName?: string;
   orderDate: string;
   address: string;
   paymentMethod: string;
@@ -177,7 +182,7 @@ export interface OrderDetail {
   price: number;
 }
 
-export interface bBlogs{
+export interface bBlogs {
   blogID: number;
   title: string;
   content: string;

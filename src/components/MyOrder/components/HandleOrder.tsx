@@ -2,6 +2,72 @@
 import { orderCancel, orderCompleted, requestRefund } from "../../../apiServices/UserServices/userServices";
 import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServices";
 import { swal } from "../../../import/import-another";
+import { useState } from "react";
+import { rateProduct, rateShipper } from "../../../apiServices/OrderServices/OrderServices";
+import * as signalR from "@microsoft/signalr";
+
+const isDevelopment = window.location.hostname === 'localhost';
+const API_URL = isDevelopment
+  ? 'https://localhost:7140'
+  : 'https://deployed-backend-url.azurewebsites.net';
+
+const getSignalRConnection = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const hubUrl = `${API_URL}/notificationHub`;
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl(hubUrl, {
+      accessTokenFactory: () => token,
+      transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+  if (connection.state !== "Connected") {
+    await connection.start();
+  }
+
+  return connection;
+};
+
+const sendDirectNotification = async (userId: string, header: string, content: string) => {
+  try {
+    const connection = await getSignalRConnection();
+    await connection.invoke("SendDirectNotification", userId, header, content);
+    console.log(`Notification sent to user ${userId}`);
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+
+const sendProductRatingNotification = async (customerName: string, rating: number, productItemId: number) => {
+  try {
+    const connection = await getSignalRConnection();
+
+    await connection.invoke("SendProductRatingNotification", customerName, rating, productItemId);
+    console.log("Product rating notification sent to staff");
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending product rating notification:", error);
+  }
+};
+
+const sendProductRatingNotificationWithName = async (customerName: string, rating: number, productItemId: number, productName: string) => {
+  try {
+    const connection = await getSignalRConnection();
+
+    await connection.invoke("SendProductRatingNotificationWithName", customerName, rating, productItemId, productName);
+    console.log("Product rating notification (with name) sent to staff");
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending product rating notification:", error);
+  }
+};
 
 const useHandleCancelOrder = () => {
 
@@ -47,7 +113,6 @@ const useHandleCancelOrder = () => {
   return { handleCancelOrder };
 };
 
-// This hook is for customers to confirm receipt of their order (change from Delivered to Completed)
 const useHandleOrderConfirm = () => {
   const handleConfirmClick = async (orderId: number) => {
     try {
@@ -102,7 +167,6 @@ const useHandleOrderConfirm = () => {
   return { handleConfirmClick };
 };
 
-// This hook is for shippers to mark an order as delivered (change from Shipped to Delivered)
 const useHandleOrderDelivered = () => {
   const handleDeliveredClick = async (orderId: number) => {
     try {
@@ -229,14 +293,12 @@ const useHandleRefundRequest = () => {
         dangerMode: true,
       });
 
-      // If user cancels or doesn't provide a reason
       if (!refundDialog) {
         return;
       }
 
       const reason = refundDialog.toString().trim();
 
-      // Validate the reason
       if (!reason) {
         swal("Error", "You must provide a reason for your refund request.", "error");
         return;
@@ -264,87 +326,127 @@ const useHandleRefundRequest = () => {
   return { handleRefundRequest };
 };
 
-// const useHandleOrderRating = () => {
-//   const [productRating, setProductRating] = useState(0);
-//   const [productComment, setProductComment] = useState('');
-//   const [shipperRating, setShipperRating] = useState(0);
-//   const [shipperComment, setShipperComment] = useState('');
+const useHandleOrderRating = () => {
+  const [productRating, setProductRating] = useState(0);
+  const [productComment, setProductComment] = useState('');
+  const [shipperRating, setShipperRating] = useState(0);
+  const [shipperComment, setShipperComment] = useState('');
 
-//   const handleProductRating = async (orderId: number) => {
-//     try {
-//       const token = localStorage.getItem("token");
-//       if (!token) {
-//         swal("Error", "You must be logged in to rate.", "error");
-//         return;
-//       }
+  const handleProductRating = async (orderDetailId: number, productItemId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        swal("Error", "You must be logged in to rate.", "error");
+        return false;
+      }
 
-//     const response = await orderRating(orderId, {
-//       productRating,
-//       productComment,
-//       shipperRating: 0,
-//       shipperComment: ''
-//     });
+      if (productRating === 0) {
+        swal("Error", "Please select a rating.", "error");
+        return false;
+      }
 
-//     if (response && response.status >= 200 && response.status < 300) {
-//       swal("Success", "Product rating submitted!", "success");
-//       // Reset rating state
-//       setProductRating(0);
-//       setProductComment('');
-//       return true;
-//     } else {
-//       throw new Error("Failed to submit product rating");
-//     }
-//   } catch (error) {
-//     console.error("Error rating product:", error);
-//     swal("Error", "Failed to submit rating. Please try again.", "error");
-//     return false;
-//   }
-// };
+      const userId = localStorage.getItem("userId") || localStorage.getItem("userID") || localStorage.getItem("userid") || localStorage.getItem("UserID") || localStorage.getItem("user_id");
+      if (!userId) {
+        swal("Error", "User ID not found. Please log in again.", "error");
+        return false;
+      }
 
-// const handleShipperRating = async (orderId: number) => {
-//   try {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       swal("Error", "You must be logged in to rate.", "error");
-//       return;
-//     }
+      const response = await rateProduct({
+        userID: userId,
+        orderDetailID: orderDetailId,
+        productItemID: productItemId,
+        rating: productRating,
+        comment: productComment
+      });
 
-//     const response = await orderRating(orderId, {
-//       productRating: 0,
-//       productComment: '',
-//       shipperRating,
-//       shipperComment
-//     });
+      if (response && response.status >= 200 && response.status < 300) {
+        swal("Success", "Product rating submitted!", "success");
 
-//     if (response && response.status >= 200 && response.status < 300) {
-//       swal("Success", "Shipper rating submitted!", "success");
-//       // Reset rating state
-//       setShipperRating(0);
-//       setShipperComment('');
-//       return true;
-//     } else {
-//       throw new Error("Failed to submit shipper rating");
-//     }
-//   } catch (error) {
-//     console.error("Error rating shipper:", error);
-//     swal("Error", "Failed to submit rating. Please try again.", "error");
-//     return false;
-//   }
-// };
+        const productName = sessionStorage.getItem(`product_${productItemId}_name`) || "";
 
-//   return { 
-//     handleProductRating, 
-//     handleShipperRating,
-//     productRating,
-//     setProductRating,
-//     productComment,
-//     setProductComment,
-//     shipperRating,
-//     setShipperRating,
-//     shipperComment,
-//     setShipperComment
-//   };
-// };
+        const userName = localStorage.getItem("userName") || userId;
 
+        if (productName) {
+          await sendProductRatingNotificationWithName(userName, productRating, productItemId, productName);
+        } else {
+          await sendProductRatingNotification(userName, productRating, productItemId);
+        }
 
-export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderDelivered, useHandleOrderReceived, useHandleRefundRequest };
+        setProductRating(0);
+        setProductComment('');
+        return true;
+      } else {
+        throw new Error("Failed to submit product rating");
+      }
+    } catch (error) {
+      console.error("Error rating product:", error);
+      swal("Error", "Failed to submit rating. Please try again.", "error");
+      return false;
+    }
+  };
+
+  const handleShipperRating = async (orderDetailId: number, productItemId: number, shipperId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        swal("Error", "You must be logged in to rate.", "error");
+        return false;
+      }
+
+      if (shipperRating === 0) {
+        swal("Error", "Please select a rating.", "error");
+        return false;
+      }
+
+      const userId = localStorage.getItem("userId") || localStorage.getItem("userID") || localStorage.getItem("userid") || localStorage.getItem("UserID") || localStorage.getItem("user_id");
+      if (!userId) {
+        swal("Error", "User ID not found. Please log in again.", "error");
+        return false;
+      }
+
+      const response = await rateShipper({
+        userID: userId,
+        orderDetailID: orderDetailId,
+        productItemID: productItemId,
+        shipperID: shipperId,
+        rating: shipperRating,
+        comment: shipperComment
+      });
+
+      if (response && response.status >= 200 && response.status < 300) {
+        swal("Success", "Shipper rating submitted!", "success");
+
+        const orderId = sessionStorage.getItem("currentOrderId") || response.data?.orderID || "Unknown";
+
+        const header = "New Rating Received";
+        const content = `A User has rated you ${shipperRating} stars on your delivery service for order with ${orderId}.`;
+        await sendDirectNotification(shipperId, header, content);
+
+        setShipperRating(0);
+        setShipperComment('');
+        return true;
+      } else {
+        throw new Error("Failed to submit shipper rating");
+      }
+    } catch (error) {
+      console.error("Error rating shipper:", error);
+      swal("Error", "Failed to submit rating. Please try again.", "error");
+      return false;
+    }
+  };
+
+  return {
+    handleProductRating,
+    handleShipperRating,
+    productRating,
+    setProductRating,
+    productComment,
+    setProductComment,
+    shipperRating,
+    setShipperRating,
+    shipperComment,
+    setShipperComment
+  };
+};
+
+export { useHandleCancelOrder, useHandleOrderConfirm, useHandleOrderDelivered, useHandleOrderReceived, useHandleRefundRequest, useHandleOrderRating };

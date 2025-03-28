@@ -33,7 +33,17 @@ const PaypalButton: FC<PaypalButtonProps> = ({ amount, currency, onSuccess, onEr
                     try {
                         const order = await actions.order?.capture();
                         if (order?.id) {
-                            onSuccess(order.id);
+                            const captureId = order.purchase_units?.[0]?.payments?.captures?.[0]?.id;
+
+                            console.log("PayPal Order ID:", order.id);
+                            console.log("PayPal Capture ID:", captureId);
+
+                            if (captureId) {
+                                onSuccess(captureId);
+                            } else {
+                                console.warn("PayPal Capture ID not found, using Order ID instead");
+                                onSuccess(order.id);
+                            }
                         } else {
                             throw new Error("Failed to capture PayPal order");
                         }

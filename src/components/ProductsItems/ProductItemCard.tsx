@@ -2,9 +2,14 @@ import React from "react";
 import {  ProductItem } from "../../interfaces";
 import { HandleAddToCart } from "../../pages/Cart-page/components/HandleAddToCart";
 import { Link } from "react-router-dom";
+import { useProductRatings } from "../../hooks/useProductRatings";
 
 const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }) => {
   const { handleAddToCart } = HandleAddToCart();
+  const { getRatingForProduct, loading } = useProductRatings();
+  
+  // Get rating data for this product
+  const { averageRating, totalReviewers } = getRatingForProduct(productItem.productItemID);
 
   const HandleAddToCartClick = (productItem: ProductItem) => {
     handleAddToCart(productItem);
@@ -30,18 +35,18 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
       {/* Thông tin sản phẩm */}
       <Link to={`/productDetails/${productItem.productItemID}`}><h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-white">{productItem.name}</h3></Link>
 
-      {productItem.price && (
+      {/* {productItem.price && (
         <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
           ${productItem.price.toLocaleString()}
         </p>
-      )}
+      )} */}
 
       <p className="text-red-500 font-bold text-xl">
         {productItem.price ? `$${productItem.price.toLocaleString()}` : "Liên hệ"}
       </p>
 
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        ⭐ {4} | Đã bán {productItem.quantity}+
+        ⭐ {!loading && typeof averageRating === 'number' ? averageRating.toFixed(1) : '0.0'} | Đánh giá {totalReviewers || 0}
       </p>
     </div>
   );

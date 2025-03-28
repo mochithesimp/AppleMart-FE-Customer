@@ -19,7 +19,8 @@ const ProductMenu = () => {
       <div className="flex flex-grow bg-gray-100 mt-16 ">
         {/* Sidebar (chiếm 1/4 màn hình) */}
         <div className="dark:bg-gray-900 w-1/5 bg-white shadow-lg p-4 relative ">
-          <SideBarforProduct productFilter={productFilter} />
+          <SideBarforProduct productFilter={productFilter}
+          productItems={productFilter.productItems} />
         </div>
 
         {/* Product List (chiếm 3/4 màn hình) */}

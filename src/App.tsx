@@ -12,13 +12,13 @@ import DeliveryOrdersPage from "./pages/DeliveryOrder-page/DeliveryOrdersPage";
 
 import ProtectedRoute from "./utils/protectedRoute";
 import ProfilePage from "./pages/Profile-page/ProfilePage";
+import PaymentWrapper from "./utils/protectedRoutePayment";
+import ProtecteDeliveryRoute from "./utils/protecteDeliveryRoute";
+import useAutoRefreshToken from "./utils/useAutoRefreshToken";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
 const LoginPage = lazy(() => import("./pages/Authentication-page/UserAuth"));
-const UserProfile = lazy(
-  () => import("./pages/Authentication-page/UserProfile")
-);
 const ProductPage = lazy(() => import("./pages/Product-page/Product"));
 const ForPassPage = lazy(
   () => import("./pages/Authentication-page/ForgetPassword")
@@ -40,10 +40,6 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
-  },
-  {
-    path: "/profile",
-    element: <UserProfile />,
   },
   {
     path: "/Product",
@@ -68,8 +64,10 @@ const router = createBrowserRouter([
   {
     path: "/Checkout",
     element: (
-      <ProtectedRoute>
-        <CheckoutPage />
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <PaymentWrapper>
+          <CheckoutPage />
+        </PaymentWrapper>
       </ProtectedRoute>
     ),
   },
@@ -87,19 +85,35 @@ const router = createBrowserRouter([
   },
   {
     path: "/Chat",
-    element: <ChatPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
+        <ChatPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/MyOrderPage",
-    element: <MyOrderPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <MyOrderPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/orderDetails/:orderId",
-    element: <OrderDetailPage />,
+    element: (
+      <ProtectedRoute allowedRoles={["Customer"]}>
+        <OrderDetailPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/DeliveryOrderPage",
-    element: <DeliveryOrdersPage />,
+    element: (
+      <ProtecteDeliveryRoute>
+        <DeliveryOrdersPage />
+      </ProtecteDeliveryRoute>
+    ),
   },
   {
     path: "/Blogs",
@@ -110,12 +124,17 @@ const router = createBrowserRouter([
     element: <BlogsDetailPage />,
   },
   {
-    path: "/ProfileUser",
-    element: <ProfilePage />,
+    path: "/profile",
+    element: (
+      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
+        <ProfilePage />
+      </ProtectedRoute>
+    ),
   },
 ]);
 
 function App() {
+  useAutoRefreshToken(); 
   return (
     <NotificationProvider>
       <CartProvider>

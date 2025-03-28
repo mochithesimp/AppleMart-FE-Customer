@@ -6,13 +6,7 @@ import { getRoleFromToken } from "./jwtHelper";
 
 const MySwal = withReactContent(Swal);
 
-const ProtectedRoute = ({
-  children,
-  allowedRoles = ["Admin", "Staff", "Customer", "Shipper"],
-}: {
-  children: React.ReactNode;
-  allowedRoles?: string[];
-}) => {
+const ProtecteDeliveryRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null); // Trạng thái kiểm tra quyền
 
@@ -33,9 +27,9 @@ const ProtectedRoute = ({
       return;
     }
 
-    const roleIdentifier = getRoleFromToken(token) ?? ""; // Đảm bảo không có giá trị null
+    const role = getRoleFromToken(token ?? "");
 
-    if (!roleIdentifier || !allowedRoles.includes(roleIdentifier)) {
+    if (role !== "Shipper") {
       MySwal.fire({
         title: "Access Denied",
         text: "You do not have permission to access this page.",
@@ -50,7 +44,7 @@ const ProtectedRoute = ({
     }
 
     setIsAuthorized(true); // Cho phép hiển thị nội dung
-  }, [allowedRoles, navigate]);
+  }, [navigate]);
 
   if (isAuthorized === null) {
     return <div className="w-screen h-screen bg-white"></div>; // Màn hình trắng trong khi kiểm tra quyền
@@ -59,4 +53,4 @@ const ProtectedRoute = ({
   return isAuthorized ? children : null;
 };
 
-export default ProtectedRoute;
+export default ProtecteDeliveryRoute;

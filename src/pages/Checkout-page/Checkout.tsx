@@ -1,5 +1,4 @@
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
-import p1 from "../../assets/Product/p-1.jpg";
 import imomo from "../../assets/Checkout/Primary logo@2x.png";
 import "./Style.css";
 import { useEffect, useRef, useState } from "react";
@@ -23,6 +22,7 @@ import PaypalButton from "../../components/PaypalButton/PaypalButton";
 import { AxiosError } from "axios";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import { debounce } from "lodash";
 
 interface CartData {
   [orderId: string]: CartProductItem[];
@@ -46,6 +46,8 @@ const CheckoutPage = () => {
 
   const [selectedValue, setSelectedValue] = useState("option1");
   const [paymentMethod, setPaymentMethod] = useState("By Cash");
+
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // get data user -----------------------------------------------------------------------------
 
@@ -123,13 +125,19 @@ const CheckoutPage = () => {
   // handle checkout ---------------------------------------------------------------------------------
   const MySwal = withReactContent(Swal);
 
-  const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+
+  const handleCheckout = debounce(async (e: React.MouseEvent<HTMLButtonElement>) => {
+
+  setIsProcessing(true);
+
+  try {
     if (!user || !user.phoneNumber) {
       MySwal.fire({
         icon: "error",
         title: "Missing Phone Number",
         text: "Please provide a valid phone number before proceeding.",
       });
+      setIsProcessing(false);
       return;
     }
 
@@ -139,18 +147,20 @@ const CheckoutPage = () => {
         title: "Invalid Phone Number",
         text: "Phone number must start with 0 and be exactly 10 digits long.",
       });
+      setIsProcessing(false);
       return;
     }
-    if (!newAddress) {
-      if (!user || !user.address) {
-        MySwal.fire({
-          icon: "error",
-          title: "Missing Address",
-          text: "Please enter your delivery address before proceeding.",
-        });
-        return;
-      }
+
+    if (!newAddress && (!user || !user.address)) {
+      MySwal.fire({
+        icon: "error",
+        title: "Missing Address",
+        text: "Please enter your delivery address before proceeding.",
+      });
+      setIsProcessing(false);
+      return;
     }
+
     const orderDate = new Date().toISOString();
     const shippingMethodId = 1;
     const voucherID = 0;
@@ -162,7 +172,6 @@ const CheckoutPage = () => {
 
     const order = {
       userID: userId,
-      shipperID: null,
       orderDate,
       address: newAddress,
       paymentMethod,
@@ -215,10 +224,20 @@ const CheckoutPage = () => {
           },
         },
       }).then(() => {
+        setIsProcessing(false)
         window.location.href = "/MyOrderPage";
       });
     }, 5000);
-  };
+  } catch (error) {
+    console.error(error);
+    MySwal.fire({
+      icon: "error",
+      title: "Order Failed",
+      text: "An error occurred while processing your order.",
+    });
+  }
+}, 300);
+
 
   const handlePaypalSuccess = async (paypalPaymentId: string) => {
     try {
@@ -479,7 +498,7 @@ const CheckoutPage = () => {
                               <td className="product-name">
                                 <div className="product-image">
                                   <img
-                                    src={p1}
+                                    src={item.productImgs[0].imageUrl}
                                     alt={item.name}
                                     className="attachment-thumbnail size-thumbnail"
                                   />
@@ -600,6 +619,11 @@ const CheckoutPage = () => {
                               ref={buttonRef}
                               className="truck-button"
                               onClick={handleCheckout}
+                              disabled={isProcessing}
+                              style={{
+                                cursor: isProcessing ? "not-allowed" : "pointer",
+                                pointerEvents: isProcessing ? "none" : "auto",
+                              }}
                             >
                               <span className="default">Pay Now</span>
                               <span className="success">

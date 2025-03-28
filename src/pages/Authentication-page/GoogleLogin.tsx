@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import { getUserIdFromToken } from "../../utils/jwtHelper";
 
 const MySwal = withReactContent(Swal);
 
@@ -73,14 +74,22 @@ const GoogleLogin = () => {
           localStorage.setItem("token", accessToken);
           localStorage.setItem("refreshToken", refreshToken);
 
+          const userId = getUserIdFromToken(accessToken);
+          if (userId) {
+            localStorage.setItem("userId", userId);
+            console.log("Stored userId in localStorage:", userId);
+          } else {
+            console.warn("Could not extract userId from token");
+          }
+
           MySwal.fire({
             icon: "success",
             title: "Login Successful!",
             text: "Redirecting to your profile...",
-            timer: 2000, 
+            timer: 2000,
             showConfirmButton: false,
           }).then(() => {
-            navigate("/profile");
+            navigate("/");
           });
         }
         if (!response) {
@@ -101,7 +110,7 @@ const GoogleLogin = () => {
       });
 
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 

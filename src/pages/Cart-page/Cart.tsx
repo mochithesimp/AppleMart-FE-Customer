@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import "./Style.css";
-import p1 from "../../assets/Product/p-1.jpg";
 // import p2 from "../../assets/Product/p-2.jpg";
 // import p3 from "../../assets/Product/p-3.jpg";
 import axios from "axios";
@@ -167,7 +166,7 @@ const CartPage = () => {
                             </button>
                           </td>
                           <td className="product-thumbnail">
-                            <img src={p1} alt={item.name} className="" />
+                            <img src={item.productImgs[0].imageUrl} alt={item.name} className="" />
                           </td>
                           <td className="product-name">{item.name}</td>
                           <td className="product-price">

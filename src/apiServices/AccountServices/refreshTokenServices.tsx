@@ -1,15 +1,21 @@
 import swal from 'sweetalert';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const refreshToken = async () => {
 
     const token = localStorage.getItem('token');
     const rfToken = localStorage.getItem('refreshToken');
+    if (!token || !rfToken) {
+        console.error("Token hoặc Refresh Token không tồn tại!");
+        return;
+    }
+    
     const data = {
-        token: token,
+        accessToken: token,
         refreshToken: rfToken
     };
     try {
-        const response = await fetch('https://localhost:7140/api/Account/refresh-token', {
+        const response = await fetch(`${API_BASE_URL}/api/Account/refresh-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,9 +24,11 @@ export const refreshToken = async () => {
         });
         if (response.ok) {
             const responseServer = await response.json();
-            const data = responseServer.data;
-            const newToken = data.token;
+            const newToken = responseServer.accessToken;
+            const newRefreshToken = responseServer.refreshToken;
+           
             localStorage.setItem('token', newToken);
+            localStorage.setItem("refreshToken", newRefreshToken);
             return newToken;
         } else if (response.status === 401) {
             swal({
@@ -38,10 +46,9 @@ export const refreshToken = async () => {
                 if (value) {
                     localStorage.removeItem("token");
                     localStorage.removeItem("refreshToken");
-                    // localStorage.removeItem("cart");
                     location.href = "/login"
                 }
-            })
+            });
         } else {
             throw new Error('Failed to refresh token.');
         }
