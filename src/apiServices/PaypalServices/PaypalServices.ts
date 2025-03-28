@@ -14,7 +14,7 @@ export const createPaypalTransaction = async (transaction: CreatePaypalTransacti
     try {
         console.log("Creating PayPal transaction with data:", JSON.stringify(transaction, null, 2));
         const response = await axios.post(
-            `${API_BASE_URL}/Paypal/create-transaction`,
+            `${API_BASE_URL}/api/Paypal/create-transaction`,
             transaction,
             {
                 headers: {
@@ -38,7 +38,7 @@ export const createPaypalTransaction = async (transaction: CreatePaypalTransacti
 export const updatePaypalTransactionStatus = async (transactionId: number, status: string) => {
     try {
         const response = await axios.put(
-            `${API_BASE_URL}/Paypal/transaction/${transactionId}/status`,
+            `${API_BASE_URL}/api/Paypal/transaction/${transactionId}/status`,
             JSON.stringify(status),
             {
                 headers: {

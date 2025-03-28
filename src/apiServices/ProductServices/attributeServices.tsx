@@ -2,7 +2,7 @@ import request from "../../utils/request";
 
 export const getAttributes = async () => {
   try {
-      const res = await request.get(`Attribute`);
+      const res = await request.get(`/api/Attribute`);
       return res.data; // Trả về dữ liệu đúng
   } catch (error) {
       console.error("Error fetching product item attributes:", error);

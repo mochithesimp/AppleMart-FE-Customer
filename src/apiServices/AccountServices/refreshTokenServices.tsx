@@ -15,7 +15,7 @@ export const refreshToken = async () => {
         refreshToken: rfToken
     };
     try {
-        const response = await fetch(`${API_BASE_URL}/Account/refresh-token`, {
+        const response = await fetch(`${API_BASE_URL}/api/Account/refresh-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

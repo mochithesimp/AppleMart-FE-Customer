@@ -4,7 +4,7 @@ import * as request from "../../utils/request";
 
 export const getProductId = async (productId: number) => {
   try {
-    const res = await request.get(`Product/${productId}`);
+    const res = await request.get(`/api/Product/${productId}`);
     //console.log("check data search: ", res);
     return res;
   } catch (error) {
@@ -14,7 +14,7 @@ export const getProductId = async (productId: number) => {
 
 export const getProduct = async () => {
   try {
-    const res = await request.get("Product");
+    const res = await request.get("/api/Product");
     return res;
   } catch (error) {
     console.log(error);
