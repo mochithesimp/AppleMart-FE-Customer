@@ -19,6 +19,7 @@ interface NotificationContextType {
     markAsRead: (notificationId: number) => Promise<void>;
     deleteNotification: (notificationId: number) => Promise<void>;
     connectionState: string;
+    testConnection: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -234,6 +235,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
 
+    const testConnection = async () => {
+        try {
+            if (!hubConnectionRef.current || hubConnectionRef.current.state !== "Connected") {
+                console.log("Connection not active, attempting to reconnect...");
+                connectionAttemptRef.current = false;
+                await setupConnection();
+            } else {
+                console.log("Connection active, reloading notifications...");
+                await hubConnectionRef.current.invoke("LoadNotifications");
+            }
+        } catch (error) {
+            console.error("Error testing connection:", error);
+        }
+    };
+
     return (
         <NotificationContext.Provider
             value={{
@@ -241,7 +257,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 unreadCount,
                 markAsRead,
                 deleteNotification,
-                connectionState
+                connectionState,
+                testConnection
             }}
         >
             {children}
