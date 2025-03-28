@@ -4,15 +4,18 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
-    host: 'localhost',
-    open: true,
+    port: 3000, 
+    host: true, 
+    open: false, 
+  },
+  define: {
+    'process.env': process.env
   },
   build: {
     minify: "esbuild",
     terserOptions: {
       compress: {
-        drop_console: true, // Xóa console.log()
+        drop_console: true, 
       },
     },
     rollupOptions: {

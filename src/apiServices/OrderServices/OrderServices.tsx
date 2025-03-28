@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
 import * as request from "../../utils/request";
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 interface OrderDetail {
   productItemID: number;
   quantity: number;
@@ -40,7 +40,7 @@ interface OrderResponse {
 export const ordersByCash = async (order: any) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.post(`https://localhost:7140/api/Order`, order, {
+    const res = await axios.post(`${API_BASE_URL}/Order`, order, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ export const orders = async (order: OrderRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`https://localhost:7140/api/Order`, order, {
+    const res = await axios.post(`${API_BASE_URL}/Order`, order, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -148,7 +148,7 @@ export const rateProduct = async (ratingData: ProductRatingRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`https://localhost:7140/api/Review/product`, ratingData, {
+    const res = await axios.post(`${API_BASE_URL}/Review/product`, ratingData, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -176,7 +176,7 @@ export const rateShipper = async (ratingData: ShipperRatingRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`https://localhost:7140/api/Review/shipper`, ratingData, {
+    const res = await axios.post(`${API_BASE_URL}/Review/shipper`, ratingData, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -222,7 +222,7 @@ export const orderRating = async (orderDetailId: number, ratingData: any) => {
         throw new Error("No authentication token found");
       }
 
-      const res = await axios.post(`https://localhost:7140/api/Review`, {
+      const res = await axios.post(`${API_BASE_URL}/Review`, {
         userID: ratingData.userID || localStorage.getItem("userId") || "",
         orderDetailID: orderDetailId,
         productItemID: ratingData.productItemID,
@@ -261,7 +261,7 @@ export const getUserProductRatingStatus = async (userId: string, orderDetailIds:
     }
 
     const queryString = orderDetailIds.map(id => `orderDetailIds=${id}`).join('&');
-    const url = `https://localhost:7140/api/Review/user/${userId}/product-rating-status?${queryString}`;
+    const url = `${API_BASE_URL}/Review/user/${userId}/product-rating-status?${queryString}`;
 
     const res = await axios.get(url, {
       headers: {
@@ -290,7 +290,7 @@ export const getShipperInfo = async (shipperId: string) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.get(`https://localhost:7140/api/User/${shipperId}`, {
+    const res = await axios.get(`${API_BASE_URL}/User/${shipperId}`, {
       headers: {
         "Authorization": `Bearer ${token}`
       },
@@ -317,7 +317,7 @@ export const hasUserRatedShipper = async (userId: string, shipperId: string, ord
       throw new Error("No authentication token found");
     }
 
-    const url = `https://localhost:7140/api/Review/user/${userId}/shipper/${shipperId}/order/${orderId}/has-rated`;
+    const url = `${API_BASE_URL}/Review/user/${userId}/shipper/${shipperId}/order/${orderId}/has-rated`;
 
     const res = await axios.get(url, {
       headers: {

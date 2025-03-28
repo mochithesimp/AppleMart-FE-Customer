@@ -1,4 +1,5 @@
 import swal from 'sweetalert';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const refreshToken = async () => {
 
@@ -14,7 +15,7 @@ export const refreshToken = async () => {
         refreshToken: rfToken
     };
     try {
-        const response = await fetch('https://localhost:7140/api/Account/refresh-token', {
+        const response = await fetch(`${API_BASE_URL}/Account/refresh-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

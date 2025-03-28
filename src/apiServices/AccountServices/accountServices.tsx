@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import axios from "axios";
 import * as request from "../../utils/request";
 
@@ -76,7 +77,7 @@ export const checkMail = async (email: string) => {
 
   export const register = async (registerValues: any) => {
     try {
-      const res = await axios.post('https://localhost:7140/api/Account/Register', registerValues);
+      const res = await axios.post(`${API_BASE_URL}/Account/Register`, registerValues);
       return res;
     } catch (error) {
       console.log(error);
