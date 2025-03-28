@@ -1,5 +1,6 @@
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
 import imomo from "../../assets/Checkout/Primary logo@2x.png";
+
 import "./Style.css";
 import { useEffect, useRef, useState } from "react";
 import { useCheckoutAnimation } from "./useCheckoutAnimation";
@@ -23,6 +24,7 @@ import { AxiosError } from "axios";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import { debounce } from "lodash";
+import { useNavigate } from "react-router-dom";
 
 interface CartData {
   [orderId: string]: CartProductItem[];
@@ -31,7 +33,7 @@ interface CartData {
 const CheckoutPage = () => {
   const [userId, setUserId] = useState<string>("");
   const [user, setUser] = useState<Partial<Iuser>>({});
-
+  const navigate = useNavigate();
   const [ward, setWard] = useState<string>("");
   const [district, setDistrict] = useState<string>("");
   const [province, setProvince] = useState<string>("");
@@ -225,7 +227,7 @@ const CheckoutPage = () => {
         },
       }).then(() => {
         setIsProcessing(false)
-        window.location.href = "/MyOrderPage";
+        navigate("/MyOrderPage");
       });
     }, 5000);
   } catch (error) {
