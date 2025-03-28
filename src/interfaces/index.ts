@@ -160,6 +160,7 @@ export interface aOrder {
   orderID: number;
   userID: string;
   shipperID: number;
+  shipperName?: string;
   orderDate: string;
   address: string;
   paymentMethod: string;
@@ -178,7 +179,7 @@ export interface OrderDetail {
   price: number;
 }
 
-export interface bBlogs{
+export interface bBlogs {
   blogID: number;
   title: string;
   content: string;

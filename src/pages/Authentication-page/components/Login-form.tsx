@@ -7,7 +7,7 @@ import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
 import { login } from "../../../apiServices/AccountServices/loginServices";
 import { AxiosError } from "axios";
-import { getRoleFromToken } from "../../../utils/jwtHelper";
+import { getRoleFromToken, getUserIdFromToken } from "../../../utils/jwtHelper";
 interface LoginFormProps {
   activeForm: "login" | "register" | "forget";
   setActiveForm: (form: "login" | "register" | "forget") => void;
@@ -30,6 +30,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm }) => {
 
         localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+
+        // Get and store the user ID from the token
+        const userId = getUserIdFromToken(accessToken);
+        if (userId) {
+          localStorage.setItem("userId", userId);
+          console.log("Stored userId in localStorage:", userId);
+        } else {
+          console.warn("Could not extract userId from token");
+        }
 
         const role = getRoleFromToken(accessToken);
 
@@ -127,9 +136,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm }) => {
                 required
               />
               <i
-                className={`bx ${
-                  showPassword ? "bx-lock-open" : "bx-lock-alt"
-                } icon`}
+                className={`bx ${showPassword ? "bx-lock-open" : "bx-lock-alt"
+                  } icon`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>

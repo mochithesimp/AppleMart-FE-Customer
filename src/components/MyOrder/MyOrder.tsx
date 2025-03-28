@@ -2,27 +2,24 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import "./MyOrder.css";
 import useOrderData from "./components/useOrderData";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useHandleCancelOrder,
   useHandleOrderConfirm,
-  // useHandleOrderRating,
   useHandleRefundRequest,
 } from "./components/HandleOrder";
-import { useState } from "react";
 
 const MyOrder = () => {
   const { orderData, searchTerm, setSearchTerm } = useOrderData();
   const { handleCancelOrder } = useHandleCancelOrder();
   const { handleConfirmClick } = useHandleOrderConfirm();
   const { handleRefundRequest } = useHandleRefundRequest();
-  // const { handleProductRating, handleShipperRating } = useHandleOrderRating();
-  const [selectedOrderForRating, setSelectedOrderForRating] = useState<number | null>(null);
-  const [ratingStage, setRatingStage] = useState<'product' | 'shipper' | null>(null);
-  const openRatingModal = (orderId: number) => {
-    setSelectedOrderForRating(orderId);
-    setRatingStage('product');
+  const navigate = useNavigate();
+
+  const handleRateOrderClick = (orderId: number) => {
+    navigate(`/orderdetails/${orderId}`, { state: { orderStatus: "Completed" } });
   };
+
   return (
     <motion.div
       className="order-table-container bg-white dark:bg-gray-700 dark:text-white"
@@ -99,7 +96,7 @@ const MyOrder = () => {
                 {order.orderStatus === "Completed" && (
                   <button
                     className="rating-button"
-                    onClick={() => openRatingModal(order.orderID)}
+                    onClick={() => handleRateOrderClick(order.orderID)}
                   >
                     Rate Order
                   </button>
@@ -109,54 +106,6 @@ const MyOrder = () => {
           ))}
         </tbody>
       </table>
-      {selectedOrderForRating && ratingStage === 'product' && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Rate Product</h2>
-
-            <div className="flex justify-between mt-4">
-              <button
-                className="bg-gray-200 px-4 py-2 rounded"
-                onClick={() => setSelectedOrderForRating(null)}
-              >
-                Exit
-              </button>
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => setRatingStage('shipper')}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedOrderForRating && ratingStage === 'shipper' && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Rate Shipper</h2>
-
-            <div className="flex justify-between mt-4">
-              <button
-                className="bg-gray-200 px-4 py-2 rounded"
-                onClick={() => setSelectedOrderForRating(null)}
-              >
-                Exit
-              </button>
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => {
-
-                  setSelectedOrderForRating(null);
-                }}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 };
