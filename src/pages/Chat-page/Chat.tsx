@@ -5,7 +5,14 @@ import styled from 'styled-components';
 import { ChatRoom, Message, User, StyledProps, ApiResponse } from '../../interfaces/index';
 import { FaPlus, FaUsers, FaPaperPlane, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import * as signalR from '@microsoft/signalr';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Replace localhost with the deployed API URL
+const API_BASE_URL = 'https://api.apple-mart.capybara.pro.vn';
+// API endpoints (with /api) for REST calls
+const API_ENDPOINT = `${API_BASE_URL}/api`;
+// Hub endpoint (without /api) for SignalR
+const CHAT_HUB_URL = `${API_BASE_URL}/chatHub`;
+
 const unwrapValues = <T,>(data: T[] | { $values: T[] } | undefined): T[] => {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -283,7 +290,7 @@ const ChatPage: React.FC = () => {
     }
 
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    axios.defaults.baseURL = `${API_BASE_URL}`;
+    axios.defaults.baseURL = API_ENDPOINT;
 
     loadRooms().catch(error => {
       console.error('Error in initial room load:', error);
@@ -294,7 +301,7 @@ const ChatPage: React.FC = () => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      axios.defaults.baseURL = `${API_BASE_URL}`;
+      axios.defaults.baseURL = API_ENDPOINT;
     }
   }, []);
 
@@ -302,23 +309,30 @@ const ChatPage: React.FC = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const newConnection = new HubConnectionBuilder()
-      .withUrl(`${API_BASE_URL}/chatHub`, {
-        accessTokenFactory: () => token,
-        transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .withAutomaticReconnect()
-      .build();
+    const setupChatConnection = () => {
+      console.log(`Setting up chat hub connection to ${CHAT_HUB_URL}...`);
 
-    setConnection(newConnection);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl(CHAT_HUB_URL, {
+          accessTokenFactory: () => token,
+          // Use both WebSockets and LongPolling to ensure connection
+          transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling,
+          // Important: Do not skip negotiation
+          skipNegotiation: false
+        })
+        .withAutomaticReconnect([0, 1000, 5000, 10000, 15000])
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+      // Set the connection and try to start it
+      setConnection(newConnection);
+    };
+
+    setupChatConnection();
 
     return () => {
-      if (newConnection.state === 'Connected') {
-        newConnection.stop();
+      if (connection && connection.state === 'Connected') {
+        connection.stop().catch(console.error);
       }
     };
   }, []);
@@ -328,9 +342,34 @@ const ChatPage: React.FC = () => {
 
     const startConnection = async () => {
       try {
+        console.log('Starting SignalR connection to:', CHAT_HUB_URL);
         await connection.start();
-        console.log('Connected to SignalR Hub');
+        console.log('Connected to SignalR Hub successfully');
 
+        // Add improved error handling for connection events
+        connection.onreconnecting(error => {
+          console.log('SignalR reconnecting due to error:', error);
+        });
+
+        connection.onreconnected(connectionId => {
+          console.log('SignalR reconnected with connectionId:', connectionId);
+          // Reload data after reconnection
+          loadRooms().catch(error => console.error('Error reloading rooms after reconnection:', error));
+          loadOnlineUsers().catch(error => console.error('Error reloading users after reconnection:', error));
+        });
+
+        connection.onclose(error => {
+          console.log('SignalR connection closed:', error);
+          // Attempt to reconnect after a timeout
+          setTimeout(() => {
+            if (connection.state !== 'Connected') {
+              console.log('Attempting to reconnect after connection closed...');
+              startConnection().catch(console.error);
+            }
+          }, 5000);
+        });
+
+        // Register event handlers
         connection.on('ReceiveMessage', (message: Message) => {
           console.log('Received message:', message);
 
@@ -407,10 +446,18 @@ const ChatPage: React.FC = () => {
           })));
         });
 
+        // Load data after connection is established
         await loadRooms();
         await loadOnlineUsers();
       } catch (error) {
-        console.error('Connection failed:', error);
+        console.error('SignalR connection failed:', error);
+        // Try to reconnect after a delay
+        setTimeout(() => {
+          if (connection.state !== 'Connected') {
+            console.log('Attempting to reconnect after failure...');
+            startConnection();
+          }
+        }, 5000);
       }
     };
 
@@ -426,7 +473,7 @@ const ChatPage: React.FC = () => {
   const loadRooms = async () => {
     try {
       console.log('Loading chat rooms...');
-      const response = await axios.get<ApiResponse<ChatRoom>>(`${API_BASE_URL}/api/chat/rooms`);
+      const response = await axios.get<ApiResponse<ChatRoom>>('/chat/rooms');
       console.log('Chat rooms response:', response.data);
 
       const roomsData: ChatRoom[] = (response.data.$values || response.data || []) as ChatRoom[];
@@ -451,7 +498,7 @@ const ChatPage: React.FC = () => {
 
   const loadOnlineUsers = async () => {
     try {
-      const response = await axios.get<ApiResponse<User>>(`${API_BASE_URL}/api/chat/users/online`);
+      const response = await axios.get<ApiResponse<User>>('/chat/users/online');
       console.log('Online users:', response.data);
       const users: User[] = (response.data.$values || response.data || []) as User[];
 
@@ -484,7 +531,7 @@ const ChatPage: React.FC = () => {
   const handleUserClick = async (userId: string) => {
     try {
       console.log('Creating chat with user:', userId);
-      const response = await axios.post<ChatRoom>(`${API_BASE_URL}/api/chat/room/private`,
+      const response = await axios.post<ChatRoom>('/chat/room/private',
         { otherUserId: userId },
         {
           headers: {
@@ -548,7 +595,7 @@ const ChatPage: React.FC = () => {
 
       setActiveRoom(room);
 
-      const response = await axios.get<ChatRoom>(`${API_BASE_URL}/api/chat/room/${room.chatRoomID}`);
+      const response = await axios.get<ChatRoom>(`/chat/room/${room.chatRoomID}`);
       console.log('Fetched room data:', response.data);
 
       const processedRoom = {
