@@ -33,6 +33,8 @@ export interface ProductItem {
   displayIndex: boolean;
   productImgs: ProductImg[];
   productItemAttributes: ProductItemAttribute[];
+  averageRating?: number;
+  totalReviewers?: number;
 }
 
 export interface ProductItemAttribute {

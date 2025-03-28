@@ -8,6 +8,7 @@ import { Attribute, ProductItem, ProductItemAttribute } from "../../interfaces";
 import { useAllProduct } from "../../context/ShopContext";
 import { getAttributes } from "../../apiServices/ProductServices/attributeServices";
 import { HandleAddToCart } from "../Cart-page/components/HandleAddToCart";
+import { useProductRatings } from "../../hooks/useProductRatings";
 
 const ProductDetails = () => {
   const { productItemId } = useParams();
@@ -17,7 +18,8 @@ const ProductDetails = () => {
   >([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [productItem, setProductItem] = useState<ProductItem>();
-// console.log("productItemId: ", productItems)
+  const { getRatingForProduct, loading } = useProductRatings();
+  // console.log("productItemId: ", productItems)
   const { handleAddToCart } = HandleAddToCart();
   const HandleAddToCartClick = (productItem: ProductItem) => {
     handleAddToCart(productItem);
@@ -113,7 +115,7 @@ const ProductDetails = () => {
                 className="w-full rounded-lg shadow"
               />
               <div className="flex gap-2 mt-4">
-                {productItem.productImgs .map((img, index) => (
+                {productItem.productImgs.map((img, index) => (
                   <img
                     key={index}
                     src={img.imageUrl}
@@ -139,7 +141,15 @@ const ProductDetails = () => {
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {product.sold} Sold ⭐ {product.rating}
+                {product.sold} Sold ⭐ {
+                  productItemId && !loading
+                    ? getRatingForProduct(parseInt(productItemId)).averageRating.toFixed(1)
+                    : '0.0'
+                } ({
+                  productItemId && !loading
+                    ? getRatingForProduct(parseInt(productItemId)).totalReviewers || 0
+                    : 0
+                } reviews)
               </p>
               <p className="mt-4 text-gray-700">{productItem.description}</p>
               {attributes.map((attribute) => {
@@ -162,8 +172,8 @@ const ProductDetails = () => {
                           <button
                             key={index}
                             className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${selectedColor === value
-                                ? "border-blue-400 bg-blue-50 text-blue-600"
-                                : "border-gray-300 text-gray-800"
+                              ? "border-blue-400 bg-blue-50 text-blue-600"
+                              : "border-gray-300 text-gray-800"
                               }`}
                             onClick={() => setSelectedColor(value)}
                           >
@@ -180,8 +190,8 @@ const ProductDetails = () => {
                           <button
                             key={index}
                             className={`px-4 py-2 border rounded ${selectedStorage === value
-                                ? "border-black font-bold"
-                                : "border-gray-300"
+                              ? "border-black font-bold"
+                              : "border-gray-300"
                               }`}
                             onClick={() => setSelectedStorage(value)}
                           >
