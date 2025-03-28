@@ -14,13 +14,11 @@ import ProtectedRoute from "./utils/protectedRoute";
 import ProfilePage from "./pages/Profile-page/ProfilePage";
 import PaymentWrapper from "./utils/protectedRoutePayment";
 import ProtecteDeliveryRoute from "./utils/protecteDeliveryRoute";
+import useAutoRefreshToken from "./utils/useAutoRefreshToken";
 
 // Lazy load các trang
 const HomePage = lazy(() => import("./pages/Home-page/Home"));
 const LoginPage = lazy(() => import("./pages/Authentication-page/UserAuth"));
-const UserProfile = lazy(
-  () => import("./pages/Authentication-page/UserProfile")
-);
 const ProductPage = lazy(() => import("./pages/Product-page/Product"));
 const ForPassPage = lazy(
   () => import("./pages/Authentication-page/ForgetPassword")
@@ -42,14 +40,6 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
-  },
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
-        <UserProfile />
-      </ProtectedRoute>
-    ),
   },
   {
     path: "/Product",
@@ -134,16 +124,17 @@ const router = createBrowserRouter([
     element: <BlogsDetailPage />,
   },
   {
-    path: "/ProfileUser",
+    path: "/profile",
     element: (
       <ProtectedRoute allowedRoles={["Customer", "Shipper"]}>
-        <ProfilePage />{" "}
+        <ProfilePage />
       </ProtectedRoute>
     ),
   },
 ]);
 
 function App() {
+  useAutoRefreshToken(); // Tự động refresh token khi app chạy
   return (
     <NotificationProvider>
       <CartProvider>

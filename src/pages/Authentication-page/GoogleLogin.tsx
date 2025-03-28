@@ -80,7 +80,7 @@ const GoogleLogin = () => {
             timer: 2000, 
             showConfirmButton: false,
           }).then(() => {
-            navigate("/profile");
+            navigate("/");
           });
         }
         if (!response) {

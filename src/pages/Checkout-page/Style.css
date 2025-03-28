@@ -171,6 +171,7 @@
 
 .checkout-review-order-table .cart_item .product-name {
   display: flex;
+  align-items: center;
 }
 
 .checkout-review-order-table .product-image {

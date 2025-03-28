@@ -6,8 +6,9 @@ import Popup from "../Popup/Popup";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useNotification } from "../../context/NotificationContext";
-import { getRoleFromToken, getUserIdFromToken } from "../../utils/jwtHelper";
+import { getUserIdFromToken } from "../../utils/jwtHelper";
 import { CartProductItem } from "../../interfaces";
+import { getUserId } from "../../apiServices/UserServices/userServices";
 
 interface CartData {
   [orderId: string]: CartProductItem[];
@@ -35,11 +36,17 @@ const MenuLinks = [
   },
 ];
 
+export interface IUser {
+  id: string;
+  role: string;
+  name: string;
+  avatar: string;
+}
+
 const NavbarforP = () => {
   const [cartCount, setCartCount] = useState(0);
   const { cart } = useCart();
-  const [role, setRole] = useState<string | null>();
-  const [userId, setUserId] = useState<string | null>();
+  const [user, setUser] = useState({} as IUser);
   const [orderPopup, setOrderPopup] = useState<boolean>(false);
   const [notificationPopup, setNotificationPopup] = useState<boolean>(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -51,11 +58,24 @@ const NavbarforP = () => {
   const isCheckoutPage = location.pathname === "/checkout";
 
   const token = localStorage.getItem("token");
+
   useEffect(() => {
-    const roleIdentifier = token ? getRoleFromToken(token) : null;
-    const userIdFromToken = token ? getUserIdFromToken(token) : null;
-    setUserId(userIdFromToken);
-    setRole(roleIdentifier);
+    const fetchUser = async () => {
+      try {
+        if (!token) {
+          console.error("Token not found");
+          return;
+        }
+        const userIdFromToken = getUserIdFromToken(token) || "";
+        const userData = await getUserId(userIdFromToken);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error fetching user", error);
+        throw new Error("User not found");
+      }
+    };
+
+    fetchUser();
   }, [token]);
 
   const {
@@ -96,7 +116,7 @@ const NavbarforP = () => {
     const cartData: CartData = JSON.parse(
       localStorage.getItem("storedCart") || "{}"
     );
-    delete cartData[userId || "guest"];
+    delete cartData[user.id || "guest"];
     localStorage.setItem("storedCart", JSON.stringify(cartData));
 
     localStorage.removeItem("token");
@@ -340,13 +360,24 @@ const NavbarforP = () => {
               {isLoggedIn ? (
                 <div className="relative inline-block">
                   <div className="flex items-center space-x-2 cursor-pointer group">
-                    <img
-                      src={noface}
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full"
-                    />
+                    <div className="flex items-center space-x-4">
+                      {/* Avatar */}
+                      <img
+                        src={user.avatar || noface}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full"
+                      />
+
+                      {/* Text */}
+                      <div className="flex flex-col">
+                        <span className="text-gray-500 text-sm">Welcome</span>
+                        <span className="text-sm font-semibold">
+                          {user.name}
+                        </span>
+                      </div>
+                    </div>
                     <div className="hidden group-hover:block absolute right-0 mt-28 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
-                      {role === "Shipper" && (
+                      {user.role === "Shipper" && (
                         <Link
                           to="/MyOrderPage"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -354,7 +385,7 @@ const NavbarforP = () => {
                           Delivery
                         </Link>
                       )}
-                      {role !== "Shipper" && (
+                      {user.role !== "Shipper" && (
                         <Link
                           to="/MyOrderPage"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -362,7 +393,12 @@ const NavbarforP = () => {
                           My Order
                         </Link>
                       )}
-
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                      >
+                        Profile
+                      </Link>
                       <Link
                         to="/login"
                         onClick={handleLogout}
