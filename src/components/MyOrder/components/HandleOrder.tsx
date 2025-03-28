@@ -4,6 +4,70 @@ import { orderConfirm } from "../../../apiServices/ShipperServices/ShipperServic
 import { swal } from "../../../import/import-another";
 import { useState } from "react";
 import { rateProduct, rateShipper } from "../../../apiServices/OrderServices/OrderServices";
+import * as signalR from "@microsoft/signalr";
+
+const isDevelopment = window.location.hostname === 'localhost';
+const API_URL = isDevelopment
+  ? 'https://localhost:7140'
+  : 'https://deployed-backend-url.azurewebsites.net';
+
+const getSignalRConnection = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const hubUrl = `${API_URL}/notificationHub`;
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl(hubUrl, {
+      accessTokenFactory: () => token,
+      transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
+    })
+    .withAutomaticReconnect()
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+  if (connection.state !== "Connected") {
+    await connection.start();
+  }
+
+  return connection;
+};
+
+const sendDirectNotification = async (userId: string, header: string, content: string) => {
+  try {
+    const connection = await getSignalRConnection();
+    await connection.invoke("SendDirectNotification", userId, header, content);
+    console.log(`Notification sent to user ${userId}`);
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+
+const sendProductRatingNotification = async (customerName: string, rating: number, productItemId: number) => {
+  try {
+    const connection = await getSignalRConnection();
+
+    await connection.invoke("SendProductRatingNotification", customerName, rating, productItemId);
+    console.log("Product rating notification sent to staff");
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending product rating notification:", error);
+  }
+};
+
+const sendProductRatingNotificationWithName = async (customerName: string, rating: number, productItemId: number, productName: string) => {
+  try {
+    const connection = await getSignalRConnection();
+
+    await connection.invoke("SendProductRatingNotificationWithName", customerName, rating, productItemId, productName);
+    console.log("Product rating notification (with name) sent to staff");
+    await connection.stop();
+  } catch (error) {
+    console.error("Error sending product rating notification:", error);
+  }
+};
 
 const useHandleCancelOrder = () => {
 
@@ -49,7 +113,6 @@ const useHandleCancelOrder = () => {
   return { handleCancelOrder };
 };
 
-// This hook is for customers to confirm receipt of their order (change from Delivered to Completed)
 const useHandleOrderConfirm = () => {
   const handleConfirmClick = async (orderId: number) => {
     try {
@@ -104,7 +167,6 @@ const useHandleOrderConfirm = () => {
   return { handleConfirmClick };
 };
 
-// This hook is for shippers to mark an order as delivered (change from Shipped to Delivered)
 const useHandleOrderDelivered = () => {
   const handleDeliveredClick = async (orderId: number) => {
     try {
@@ -231,14 +293,12 @@ const useHandleRefundRequest = () => {
         dangerMode: true,
       });
 
-      // If user cancels or doesn't provide a reason
       if (!refundDialog) {
         return;
       }
 
       const reason = refundDialog.toString().trim();
 
-      // Validate the reason
       if (!reason) {
         swal("Error", "You must provide a reason for your refund request.", "error");
         return;
@@ -301,7 +361,17 @@ const useHandleOrderRating = () => {
 
       if (response && response.status >= 200 && response.status < 300) {
         swal("Success", "Product rating submitted!", "success");
-        // Reset rating state
+
+        const productName = sessionStorage.getItem(`product_${productItemId}_name`) || "";
+
+        const userName = localStorage.getItem("userName") || userId;
+
+        if (productName) {
+          await sendProductRatingNotificationWithName(userName, productRating, productItemId, productName);
+        } else {
+          await sendProductRatingNotification(userName, productRating, productItemId);
+        }
+
         setProductRating(0);
         setProductComment('');
         return true;
@@ -345,7 +415,13 @@ const useHandleOrderRating = () => {
 
       if (response && response.status >= 200 && response.status < 300) {
         swal("Success", "Shipper rating submitted!", "success");
-        // Reset rating state
+
+        const orderId = sessionStorage.getItem("currentOrderId") || response.data?.orderID || "Unknown";
+
+        const header = "New Rating Received";
+        const content = `A User has rated you ${shipperRating} stars on your delivery service for order with ${orderId}.`;
+        await sendDirectNotification(shipperId, header, content);
+
         setShipperRating(0);
         setShipperComment('');
         return true;
