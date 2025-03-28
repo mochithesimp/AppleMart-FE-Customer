@@ -1,5 +1,4 @@
 import NavbarforP from "../../components/NavbarProduct/NavbarforP";
-import p1 from "../../assets/Product/p-1.jpg";
 import imomo from "../../assets/Checkout/Primary logo@2x.png";
 import "./Style.css";
 import { useEffect, useRef, useState } from "react";
@@ -499,7 +498,7 @@ const CheckoutPage = () => {
                               <td className="product-name">
                                 <div className="product-image">
                                   <img
-                                    src={p1}
+                                    src={item.productImgs[0].imageUrl}
                                     alt={item.name}
                                     className="attachment-thumbnail size-thumbnail"
                                   />

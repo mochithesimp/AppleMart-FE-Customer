@@ -5,8 +5,9 @@ import { useSidebar } from "./SidebarContext";
 import classNames from "classnames";
 import { useState } from "react";
 import useProductFilter from "../ProductsSection/useProductFilter";
+import { ProductItem } from "../../interfaces";
 
-const SidebarP: React.FC<{ productFilter: ReturnType<typeof useProductFilter> }> = ({ productFilter }) => {
+const SidebarP: React.FC<{ productFilter: ReturnType<typeof useProductFilter>; productItems: ProductItem[]; }> = ({ productFilter, productItems }) => {
     const { openSidebar, toggleSidebar } = useSidebar();
     const [showFilter, setShowFilter] = useState(false);
 
@@ -49,7 +50,8 @@ const SidebarP: React.FC<{ productFilter: ReturnType<typeof useProductFilter> }>
                         onMouseEnter={() => setShowFilter(true)}
                         onMouseLeave={() => setShowFilter(false)}
                     >
-                        <FilterSection productFilter={productFilter} />
+                        <FilterSection productFilter={productFilter}
+                        productItems={productItems} />
                     </div>
                 </div>
 

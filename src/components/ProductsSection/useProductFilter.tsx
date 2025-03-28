@@ -48,6 +48,14 @@ const useProductFilter = () => {
         Pink: { Colors: "Pink" },
         Silver: { Colors: "Silver" },
         Gold: { Colors: "Gold" },
+        "Navy Blue": { Colors: "Navy Blue" }, // Xanh đen
+        Orange: { Colors: "Orange" }, // Cam
+        Green: { Colors: "Green" }, // Xanh lá
+        Brown: { Colors: "Brown" }, // Nâu
+        Beige: { Colors: "Beige" }, // Kem
+        Cyan: { Colors: "Cyan" }, // Xanh dương nhạt / Xanh cyan
+        Red: { Colors: "Red" }, // Đỏ
+        Yellow: { Colors: "Yellow" }, // Vàng
       };
 
       if (colorBy in filterColorMap) {

@@ -6,7 +6,6 @@ const useAutoRefreshToken = () => {
     const interval = setInterval(async () => {
       try {
         await refreshToken();
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>>")
       } catch (error) {
         console.error("Auto refresh token failed:", error);
       }

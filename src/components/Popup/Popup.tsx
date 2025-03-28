@@ -1,9 +1,4 @@
-// import Button from "../Shared/Button";
-// import { IoCloseCircleOutline } from "react-icons/io5";
 import React from "react";
-import p1 from "../../assets/Product/p-1.jpg";
-// import p2 from "../../assets/Product/p-2.jpg";
-// import p3 from "../../assets/Product/p-3.jpg";
 import empty1 from "../../assets/Empty-1.png";
 import empty2 from "../../assets/Empty-2.png";
 import "./Style.css";
@@ -15,12 +10,6 @@ const Popup: React.FC<{
   handleOrderPopup: () => void;
   popupRef: React.RefObject<HTMLDivElement | null>;
 }> = ({ orderPopup, popupRef }) => {
-  // const cartItems = [
-  //   { id: 1, name: "Tai nghe Sony", price: 120.99, image: p1 },
-  //   { id: 2, name: "Đồng hồ thông minh", price: 199.99, image: p2 },
-  //   { id: 3, name: "Chuột không dây", price: 35.5, image: p3 },
-  //   { id: 4, name: "Chuột không dây", price: 35.5, image: p3 },
-  // ];
 
   const { cart, removeItems } = useCart();
   const totalAmount = cart.reduce(
@@ -50,7 +39,7 @@ const Popup: React.FC<{
                       >
                         <div className="menu-cart__product-image w-20 h-20">
                           <img
-                            src={p1}
+                            src={item.productImgs[0].imageUrl}
                             alt={item.name}
                             className="menu-cart__product__image w-full h-full object-cover"
                           />
