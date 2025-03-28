@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import * as signalR from "@microsoft/signalr";
 
-const isDevelopment = window.location.hostname === 'localhost';
-
-const API_URL = isDevelopment
-    ? 'https://localhost:7140'
-    : 'https://deployed-backend-url.azurewebsites.net';
+// Use the production API URL
+const API_URL = 'https://api.apple-mart.capybara.pro.vn';
+const HUB_URL = `${API_URL}/notificationHub`;
 
 interface Notification {
     notificationID: number;
@@ -21,7 +19,6 @@ interface NotificationContextType {
     markAsRead: (notificationId: number) => Promise<void>;
     deleteNotification: (notificationId: number) => Promise<void>;
     connectionState: string;
-    testConnection: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -56,15 +53,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         console.log("Setting up new SignalR connection...");
 
         try {
-            const hubUrl = `${API_URL}/notificationHub`;
-            console.log("Attempting to connect to:", hubUrl);
+            console.log("Attempting to connect to:", HUB_URL);
 
+            // Create a new connection with basic configuration
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl(hubUrl, {
+                .withUrl(HUB_URL, {
                     accessTokenFactory: () => token,
                     transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
                 })
-                .withAutomaticReconnect([0, 2000, 5000, 10000, 20000])
+                .withAutomaticReconnect([0, 2000, 5000, 10000])
                 .configureLogging(signalR.LogLevel.Information)
                 .build();
 
@@ -75,16 +72,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                         const exists = prev.some(n => n.notificationID === notification.notificationID);
                         if (!exists) {
                             const updatedNotifications = [notification, ...prev];
-                            console.log("Updated notifications array:", updatedNotifications);
-
                             if (!notification.isRead) {
-                                setUnreadCount(prevCount => {
-                                    const newCount = prevCount + 1;
-                                    console.log("Immediately updating unread count to:", newCount);
-                                    return newCount;
-                                });
+                                setUnreadCount(prevCount => prevCount + 1);
                             }
-
                             return updatedNotifications;
                         }
                         return prev;
@@ -97,7 +87,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 if (Array.isArray(loadedNotifications)) {
                     setNotifications(loadedNotifications);
                     const count = loadedNotifications.filter(n => !n.isRead).length;
-                    console.log("Setting unread count from loaded notifications:", count);
                     setUnreadCount(count);
                 }
             });
@@ -126,11 +115,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 });
             });
 
-            connection.on("UpdateUnreadCount", (count: number) => {
-                console.log("Server sent updated unread count:", count);
-                setUnreadCount(count);
-            });
-
             connection.onreconnecting(() => {
                 console.log("Connection lost. Attempting to reconnect...");
                 setConnectionState("Reconnecting");
@@ -139,7 +123,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             connection.onreconnected(() => {
                 console.log("Reconnected successfully");
                 setConnectionState("Connected");
-                // refresh lai noti
                 connection.invoke("LoadNotifications").catch(console.error);
             });
 
@@ -151,32 +134,30 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 setTimeout(handleReconnection, 5000);
             });
 
-            await connection.start();
-            console.log("Connected to notification hub at:", hubUrl);
-            setConnectionState("Connected");
-            hubConnectionRef.current = connection;
-
-            // Try to load initial notifications after successful connection
+            // Try to start the connection
             try {
-                await connection.invoke("LoadNotifications");
-            } catch (error) {
-                console.error("Error loading initial notifications:", error);
-            }
+                await connection.start();
+                console.log("Connected to notification hub");
+                setConnectionState("Connected");
+                hubConnectionRef.current = connection;
 
+                // Load initial notifications
+                try {
+                    await connection.invoke("LoadNotifications");
+                    console.log("Successfully loaded notifications");
+                } catch (error) {
+                    console.error("Error loading initial notifications:", error);
+                }
+            } catch (error) {
+                console.error("Error starting SignalR connection:", error);
+                setConnectionState("Failed");
+                connectionAttemptRef.current = false;
+                setTimeout(handleReconnection, 5000);
+            }
         } catch (error) {
             console.error("Error setting up SignalR connection:", error);
             setConnectionState("Failed");
             connectionAttemptRef.current = false;
-
-            if (hubConnectionRef.current) {
-                try {
-                    await hubConnectionRef.current.stop();
-                } catch (stopError) {
-                    console.error("Error stopping failed connection:", stopError);
-                }
-                hubConnectionRef.current = null;
-            }
-
             setTimeout(handleReconnection, 5000);
         }
     };
@@ -210,6 +191,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, []);
 
     useEffect(() => {
+        console.log(`API URL is set to: ${API_URL}`);
         setupConnection();
 
         return () => {
@@ -232,10 +214,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return () => clearInterval(checkConnection);
     }, [handleReconnection]);
 
-    useEffect(() => {
-        console.log("SignalR Connection State:", connectionState);
-    }, [connectionState]);
-
     const markAsRead = async (notificationId: number) => {
         try {
             if (hubConnectionRef.current?.state === "Connected") {
@@ -256,20 +234,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
 
-    const testConnection = async () => {
-        if (hubConnectionRef.current?.state === "Connected") {
-            console.log("Testing SignalR connection...");
-            try {
-                await hubConnectionRef.current.invoke("Echo", "Test message");
-                console.log("SignalR connection test successful");
-            } catch (error) {
-                console.error("SignalR connection test failed:", error);
-            }
-        } else {
-            console.log("Not connected to SignalR hub");
-        }
-    };
-
     return (
         <NotificationContext.Provider
             value={{
@@ -277,8 +241,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 unreadCount,
                 markAsRead,
                 deleteNotification,
-                connectionState,
-                testConnection,
+                connectionState
             }}
         >
             {children}

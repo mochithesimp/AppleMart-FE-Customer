@@ -6,10 +6,7 @@ import { useState } from "react";
 import { rateProduct, rateShipper } from "../../../apiServices/OrderServices/OrderServices";
 import * as signalR from "@microsoft/signalr";
 
-const isDevelopment = window.location.hostname === 'localhost';
-const API_URL = isDevelopment
-  ? 'https://localhost:7140'
-  : 'https://deployed-backend-url.azurewebsites.net';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.apple-mart.capybara.pro.vn';
 
 const getSignalRConnection = async () => {
   const token = localStorage.getItem("token");
