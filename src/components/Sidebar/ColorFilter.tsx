@@ -6,6 +6,14 @@ const colorFilters = [
   { label: "Pink", value: "Pink" },
   { label: "Silver", value: "Silver" },
   { label: "Gold", value: "Gold" },
+  { label: "Navy Blue", value: "Navy Blue" }, // Xanh đen
+  { label: "Orange", value: "Orange" }, // Cam
+  { label: "Green", value: "Green" }, // Xanh lá
+  { label: "Brown", value: "Brown" }, // Nâu
+  { label: "Beige", value: "Beige" }, // Kem
+  { label: "Cyan", value: "Cyan" },
+  { label: "Red", value: "Red" },
+  { label: "Yellow", value: "Yellow" },
 ];
 
 const ColorFilter: React.FC<{

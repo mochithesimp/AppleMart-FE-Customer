@@ -97,6 +97,7 @@ export interface CartProductItem {
   quantity: number;
   price: number;
   stock: number;
+  productImgs: ProductImg[];
   isDeleted: boolean;
 }
 

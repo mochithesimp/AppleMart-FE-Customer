@@ -237,7 +237,6 @@ const OrderDetails = () => {
             const productItem = productItems.find(
               (p) => p.productItemID === order.productItemID
             );
-
             const isRated = ratingStatus[order.orderDetailID] === true;
             const showRateButton = orderStatus === "Completed" && !isRated && !isLoadingRatingStatus;
 

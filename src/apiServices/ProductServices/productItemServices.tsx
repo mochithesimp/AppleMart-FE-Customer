@@ -37,6 +37,15 @@ export const search = async (queryParams: URLSearchParams) => {
   }
 };
 
+export const getProductItemTotalSold = async (productItemId: number) => {
+  try {
+    const res = await request.get(`ProductItem/${productItemId}/total-sold`);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getProductItemId = async (productItemId: number) => {
   try {
     const res = await request.get(`ProductItem/${productItemId}`);

@@ -2,12 +2,17 @@ import SidebarToggle from "../Sidebar/SidebarToggle";
 import SidebarP from "../Sidebar/SidebarP";
 import { SidebarProvider } from "../Sidebar/SidebarContext";
 import useProductFilter from "../ProductsSection/useProductFilter";
+import { ProductItem } from "../../interfaces";
 
-const SideBarforProduct: React.FC<{ productFilter: ReturnType<typeof useProductFilter> }> = ({ productFilter }) => {
+const SideBarforProduct: React.FC<{
+  productFilter: ReturnType<typeof useProductFilter>;
+  productItems: ProductItem[];
+}> = ({ productFilter, productItems }) => {
   return (
     <SidebarProvider>
       <SidebarToggle />
-      <SidebarP productFilter={productFilter} />
+      <SidebarP productFilter={productFilter}
+      productItems={productItems} />
     </SidebarProvider>
   );
 };

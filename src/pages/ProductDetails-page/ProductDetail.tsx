@@ -9,7 +9,10 @@ import { useAllProduct } from "../../context/ShopContext";
 import { getAttributes } from "../../apiServices/ProductServices/attributeServices";
 import { HandleAddToCart } from "../Cart-page/components/HandleAddToCart";
 import { useProductRatings } from "../../hooks/useProductRatings";
-import { getProductReviews } from "../../apiServices/ProductServices/productItemServices";
+import {
+  getProductItemTotalSold,
+  getProductReviews,
+} from "../../apiServices/ProductServices/productItemServices";
 
 type Review = {
   reviewID: number;
@@ -28,6 +31,8 @@ type Review = {
 
 const ProductDetails = () => {
   const { productItemId } = useParams();
+
+  const [totalSold, setTotalSold] = useState<number>(0);
   const { productItems } = useAllProduct();
   const [productItemAttributes, setProductItemAttributes] = useState<
     ProductItemAttribute[]
@@ -48,8 +53,8 @@ const ProductDetails = () => {
     const fetchData = async () => {
       const productItemAttributes = await getProductItemAttributes();
 
-      if (productItemAttributes && productItemAttributes.$values) {
-        setProductItemAttributes(productItemAttributes.$values);
+      if (productItemAttributes && productItemAttributes.items.$values) {
+        setProductItemAttributes(productItemAttributes.items.$values);
       } else {
         console.error("Data not found or invalid response structure");
       }
@@ -100,7 +105,10 @@ const ProductDetails = () => {
           let reviewsArray = [];
           // Handle the case where reviews is an object with $values
           if (result.reviews && result.reviews.$values) {
-            console.log("Direct product reviews (nested):", result.reviews.$values);
+            console.log(
+              "Direct product reviews (nested):",
+              result.reviews.$values
+            );
             reviewsArray = result.reviews.$values;
           } else if (result.reviews && Array.isArray(result.reviews)) {
             console.log("Direct product reviews (array):", result.reviews);
@@ -113,7 +121,9 @@ const ProductDetails = () => {
           }
 
           // Filter out reviews where productRating is null
-          const filteredReviews = reviewsArray.filter((review: Review) => review.productRating !== null);
+          const filteredReviews = reviewsArray.filter(
+            (review: Review) => review.productRating !== null
+          );
           console.log("Filtered product reviews:", filteredReviews);
           setProductReviews(filteredReviews);
         } else {
@@ -163,22 +173,46 @@ const ProductDetails = () => {
   }, [productItem]);
 
   // Check if it's an array before using slice
-  const displayedReviews = Array.isArray(productReviews) && productReviews.length > 0
-    ? (showAllReviews ? productReviews : productReviews.slice(0, 3))
-    : [];
+  const displayedReviews =
+    Array.isArray(productReviews) && productReviews.length > 0
+      ? showAllReviews
+        ? productReviews
+        : productReviews.slice(0, 3)
+      : [];
 
   const renderStars = (rating: number) => {
-    return Array(5).fill(0).map((_, index) => (
-      <span key={index} className={`text-xl ${index < rating ? "text-yellow-400" : "text-gray-300"}`}>
-        ★
-      </span>
-    ));
+    return Array(5)
+      .fill(0)
+      .map((_, index) => (
+        <span
+          key={index}
+          className={`text-xl ${
+            index < rating ? "text-yellow-400" : "text-gray-300"
+          }`}
+        >
+          ★
+        </span>
+      ));
   };
 
   // Get rating data from useProductRatings hook
   const { averageRating, totalReviewers } = productItemId
     ? getRatingForProduct(parseInt(productItemId))
     : { averageRating: 0, totalReviewers: 0 };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (productItemId) {
+        const result = await getProductItemTotalSold(parseInt(productItemId));
+        if (result && result.totalSold) {
+          setTotalSold(result.totalSold);
+        } else {
+          console.error("Data not found or invalid response structure");
+        }
+      }
+    };
+    fetchData();
+  }, [productItemId]);
 
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 overflow-hidden">
@@ -203,8 +237,11 @@ const ProductDetails = () => {
                     key={index}
                     src={img.imageUrl}
                     alt="Product preview"
-                    className={`w-16 h-16 rounded cursor-pointer border-2 ${selectedImage === img.imageUrl ? "border-black" : "border-gray-300"
-                      }`}
+                    className={`w-16 h-16 rounded cursor-pointer border-2 ${
+                      selectedImage === img.imageUrl
+                        ? "border-black"
+                        : "border-gray-300"
+                    }`}
                     onClick={() => setSelectedImage(img.imageUrl)}
                   />
                 ))}
@@ -216,83 +253,92 @@ const ProductDetails = () => {
               <h2 className="text-2xl font-bold">{productItem.name}</h2>
               <p className="text-gray-500">Available: {productItem.quantity}</p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="line-through text-gray-400">
+                {/* <span className="line-through text-gray-400">
                   ${productItem.price.toLocaleString()}
-                </span>
+                </span> */}
                 <span className="text-xl font-semibold text-red-600">
-                  ${product.discountedPrice.toLocaleString()}
+                  ${productItem.price.toLocaleString()}
                 </span>
               </div>
               <p className="text-sm text-gray-600">
-                {product.sold} Sold ⭐ {
-                  productItemId && !ratingsLoading
-                    ? averageRating.toFixed(1)
-                    : '0.0'
-                } ({
-                  productItemId && !ratingsLoading
-                    ? totalReviewers || 0
-                    : 0
-                } reviews)
+                {totalSold} Sold ⭐{" "}
+                {productItemId && !ratingsLoading
+                  ? averageRating.toFixed(1)
+                  : "0.0"}{" "}
+                ({productItemId && !ratingsLoading ? totalReviewers || 0 : 0}{" "}
+                reviews)
               </p>
               <p className="mt-4 text-gray-700">{productItem.description}</p>
-              {attributes.map((attribute) => {
-                // Lọc tất cả các giá trị liên quan đến attributeID
-                const relatedValues = productItem?.productItemAttributes
-                  .filter(
-                    (pia) => Number(pia.attributeID) === attribute.attributeID
-                  )
-                  .map((pia) => pia.value);
+              <div>
+                {attributes.map((attribute) => {
+                  // Lọc tất cả các giá trị liên quan đến attributeID
+                  const relatedValues = productItem?.productItemAttributes
+                    .filter(
+                      (pia) => Number(pia.attributeID) === attribute.attributeID
+                    )
+                    .map((pia) => pia.value);
 
-                if (relatedValues.length === 0) return null;
+                  if (relatedValues.length === 0) return null;
 
-                return (
-                  <div key={attribute.attributeID} className="mt-4">
-                    <p className="font-semibold">{attribute.attributeName}:</p>
-                    <div className="flex gap-2 mt-2">
-                      {relatedValues.map((value, index) =>
-                        attribute.attributeName.toLowerCase() === "color" ? (
-                          // Nếu là thuộc tính "Color", hiển thị nút tròn với màu nền
-                          <button
-                            key={index}
-                            className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${selectedColor === value
-                              ? "border-blue-400 bg-blue-50 text-blue-600"
-                              : "border-gray-300 text-gray-800"
+                  return (
+                    <div key={attribute.attributeID} className="mt-4">
+                      <p className="font-semibold">
+                        {attribute.attributeName}:
+                      </p>
+                      <div className="flex gap-2 mt-2">
+                        {relatedValues.map((value, index) =>
+                          attribute.attributeName.toLowerCase() === "color" ? (
+                            // Nếu là thuộc tính "Color", hiển thị nút tròn với màu nền
+                            <button
+                              key={index}
+                              className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${
+                                selectedColor === value
+                                  ? "border-blue-400 bg-blue-50 text-blue-600"
+                                  : "border-gray-300 text-gray-800"
                               }`}
-                            onClick={() => setSelectedColor(value)}
-                          >
-                            <span
-                              className="w-5 h-5 rounded-full border"
-                              style={{ backgroundColor: value.toLowerCase() }}
-                            ></span>
-                            <span className="text-blue-600 font-medium">
+                              onClick={() => setSelectedColor(value)}
+                            >
+                              <span
+                                className="w-5 h-5 rounded-full border"
+                                style={{ backgroundColor: value.toLowerCase() }}
+                              ></span>
+                              <span className="text-blue-600 font-medium">
+                                {value}
+                              </span>
+                            </button>
+                          ) : (
+                            // Các thuộc tính khác hiển thị nút chữ nhật
+                            <button
+                              key={index}
+                              className={`px-4 py-2 border rounded ${
+                                selectedStorage === value
+                                  ? "border-black font-bold"
+                                  : "border-gray-300"
+                              }`}
+                              onClick={() => setSelectedStorage(value)}
+                            >
                               {value}
-                            </span>
-                          </button>
-                        ) : (
-                          // Các thuộc tính khác hiển thị nút chữ nhật
-                          <button
-                            key={index}
-                            className={`px-4 py-2 border rounded ${selectedStorage === value
-                              ? "border-black font-bold"
-                              : "border-gray-300"
-                              }`}
-                            onClick={() => setSelectedStorage(value)}
-                          >
-                            {value}
-                          </button>
-                        )
-                      )}
+                            </button>
+                          )
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
 
               {/* Action Buttons */}
               <div className="mt-6 flex gap-4">
-                <button className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800" onClick={() => HandleAddToCartClick(productItem)}>
+                <button
+                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800"
+                  onClick={() => HandleAddToCartClick(productItem)}
+                >
                   Add To Cart
                 </button>
-                <Link to="/checkout" className="border px-6 py-3 rounded-lg hover:bg-gray-200">
+                <Link
+                  to="/checkout"
+                  className="border px-6 py-3 rounded-lg hover:bg-gray-200"
+                >
                   Checkout Now
                 </Link>
               </div>
@@ -308,9 +354,11 @@ const ProductDetails = () => {
         <div className="border-t pt-8">
           <h3 className="text-2xl font-bold mb-6">
             Customer Reviews
-            {Array.isArray(productReviews) && productReviews.length > 0 &&
-              <span className="text-lg font-normal text-gray-500 ml-2">({productReviews.length})</span>
-            }
+            {Array.isArray(productReviews) && productReviews.length > 0 && (
+              <span className="text-lg font-normal text-gray-500 ml-2">
+                ({productReviews.length})
+              </span>
+            )}
           </h3>
 
           {loadingReviews ? (
@@ -321,14 +369,21 @@ const ProductDetails = () => {
                 {displayedReviews.map((review) => (
                   <div key={review.reviewID} className="border-b pb-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-semibold">{review.userName || review.userID || "Anonymous"}</span>
-                      <div className="flex">{renderStars(review.productRating || 0)}</div>
+                      <span className="font-semibold">
+                        {review.userName || review.userID || "Anonymous"}
+                      </span>
+                      <div className="flex">
+                        {renderStars(review.productRating || 0)}
+                      </div>
                       <span className="text-gray-500 text-sm">
-                        {review.date ? new Date(review.date).toLocaleDateString() : "Unknown date"}
+                        {review.date
+                          ? new Date(review.date).toLocaleDateString()
+                          : "Unknown date"}
                       </span>
                     </div>
                     <p className="text-gray-700 dark:text-gray-300">
-                      {review.productComment && review.productComment.trim() !== ""
+                      {review.productComment &&
+                      review.productComment.trim() !== ""
                         ? review.productComment
                         : "No comment"}
                     </p>
@@ -342,7 +397,9 @@ const ProductDetails = () => {
                     onClick={() => setShowAllReviews(!showAllReviews)}
                     className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition-colors"
                   >
-                    {showAllReviews ? "Show Less" : `Show More (${productReviews.length - 3} more)`}
+                    {showAllReviews
+                      ? "Show Less"
+                      : `Show More (${productReviews.length - 3} more)`}
                   </button>
                 </div>
               )}

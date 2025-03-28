@@ -134,7 +134,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  useAutoRefreshToken(); // Tự động refresh token khi app chạy
+  useAutoRefreshToken(); 
   return (
     <NotificationProvider>
       <CartProvider>

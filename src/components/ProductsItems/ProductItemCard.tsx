@@ -35,11 +35,11 @@ const ProductItemCard: React.FC<{ productItem: ProductItem }> = ({ productItem }
       {/* Thông tin sản phẩm */}
       <Link to={`/productDetails/${productItem.productItemID}`}><h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-white">{productItem.name}</h3></Link>
 
-      {productItem.price && (
+      {/* {productItem.price && (
         <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
           ${productItem.price.toLocaleString()}
         </p>
-      )}
+      )} */}
 
       <p className="text-red-500 font-bold text-xl">
         {productItem.price ? `$${productItem.price.toLocaleString()}` : "Liên hệ"}
