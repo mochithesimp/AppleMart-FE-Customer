@@ -101,7 +101,6 @@ const useProductFilter = () => {
 
       queryParams.append("PageNumber", pageNumber.toString());
 
-      // console.log(`Fetching from URL: https://localhost:7140/api/ProductItem?${queryParams.toString()}`);
       const response = await search(queryParams);
       setTotalPages(response.totalPages)
       const productImgsResult = await getProductImgs();

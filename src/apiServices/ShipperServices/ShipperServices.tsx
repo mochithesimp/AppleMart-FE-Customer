@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as request from "../../utils/request";
 import { getUserIdFromToken } from "../../utils/jwtHelper";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getOrderList = async (queryParams: URLSearchParams) => {
   try {
@@ -24,7 +25,7 @@ export const orderConfirm = async (orderId: number, token: string) => {
     const userIdIdentifier = getUserIdFromToken(token);
     const userId = userIdIdentifier;
     const res = await axios.put(
-      `https://localhost:7140/api/Order/${orderId}/status?NewStatus=Delivered&ShipperId=${userId}`,
+      `${API_BASE_URL}/Order/${orderId}/status?NewStatus=Delivered&ShipperId=${userId}`,
       {},
       {
         headers: {
