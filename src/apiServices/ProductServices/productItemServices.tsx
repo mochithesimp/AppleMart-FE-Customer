@@ -21,7 +21,7 @@ type ProductRating = {
 
 export const getProductItems = async () => {
   try {
-    const res = await request.get(`ProductItem`);
+    const res = await request.get(`/api/ProductItem`);
     return res;
   } catch {
     return []; // Trả về mảng rỗng nếu lỗi
@@ -30,7 +30,7 @@ export const getProductItems = async () => {
 
 export const search = async (queryParams: URLSearchParams) => {
   try {
-    const res = await request.get("ProductItem", { params: queryParams });
+    const res = await request.get("/api/ProductItem", { params: queryParams });
     return res;
   } catch (error) {
     console.log(error);
@@ -39,7 +39,7 @@ export const search = async (queryParams: URLSearchParams) => {
 
 export const getProductItemTotalSold = async (productItemId: number) => {
   try {
-    const res = await request.get(`ProductItem/${productItemId}/total-sold`);
+    const res = await request.get(`/api/ProductItem/${productItemId}/total-sold`);
     return res;
   } catch (error) {
     console.log(error);
@@ -48,7 +48,7 @@ export const getProductItemTotalSold = async (productItemId: number) => {
 
 export const getProductItemId = async (productItemId: number) => {
   try {
-    const res = await request.get(`ProductItem/${productItemId}`);
+    const res = await request.get(`/api/ProductItem/${productItemId}`);
     return res;
   } catch (error) {
     console.log(error);
@@ -57,7 +57,7 @@ export const getProductItemId = async (productItemId: number) => {
 
 export const getProductRatings = async () => {
   try {
-    const res = await request.get("Review/products/summary");
+    const res = await request.get("/api/Review/products/summary");
 
     // Process the response to handle the nested structure and filter reviews
     if (res && res.$values) {
@@ -83,7 +83,7 @@ export const getProductRatings = async () => {
 
 export const getProductReviews = async (productItemId: number) => {
   try {
-    const res = await request.get(`Review/product/${productItemId}/details`);
+    const res = await request.get(`/api/Review/product/${productItemId}/details`);
 
     // Process the reviews
     if (res && res.reviews) {

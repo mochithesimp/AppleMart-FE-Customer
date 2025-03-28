@@ -40,7 +40,7 @@ interface OrderResponse {
 export const ordersByCash = async (order: any) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.post(`${API_BASE_URL}/Order`, order, {
+    const res = await axios.post(`${API_BASE_URL}/api/Order`, order, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ export const orders = async (order: OrderRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`${API_BASE_URL}/Order`, order, {
+    const res = await axios.post(`${API_BASE_URL}/api/Order`, order, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -87,7 +87,7 @@ export const getOrderList = async (queryParams: URLSearchParams) => {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await request.get("Order/orders", {
+    const res = await request.get("/api/Order/orders", {
       params: queryParams,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -103,7 +103,7 @@ export const getOrderList = async (queryParams: URLSearchParams) => {
 export const getOrder = async (orderId: any) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await request.get(`Order/${parseInt(orderId)}`, {
+    const res = await request.get(`/api/Order/${parseInt(orderId)}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -116,7 +116,7 @@ export const getOrder = async (orderId: any) => {
 
 export const search = async (queryParams: URLSearchParams) => {
   try {
-    const res = await request.get("Order/orders", { params: queryParams });
+    const res = await request.get("/api/Order/orders", { params: queryParams });
     // console.log("check data search: ", res);
     return res;
   } catch (error) {
@@ -148,7 +148,7 @@ export const rateProduct = async (ratingData: ProductRatingRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`${API_BASE_URL}/Review/product`, ratingData, {
+    const res = await axios.post(`${API_BASE_URL}/api/Review/product`, ratingData, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -176,7 +176,7 @@ export const rateShipper = async (ratingData: ShipperRatingRequest) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.post(`${API_BASE_URL}/Review/shipper`, ratingData, {
+    const res = await axios.post(`${API_BASE_URL}/api/Review/shipper`, ratingData, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -222,7 +222,7 @@ export const orderRating = async (orderDetailId: number, ratingData: any) => {
         throw new Error("No authentication token found");
       }
 
-      const res = await axios.post(`${API_BASE_URL}/Review`, {
+      const res = await axios.post(`${API_BASE_URL}/api/Review`, {
         userID: ratingData.userID || localStorage.getItem("userId") || "",
         orderDetailID: orderDetailId,
         productItemID: ratingData.productItemID,
@@ -261,7 +261,7 @@ export const getUserProductRatingStatus = async (userId: string, orderDetailIds:
     }
 
     const queryString = orderDetailIds.map(id => `orderDetailIds=${id}`).join('&');
-    const url = `${API_BASE_URL}/Review/user/${userId}/product-rating-status?${queryString}`;
+    const url = `${API_BASE_URL}/api/Review/user/${userId}/product-rating-status?${queryString}`;
 
     const res = await axios.get(url, {
       headers: {
@@ -290,7 +290,7 @@ export const getShipperInfo = async (shipperId: string) => {
       throw new Error("No authentication token found");
     }
 
-    const res = await axios.get(`${API_BASE_URL}/User/${shipperId}`, {
+    const res = await axios.get(`${API_BASE_URL}/api/User/${shipperId}`, {
       headers: {
         "Authorization": `Bearer ${token}`
       },
@@ -317,7 +317,7 @@ export const hasUserRatedShipper = async (userId: string, shipperId: string, ord
       throw new Error("No authentication token found");
     }
 
-    const url = `${API_BASE_URL}/Review/user/${userId}/shipper/${shipperId}/order/${orderId}/has-rated`;
+    const url = `${API_BASE_URL}/api/Review/user/${userId}/shipper/${shipperId}/order/${orderId}/has-rated`;
 
     const res = await axios.get(url, {
       headers: {

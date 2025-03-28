@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const getUser = async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await request.get("User/GetAll", {
+    const res = await request.get("/api/User/GetAll", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -18,7 +18,7 @@ export const getUser = async () => {
 export const getUserId = async (userId: string) => {
   try {
     const token = localStorage.getItem("token");
-    const res = await request.get(`User/${userId}`, {
+    const res = await request.get(`/api/User/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -33,7 +33,7 @@ export const updateUser = async (userId: string, formData: unknown) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.put(
-      `${API_BASE_URL}/User/${userId}`,
+      `${API_BASE_URL}/api/User/${userId}`,
       formData,
       {
         headers: {
@@ -51,7 +51,7 @@ export const orderCancel = async (orderId: number) => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.put(
-      `${API_BASE_URL}/Order/${orderId}/status?NewStatus=Cancelled&isCancelledByCustomer=true`,
+      `${API_BASE_URL}/api/Order/${orderId}/status?NewStatus=Cancelled&isCancelledByCustomer=true`,
       {}, // Empty body is required
       {
         headers: {
@@ -70,7 +70,7 @@ export const orderCompleted = async (orderId: number) => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.put(
-      `${API_BASE_URL}/Order/${orderId}/status?NewStatus=Completed`,
+      `${API_BASE_URL}/api/Order/${orderId}/status?NewStatus=Completed`,
       {}, // Empty body is required
       {
         headers: {
@@ -93,7 +93,7 @@ export const requestRefund = async (orderId: number, reason: string) => {
     }
 
     const response = await axios.put(
-      `${API_BASE_URL}/Order/${orderId}/status?NewStatus=RefundRequested&RefundReason=${encodeURIComponent(reason)}`,
+      `${API_BASE_URL}/api/Order/${orderId}/status?NewStatus=RefundRequested&RefundReason=${encodeURIComponent(reason)}`,
       {},
       {
         headers: {

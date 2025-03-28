@@ -7,7 +7,7 @@ export const getOrderList = async (queryParams: URLSearchParams) => {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await request.get("Shipper/orders", {
+    const res = await request.get("/api/Shipper/orders", {
       params: queryParams,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -25,7 +25,7 @@ export const orderConfirm = async (orderId: number, token: string) => {
     const userIdIdentifier = getUserIdFromToken(token);
     const userId = userIdIdentifier;
     const res = await axios.put(
-      `${API_BASE_URL}/Order/${orderId}/status?NewStatus=Delivered&ShipperId=${userId}`,
+      `${API_BASE_URL}/api//Order/${orderId}/status?NewStatus=Delivered&ShipperId=${userId}`,
       {},
       {
         headers: {
