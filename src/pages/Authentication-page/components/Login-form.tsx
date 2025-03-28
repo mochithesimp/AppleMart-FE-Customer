@@ -7,6 +7,7 @@ import GoogleLogin from "../GoogleLogin";
 import "../Style.css";
 import { login } from "../../../apiServices/AccountServices/loginServices";
 import { AxiosError } from "axios";
+import { NavLink } from "react-router-dom";
 import { getRoleFromToken, getUserIdFromToken } from "../../../utils/jwtHelper";
 interface LoginFormProps {
   activeForm: "login" | "register" | "forget";
@@ -142,13 +143,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ activeForm }) => {
               ></i>
             </div>
             <div className="forgot-pass">
-              {/* <NavLink
+              <NavLink
                 to="/ForgetPass"
-                className={`${activeForm === "forget" ? "active-btn" : ""}`}
-                onClick={() => setActiveForm("forget")}
               >
                 Forgot Password?
-              </NavLink> */}
+              </NavLink>
             </div>
             <div className="input-box">
               <button
