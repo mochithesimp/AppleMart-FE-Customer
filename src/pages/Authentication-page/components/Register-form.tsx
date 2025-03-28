@@ -53,6 +53,15 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
       return;
     }
 
+    if (password.length < 6) {
+      MySwal.fire({
+        icon: "error",
+        title: "Weak Password",
+        text: "Password must be at least 6 characters long!",
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
       MySwal.fire({
         icon: "error",
