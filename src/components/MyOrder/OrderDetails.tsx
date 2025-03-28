@@ -20,7 +20,19 @@ const OrderDetails = () => {
   const [hasRatedShipper, setHasRatedShipper] = useState<boolean>(false);
   const [isCheckingShipperRating, setIsCheckingShipperRating] = useState<boolean>(false);
 
-  // Fetch rating status for all order details
+  useEffect(() => {
+    const customerName = localStorage.getItem("userName");
+    if (!customerName) {
+      const userInfo = JSON.parse(localStorage.getItem("user") || "{}");
+      if (userInfo && userInfo.name) {
+        localStorage.setItem("userName", userInfo.name);
+      } else if (userInfo && userInfo.email) {
+        const nameFromEmail = userInfo.email.split('@')[0];
+        localStorage.setItem("userName", nameFromEmail);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const fetchRatingStatus = async () => {
       if (orderDetails.length === 0) return;
@@ -50,7 +62,6 @@ const OrderDetails = () => {
     fetchRatingStatus();
   }, [orderDetails]);
 
-  // Get shipper information
   const shipperInfo = orderData && orderData.length > 0 && orderId
     ? orderData.find(o => o.orderID === parseInt(orderId.toString()))
     : null;
@@ -58,7 +69,6 @@ const OrderDetails = () => {
   const shipperId = shipperInfo?.shipperID || null;
   const orderIdNumber = orderId ? parseInt(orderId.toString()) : 0;
 
-  // Fetch shipper name if we have a shipper ID
   useEffect(() => {
     const fetchShipperName = async () => {
       if (!shipperId) return;
@@ -67,6 +77,7 @@ const OrderDetails = () => {
         const response = await getShipperInfo(shipperId.toString());
         if (response && response.status >= 200 && response.status < 300 && response.data) {
           setShipperName(response.data.name || "Unknown");
+          sessionStorage.setItem("currentShipperName", response.data.name || "Unknown");
         }
       } catch (error) {
         console.error("Error fetching shipper details:", error);
@@ -76,7 +87,6 @@ const OrderDetails = () => {
     fetchShipperName();
   }, [shipperId]);
 
-  // Check if shipper has been rated
   useEffect(() => {
     const checkShipperRating = async () => {
       if (!shipperId || !orderId) return;
@@ -140,13 +150,11 @@ const OrderDetails = () => {
   const handleRatingSubmit = async (orderDetailId: number, productItemId: number) => {
     const success = await handleProductRating(orderDetailId, productItemId);
     if (success) {
-      // Update the rating status locally
       setRatingStatus(prev => ({
         ...prev,
         [orderDetailId]: true
       }));
 
-      // Close the product rating popup first
       setSelectedItemForRating(null);
     }
   };
@@ -170,8 +178,23 @@ const OrderDetails = () => {
     }
   };
 
-  // Helper to determine if the shipper rate button should be shown
   const showRateShipperButton = orderStatus === "Completed" && shipperId && !hasRatedShipper && !isCheckingShipperRating;
+
+  useEffect(() => {
+    if (productItems && productItems.length > 0) {
+      productItems.forEach(item => {
+        if (item.productItemID && item.name) {
+          sessionStorage.setItem(`product_${item.productItemID}_name`, item.name);
+        }
+      });
+    }
+  }, [productItems]);
+
+  useEffect(() => {
+    if (orderId) {
+      sessionStorage.setItem("currentOrderId", orderId.toString());
+    }
+  }, [orderId]);
 
   return (
     <motion.div
@@ -288,7 +311,6 @@ const OrderDetails = () => {
                   const orderDetail = orderDetails.find(item => item.orderDetailID === selectedItemForRating);
                   if (orderDetail) {
                     handleRatingSubmit(selectedItemForRating, orderDetail.productItemID);
-                    // Force close popup after submission
                     setTimeout(() => {
                       setSelectedItemForRating(null);
                     }, 300);
