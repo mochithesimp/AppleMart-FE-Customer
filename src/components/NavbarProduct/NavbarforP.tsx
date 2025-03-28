@@ -379,7 +379,7 @@ const NavbarforP = () => {
                     <div className="hidden group-hover:block absolute right-0 mt-28 w-32 bg-white border border-gray-300 shadow-lg rounded-lg">
                       {user.role === "Shipper" && (
                         <Link
-                          to="/MyOrderPage"
+                          to="/DeliveryOrderPage"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                           Delivery

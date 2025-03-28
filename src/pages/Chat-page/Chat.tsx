@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { ChatRoom, Message, User, StyledProps, ApiResponse } from '../../interfaces/index';
 import { FaPlus, FaUsers, FaPaperPlane, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import * as signalR from '@microsoft/signalr';
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const unwrapValues = <T,>(data: T[] | { $values: T[] } | undefined): T[] => {
   if (!data) return [];
   if (Array.isArray(data)) return data;
@@ -283,7 +283,7 @@ const ChatPage: React.FC = () => {
     }
 
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    axios.defaults.baseURL = 'https://localhost:7140';
+    axios.defaults.baseURL = `${API_BASE_URL}`;
 
     loadRooms().catch(error => {
       console.error('Error in initial room load:', error);
@@ -294,7 +294,7 @@ const ChatPage: React.FC = () => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      axios.defaults.baseURL = 'https://localhost:7140';
+      axios.defaults.baseURL = `${API_BASE_URL}`;
     }
   }, []);
 
@@ -303,7 +303,7 @@ const ChatPage: React.FC = () => {
     if (!token) return;
 
     const newConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7140/chatHub', {
+      .withUrl(`${API_BASE_URL}/chatHub`, {
         accessTokenFactory: () => token,
         transport: signalR.HttpTransportType.WebSockets,
         skipNegotiation: true,
@@ -426,7 +426,7 @@ const ChatPage: React.FC = () => {
   const loadRooms = async () => {
     try {
       console.log('Loading chat rooms...');
-      const response = await axios.get<ApiResponse<ChatRoom>>('/api/chat/rooms');
+      const response = await axios.get<ApiResponse<ChatRoom>>(`${API_BASE_URL}/api/chat/rooms`);
       console.log('Chat rooms response:', response.data);
 
       const roomsData: ChatRoom[] = (response.data.$values || response.data || []) as ChatRoom[];
@@ -451,7 +451,7 @@ const ChatPage: React.FC = () => {
 
   const loadOnlineUsers = async () => {
     try {
-      const response = await axios.get<ApiResponse<User>>('/api/chat/users/online');
+      const response = await axios.get<ApiResponse<User>>(`${API_BASE_URL}/api/chat/users/online`);
       console.log('Online users:', response.data);
       const users: User[] = (response.data.$values || response.data || []) as User[];
 
@@ -484,7 +484,7 @@ const ChatPage: React.FC = () => {
   const handleUserClick = async (userId: string) => {
     try {
       console.log('Creating chat with user:', userId);
-      const response = await axios.post<ChatRoom>('/api/chat/room/private',
+      const response = await axios.post<ChatRoom>(`${API_BASE_URL}/api/chat/room/private`,
         { otherUserId: userId },
         {
           headers: {
@@ -548,7 +548,7 @@ const ChatPage: React.FC = () => {
 
       setActiveRoom(room);
 
-      const response = await axios.get<ChatRoom>(`/api/chat/room/${room.chatRoomID}`);
+      const response = await axios.get<ChatRoom>(`${API_BASE_URL}/api/chat/room/${room.chatRoomID}`);
       console.log('Fetched room data:', response.data);
 
       const processedRoom = {

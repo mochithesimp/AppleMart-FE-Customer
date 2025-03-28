@@ -19,7 +19,7 @@ export const login = async (email: string, password: string) => {
 export const forgetPassword = async (email: string) => {
   try {
     // Sử dụng GET và truyền email qua query parameter
-    const res = await request.get(`Account/forget-password?email=${encodeURIComponent(email)}`);
+    const res = await request.get(`/api/Account/forget-password?email=${encodeURIComponent(email)}`);
     return res;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -33,7 +33,7 @@ export const forgetPassword = async (email: string) => {
 
 export const changePass = async (email: string, resetPasswordToken: string, password: string, confirmPassword: string) => {
   try {
-    const res = await request.post("Account/reset-password", { 
+    const res = await request.post("/api/Account/reset-password", { 
       email, 
       resetPasswordToken, 
       password, 
