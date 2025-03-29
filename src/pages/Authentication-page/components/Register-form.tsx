@@ -11,6 +11,7 @@ import "../Style.css";
 import { register } from "../../../apiServices/AccountServices/accountServices";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { useNavigate } from "react-router-dom";
 // import { register } from "../../../apiServices/AccountServices/accountServices";
 interface ResgiterFormProps {
   activeForm: "login" | "register" | "forget";
@@ -26,7 +27,7 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-
+  const navigate = useNavigate();
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -112,7 +113,7 @@ const ResgiterForm: React.FC<ResgiterFormProps> = ({ activeForm }) => {
         timer: 2000,
         showConfirmButton: false,
       }).then(() => {
-        window.location.reload();
+        navigate("/");
       });
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
