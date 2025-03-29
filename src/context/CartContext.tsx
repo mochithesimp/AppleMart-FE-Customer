@@ -171,6 +171,7 @@ const decrementQuantity = (productItemID: number) => {
       value={{
         cart,
         totals,
+        setCart,
         removeItems,
         addToCart,
         incrementQuantity,
