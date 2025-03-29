@@ -17,7 +17,7 @@ import {
   getUserId,
   updateUser,
 } from "../../apiServices/UserServices/userServices";
-import { CartProductItem, Iuser } from "../../interfaces";
+import { Iuser } from "../../interfaces";
 import { createPaypalTransaction } from "../../apiServices/PaypalServices/PaypalServices";
 import PaypalButton from "../../components/PaypalButton/PaypalButton";
 import { AxiosError } from "axios";
@@ -26,9 +26,9 @@ import Swal from "sweetalert2";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
 
-interface CartData {
-  [orderId: string]: CartProductItem[];
-}
+// interface CartData {
+//   [orderId: string]: CartProductItem[];
+// }
 
 const CheckoutPage = () => {
   const [userId, setUserId] = useState<string>("");
@@ -44,7 +44,7 @@ const CheckoutPage = () => {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const truckRef = useRef<HTMLDivElement | null>(null);
 
-  const { cart } = useCart();
+  const { cart, setCart } = useCart();
 
   const [selectedValue, setSelectedValue] = useState("option1");
   const [paymentMethod, setPaymentMethod] = useState("By Cash");
@@ -200,15 +200,13 @@ const CheckoutPage = () => {
       throw new Error("Error updating user");
     }
 
-    const cartData: CartData = JSON.parse(
-      localStorage.getItem("storedCart") || "{}"
-    );
-    delete cartData[userId || "guest"];
-    localStorage.setItem("storedCart", JSON.stringify(cartData));
+    // const cartData: CartData = JSON.parse(
+    //   localStorage.getItem("storedCart") || "{}"
+    // );
+    // delete cartData[userId || "guest"];
+    // localStorage.setItem("storedCart", JSON.stringify(cartData));
 
-    localStorage.removeItem("storedCart");
-    localStorage.removeItem("shippingAddress");
-    localStorage.removeItem("currentQuantities");
+    clearCart();
 
     // animation
     handleButtonClick(e);
@@ -329,29 +327,15 @@ const CheckoutPage = () => {
         throw new Error("Error updating user");
       }
 
-      const cartData: CartData = JSON.parse(
-        localStorage.getItem("storedCart") || "{}"
-      );
-      delete cartData[userId || "guest"];
-      localStorage.setItem("storedCart", JSON.stringify(cartData));
-
-      localStorage.removeItem("storedCart");
-      localStorage.removeItem("shippingAddress");
-      localStorage.removeItem("currentQuantities");
+      clearCart();
 
       swal({
-        title: "Order Placed Successfully!",
-        text: "Thank you for your purchase. Please check your purchase order for order details.",
-        icon: "success",
-        buttons: {
-          ok: {
-            text: "OK",
-            value: true,
-            className: "swal-ok-button",
-          },
-        },
+          title: "Order Placed Successfully!",
+          text: "Thank you for your purchase. Please check your order details.",
+          icon: "success",
+          buttons: { ok: { text: "OK", value: true, className: "swal-ok-button" } },
       }).then(() => {
-        window.location.href = "/MyOrderPage";
+          window.location.href = "/MyOrderPage";
       });
     } catch (error) {
       console.error("Error in handlePaypalSuccess:", {
@@ -367,6 +351,13 @@ const CheckoutPage = () => {
       });
     }
   };
+
+  const clearCart = () => {
+    localStorage.removeItem("storedCart");
+    localStorage.removeItem("shippingAddress");
+    localStorage.removeItem("currentQuantities");
+    setCart([]);// Cập nhật state giỏ hàng để UI phản hồi ngay lập tức
+};
 
   const handlePaypalError = (error: Error | unknown) => {
     console.error("PayPal error:", error);

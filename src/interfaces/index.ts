@@ -89,6 +89,8 @@ export interface CartContextType {
   incrementQuantity: (productId: number) => void;
   decrementQuantity: (productId: number) => void;
   removeItems: (productId: number) => void;
+  setCart: React.Dispatch<React.SetStateAction<CartProductItem[]>>; // Thêm dòng này
+
 }
 
 export interface CartProductItem {
